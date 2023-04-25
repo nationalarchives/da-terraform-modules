@@ -1,4 +1,4 @@
-name: TDR Run Terraform Checks
+name: Run Terraform Checks
 on:
   pull_request:
 jobs:
