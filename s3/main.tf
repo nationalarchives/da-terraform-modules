@@ -41,7 +41,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 
 resource "aws_s3_bucket" "logging_bucket" {
   count  = var.create_log_bucket ? 1 : 0
-  bucket = var.bucket_name
+  bucket = "${var.bucket_name}-logs"
   tags = merge(
     var.common_tags,
     tomap(
