@@ -1,6 +1,4 @@
-variable "table_name" {
-  default = ""
-}
+variable "table_name" {}
 
 variable "read_capacity" {
   default = 5
