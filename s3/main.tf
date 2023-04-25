@@ -90,7 +90,7 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
 }
 
 resource "aws_s3_bucket_policy" "logging_bucket_policy" {
-  count = local.log_bucket_count
+  count      = local.log_bucket_count
   bucket     = aws_s3_bucket.logging_bucket[count.index].id
   policy     = var.logging_bucket_policy
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
