@@ -1,3 +1,6 @@
+locals {
+  log_bucket_count = var.create_log_bucket ? 1 : 0
+}
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
   tags = merge(
@@ -40,7 +43,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 }
 
 resource "aws_s3_bucket" "logging_bucket" {
-  count  = var.create_log_bucket ? 1 : 0
+  count  = local.log_bucket_count
   bucket = "${var.bucket_name}-logs"
   tags = merge(
     var.common_tags,
@@ -51,7 +54,7 @@ resource "aws_s3_bucket" "logging_bucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "logging_bucket_public_access" {
-  count                   = var.create_log_bucket ? 1 : 0
+  count                   = local.log_bucket_count
   bucket                  = aws_s3_bucket.logging_bucket[count.index].id
   block_public_acls       = true
   block_public_policy     = true
@@ -60,7 +63,7 @@ resource "aws_s3_bucket_public_access_block" "logging_bucket_public_access" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "logging_encryption_configuration" {
-  count  = var.create_log_bucket ? 1 : 0
+  count  = local.log_bucket_count
   bucket = aws_s3_bucket.logging_bucket[count.index].id
   rule {
     apply_server_side_encryption_by_default {
@@ -71,7 +74,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "logging_encryptio
 }
 
 resource "aws_s3_bucket_versioning" "logging_versioning_example" {
-  count  = var.create_log_bucket ? 1 : 0
+  count  = local.log_bucket_count
   bucket = aws_s3_bucket.logging_bucket[count.index].id
   versioning_configuration {
     status = "Enabled"
@@ -79,7 +82,7 @@ resource "aws_s3_bucket_versioning" "logging_versioning_example" {
 }
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  count  = var.create_log_bucket ? 1 : 0
+  count  = local.log_bucket_count
   bucket = aws_s3_bucket.bucket.id
 
   target_bucket = aws_s3_bucket.logging_bucket[count.index].id
@@ -87,7 +90,8 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
 }
 
 resource "aws_s3_bucket_policy" "logging_bucket_policy" {
-  bucket     = aws_s3_bucket.logging_bucket.*.id[0]
+  count = local.log_bucket_count
+  bucket     = aws_s3_bucket.logging_bucket[count.index].id
   policy     = var.logging_bucket_policy
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
