@@ -104,5 +104,5 @@ variable "sqs_queue_batching_window" {
 }
 
 variable "sqs_queue_concurrency" {
-  default = 2
+  default = null
 }
