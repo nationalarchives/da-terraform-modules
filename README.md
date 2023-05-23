@@ -11,6 +11,15 @@ Creates an S3 bucket with an optional bucket policy, all public access blocked a
 ## Dynamo
 Creates a Dynamo DB table. 
 
+## GitHub Repository Secrets
+Set repository secrets in GitHub
+
+## GitHub Environment Secrets
+Set environment secrets in GitHub
+
+## Lambda
+Create lambdas
+
 ## Using the modules
 You can either clone this repository into the root of your existing terraform project and reference the modules directly
 ```hcl
