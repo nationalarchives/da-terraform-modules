@@ -24,12 +24,9 @@ resource "aws_lambda_function" "lambda_function" {
       local_mount_path = file_system_config.value.mount_path
     }
   }
-  dynamic "vpc_config" {
-    for_each = var.vpc_config
-    content {
-      subnet_ids         = vpc_config.value.subnet_ids
-      security_group_ids = vpc_config.value.security_group_ids
-    }
+  vpc_config {
+    security_group_ids = var.vpc_config.security_group_ids
+    subnet_ids         = var.vpc_config.subnet_ids
   }
 
   lifecycle {
@@ -38,8 +35,9 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-  name = "/aws/lambda/${aws_lambda_function.lambda_function.function_name}"
-  tags = var.tags
+  name              = "/aws/lambda/${aws_lambda_function.lambda_function.function_name}"
+  retention_in_days = var.log_retention
+  tags              = var.tags
 }
 
 locals {
@@ -55,10 +53,23 @@ resource "aws_kms_ciphertext" "encrypted_environment_variables" {
 }
 
 resource "aws_lambda_event_source_mapping" "sqs_queue_mappings" {
-  for_each         = var.lambda_sqs_queue_mappings
-  event_source_arn = each.key
-  function_name    = aws_lambda_function.lambda_function.*.arn[0]
-  batch_size       = 1
+  for_each                           = var.lambda_sqs_queue_mappings
+  event_source_arn                   = each.key
+  function_name                      = aws_lambda_function.lambda_function.*.arn[0]
+  batch_size                         = var.sqs_queue_mapping_batch_size
+  maximum_batching_window_in_seconds = var.sqs_queue_batching_window
+  scaling_config {
+    maximum_concurrency = var.sqs_queue_concurrency
+  }
+
+}
+
+resource "aws_lambda_permission" "sqs_permissions" {
+  for_each      = var.lambda_sqs_queue_mappings
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_function.function_name
+  principal     = "sqs.amazonaws.com"
+  source_arn    = each.value
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {
@@ -72,7 +83,7 @@ resource "aws_lambda_permission" "lambda_permissions" {
 
 resource "aws_iam_role" "lambda_iam_role" {
   assume_role_policy = templatefile("${path.module}/templates/lambda_assume_role.json.tpl", {})
-  name               = var.role_name
+  name               = "${var.function_name}Role"
 }
 
 resource "aws_iam_policy" "lambda_policies" {

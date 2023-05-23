@@ -32,14 +32,16 @@ variable "timeout_seconds" {
 }
 
 variable "memory_size" {
-  default = 1024
+  default = 256
 }
 
 variable "reserved_concurrency" {
-  default = 1
+  default = -1
 }
 
-variable "tags" {}
+variable "tags" {
+  type = map(string)
+}
 
 variable "efs_access_points" {
   type = list(object({
@@ -47,24 +49,24 @@ variable "efs_access_points" {
     mount_path       = string
   }))
   default     = []
-  description = "A list of access point arns and mount paths. This can be ommitted if EFS is not needed"
+  description = "A list of access point arns and mount paths. This can be omitted if EFS is not needed"
 }
 
 variable "vpc_config" {
-  type = list(object({
+  type = object({
     subnet_ids         = list(string)
     security_group_ids = list(string)
-  }))
+  })
+  default = {
+    subnet_ids         = [],
+    security_group_ids = []
+  }
 }
 
 variable "lambda_sqs_queue_mappings" {
   type        = set(string)
   default     = []
-  description = "A list of sqs queues which can trigger this lambda"
-}
-
-variable "role_name" {
-  description = "The lambda execution role name. The role will be created by the module"
+  description = "A list of sqs queue arns which can trigger this lambda"
 }
 
 variable "storage_size" {
@@ -87,4 +89,20 @@ variable "policy_attachments" {
   type        = set(string)
   default     = []
   description = "A list of policy arns to attach. These will need to be pre-existing policies"
+}
+
+variable "log_retention" {
+  default = 30
+}
+
+variable "sqs_queue_mapping_batch_size" {
+  default = 1
+}
+
+variable "sqs_queue_batching_window" {
+  default = 0
+}
+
+variable "sqs_queue_concurrency" {
+  default = 2
 }
