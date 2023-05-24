@@ -55,20 +55,10 @@ resource "aws_route" "internet_access" {
   gateway_id             = aws_internet_gateway.gw.id
 }
 
-resource "aws_eip" "gw" {
-  count      = var.az_count
-  vpc        = true
-  depends_on = [aws_internet_gateway.gw]
-
-  tags = merge(
-    var.tags
-  )
-}
-
 resource "aws_nat_gateway" "gw" {
-  count         = var.az_count
+  count         = length(var.elastic_ip_ids)
   subnet_id     = aws_subnet.public.*.id[count.index]
-  allocation_id = aws_eip.gw.*.id[count.index]
+  allocation_id = var.elastic_ip_ids[count.index]
 
   tags = merge(
     var.tags,
@@ -78,8 +68,8 @@ resource "aws_nat_gateway" "gw" {
   )
 }
 
-resource "aws_route_table" "private" {
-  count  = var.az_count
+resource "aws_route_table" "private_nat_gateway" {
+  count  = length(var.elastic_ip_ids)
   vpc_id = aws_vpc.main.id
 
   route {
@@ -95,8 +85,33 @@ resource "aws_route_table" "private" {
   )
 }
 
-resource "aws_route_table_association" "private" {
-  count          = var.az_count
-  subnet_id      = aws_subnet.private.*.id[count.index]
-  route_table_id = aws_route_table.private.*.id[count.index]
+resource "aws_route_table" "private_nat_instance" {
+  count  = length(var.network_interface_ids)
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block           = "0.0.0.0/0"
+    network_interface_id = var.network_interface_ids[count.index]
+  }
+
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-route-table-${count.index}" }
+    )
+  )
+}
+
+resource "aws_route_table_association" "private_nat_instance" {
+  count     = length(var.network_interface_ids) > 0 ? var.az_count : 0
+  subnet_id = aws_subnet.private.*.id[count.index]
+  // If AZ count is higher than the number of ENI ids provided, assign all remaining subnets to the last ENI
+  route_table_id = count.index > length(var.network_interface_ids) - 1 ? var.network_interface_ids[length(var.network_interface_ids) - 1] : var.network_interface_ids[count.index]
+}
+
+resource "aws_route_table_association" "private_nat_gateway" {
+  count     = length(var.elastic_ip_ids) > 0 ? var.az_count : 0
+  subnet_id = aws_subnet.private.*.id[count.index]
+  // If AZ count is higher than the number of elastic IPs provided, assign all remaining subnets to the last NAT gateway
+  route_table_id = count.index > length(var.elastic_ip_ids) - 1 ? aws_route_table.private_nat_gateway.*.id[length(var.elastic_ip_ids) - 1] : aws_route_table.private_nat_gateway.*.id[count.index]
 }
