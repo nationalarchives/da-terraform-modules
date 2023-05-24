@@ -33,7 +33,13 @@ Creates an IAM role and attaches the policies passed to it.
 Takes a list of objects describing the ssm parameters. You can optionally ignore value changes so terraform won't overwrite changes made elsewhere.
 
 ## VPC
-Creates a VPC with public security groups routing through an internet gateway and private security groups through a NAT gateway. 
+Creates a VPC with public security groups routing through an internet gateway and private security groups through a NAT gateway.
+
+## SNS
+Creates an SNS queue. A list of Lambda or SQS can be passed and will be subscribed to this queue.
+
+## SQS
+Creates an SQS queue.
 
 ## Using the modules
 You can either clone this repository into the root of your existing terraform project and reference the modules directly

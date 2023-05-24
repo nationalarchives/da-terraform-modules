@@ -44,7 +44,7 @@ variable "fifo_queue" {
   default = false
 }
 
-variable "encrypt_with_sqs_keys" {
+variable "encrypt_with_sse_sqs" {
   type        = bool
   description = "Encrypt the queue contents at rest with SQS encryption keys. "
   default     = true

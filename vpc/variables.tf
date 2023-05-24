@@ -16,9 +16,9 @@ variable "cidr_block" {
   default = "10.0.0.0/16"
 }
 
-variable "new_bits" {
-  default     = 8
-  description = "The number of bits to extend the network prefix by when creating subnets. A /16 VPC CIDR block and a new_bits value of 8 will return a /24 subnet"
+variable "subnet_cidr_prefix" {
+  default     = "/24"
+  description = "The cidr prefix to determine the subnet sizes"
 }
 
 variable "elastic_ip_ids" {

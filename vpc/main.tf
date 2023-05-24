@@ -1,3 +1,7 @@
+locals {
+  new_bits = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
+}
+
 data "aws_availability_zones" "available" {
 }
 
@@ -18,21 +22,21 @@ resource "aws_default_security_group" "default" {
 
 resource "aws_subnet" "private" {
   count             = var.az_count
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, var.new_bits, count.index)
+  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, count.index)
   availability_zone = data.aws_availability_zones.available.names[count.index]
   vpc_id            = aws_vpc.main.id
 
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-private-subnet-${count.index}" }
+      { "Name" = "${var.vpc_name}-private-subnet-${data.aws_availability_zones.available.names[count.index]}" }
     )
   )
 }
 
 resource "aws_subnet" "public" {
   count                   = var.az_count
-  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, var.new_bits, var.az_count + count.index)
+  cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, var.az_count + count.index)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   vpc_id                  = aws_vpc.main.id
   map_public_ip_on_launch = true
@@ -40,7 +44,7 @@ resource "aws_subnet" "public" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-public-subnet-${count.index}" }
+      { "Name" = "${var.vpc_name}-public-subnet-${data.aws_availability_zones.available.names[count.index]}" }
     )
   )
 }

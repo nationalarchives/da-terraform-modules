@@ -12,15 +12,17 @@ resource "aws_sns_topic" "sns_topic" {
 }
 
 resource "aws_sns_topic_subscription" "lambda_subscriptions" {
-  for_each  = var.lambda_subscriptions
-  endpoint  = each.value
-  protocol  = "lambda"
-  topic_arn = aws_sns_topic.sns_topic.arn
+  for_each             = var.lambda_subscriptions
+  endpoint             = each.value
+  protocol             = "lambda"
+  topic_arn            = aws_sns_topic.sns_topic.arn
+  raw_message_delivery = true
 }
 
 resource "aws_sns_topic_subscription" "sqs_subscriptions" {
-  for_each  = var.sqs_subscriptions
-  endpoint  = each.value
-  protocol  = "sqs"
-  topic_arn = aws_sns_topic.sns_topic.arn
+  for_each             = var.sqs_subscriptions
+  endpoint             = each.value
+  protocol             = "sqs"
+  topic_arn            = aws_sns_topic.sns_topic.arn
+  raw_message_delivery = true
 }
