@@ -85,7 +85,7 @@ resource "aws_lambda_permission" "lambda_permissions" {
 
 resource "aws_iam_role" "lambda_iam_role" {
   assume_role_policy = templatefile("${path.module}/templates/lambda_assume_role.json.tpl", {})
-  name               = "${var.function_name}Role"
+  name               = "${var.function_name}-role"
 }
 
 resource "aws_iam_policy" "lambda_policies" {
