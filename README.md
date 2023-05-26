@@ -41,6 +41,9 @@ Creates an SNS queue. A list of Lambda or SQS can be passed and will be subscrib
 ## SQS
 Creates an SQS queue.
 
+## Security Group
+Creates a security group with rules passed to it.
+
 ## Using the modules
 You can either clone this repository into the root of your existing terraform project and reference the modules directly
 ```hcl
