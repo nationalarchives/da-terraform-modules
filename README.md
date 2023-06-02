@@ -20,6 +20,30 @@ Set environment secrets in GitHub
 ## Lambda
 Create lambdas
 
+## Cloudwatch Events
+Creates a cloudwatch event based on either an event pattern or a schedule. Can send to a lambda, an SQS, an SNS topic or a mix of all of them.
+
+## IAM Policy
+Creates an IAM policy from a string
+
+## IAM Role
+Creates an IAM role and attaches the policies passed to it.
+
+## SSM Parameter
+Takes a list of objects describing the ssm parameters. You can optionally ignore value changes so terraform won't overwrite changes made elsewhere.
+
+## VPC
+Creates a VPC with public security groups routing through an internet gateway and private security groups through a NAT gateway.
+
+## SNS
+Creates an SNS queue. A list of Lambda or SQS can be passed and will be subscribed to this queue.
+
+## SQS
+Creates an SQS queue.
+
+## Security Group
+Creates a security group with rules passed to it.
+
 ## Using the modules
 You can either clone this repository into the root of your existing terraform project and reference the modules directly
 ```hcl
