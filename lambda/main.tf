@@ -119,5 +119,4 @@ resource "aws_iam_role_policy_attachment" "vpc_access_policy_attachment" {
   count      = local.vpc_config_policy_count
   policy_arn = aws_iam_policy.vpc_access_policy[count.index].arn
   role       = aws_iam_role.lambda_iam_role.name
-
 }
