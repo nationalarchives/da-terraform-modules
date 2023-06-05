@@ -32,3 +32,11 @@ variable "network_interface_ids" {
   type        = list(string)
   default     = []
 }
+
+variable "enable_dns_hostnames" {
+  default = true
+}
+
+variable "enable_dns_support" {
+  default = true
+}
