@@ -110,7 +110,7 @@ resource "aws_route_table_association" "private_nat_instance" {
   count     = length(var.network_interface_ids) > 0 ? var.az_count : 0
   subnet_id = aws_subnet.private.*.id[count.index]
   // If AZ count is higher than the number of ENI ids provided, assign all remaining subnets to the last ENI
-  route_table_id = count.index > length(var.network_interface_ids) - 1 ? var.network_interface_ids[length(var.network_interface_ids) - 1] : var.network_interface_ids[count.index]
+  route_table_id = count.index > length(var.network_interface_ids) - 1 ? aws_route_table.private_nat_instance.*.id[length(var.network_interface_ids) - 1] : aws_route_table.private_nat_instance.*.id[count.index]
 }
 
 resource "aws_route_table_association" "private_nat_gateway" {
