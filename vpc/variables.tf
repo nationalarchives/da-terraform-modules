@@ -22,7 +22,8 @@ variable "subnet_cidr_prefix" {
 }
 
 variable "create_nat_gateway" {
-  default = false
+  description = "Will create a NAT gateway when true. Otherwise, it will use https://github.com/1debit/alternat to create a NAT instance"
+  default     = false
 }
 
 variable "elastic_ip_ids" {
@@ -37,6 +38,7 @@ variable "nat_instance_settings" {
     nat_instance_type             = optional(string, "t4g.nano")
     nat_instance_iam_profile_name = optional(string)
     nat_instance_iam_role_name    = optional(string)
+    create_nat_gateway            = optional(bool, true)
   })
   default     = {}
   description = "Settings for the NAT instance. Must be provided if create_nat_gateway is false"

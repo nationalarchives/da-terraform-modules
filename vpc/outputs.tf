@@ -13,3 +13,7 @@ output "public_subnets" {
 output "vpc_id" {
   value = aws_vpc.main.id
 }
+
+output "cloud_init" {
+  value = data.cloudinit_config.user_data_config.rendered
+}

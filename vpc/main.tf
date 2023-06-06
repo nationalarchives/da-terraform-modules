@@ -126,7 +126,6 @@ data "aws_network_interface" "interface" {
     name   = "association.allocation-id"
     values = [var.elastic_ip_ids[count.index]]
   }
-  depends_on = [module.alternat_instances]
 }
 
 resource "aws_route" "nat_instance_route" {
@@ -134,37 +133,30 @@ resource "aws_route" "nat_instance_route" {
   route_table_id         = aws_route_table.private_nat_instance[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = data.aws_network_interface.interface[count.index].id
-  depends_on             = [module.alternat_instances]
 }
 
-module "alternat_instances" {
-  count                         = var.create_nat_gateway ? 0 : 1
-  source                        = "git::https://github.com/1debit/alternat.git//modules/terraform-aws-alternat?ref=v0.4.2"
-  lambda_package_type           = "Zip"
-  ingress_security_group_ids    = [var.nat_instance_settings.security_group]
-  vpc_id                        = aws_vpc.main.id
-  vpc_az_maps                   = local.vpc_az_maps
-  create_nat_gateways           = false
-  nat_instance_type             = var.nat_instance_settings.nat_instance_type
-  nat_instance_iam_profile_name = var.nat_instance_settings.nat_instance_iam_profile_name
-  nat_instance_iam_role_name    = var.nat_instance_settings.nat_instance_iam_role_name
-  nat_instance_eip_ids          = var.elastic_ip_ids
-  nat_instance_block_devices = {
-    xvda = {
-      device_name = "/dev/xvda"
-      ebs = {
-        encrypted   = true
-        volume_type = "gp3"
-        volume_size = 20
-      }
-    }
+data "cloudinit_config" "user_data_config" {
+  part {
+    filename     = "cloud-config.yaml"
+    content_type = "text/cloud-config"
+
+    content = file("${path.module}/templates/cloud-config.yml")
   }
-  tags = merge(
-    var.tags,
-    tomap({
-      Name = "NAT instance resource"
-    })
-  )
+}
+
+data "aws_ami" "ami" {
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*x86_64"]
+  }
+  owners = ["137112412989"]
+}
+
+resource "aws_instance" "nat_instance" {
+  ami           = data.aws_ami.ami.id
+  user_data     = data.cloudinit_config.user_data_config.rendered
+  instance_type = "t3.nano"
 }
 
 resource "aws_route_table_association" "private_nat_gateway" {
