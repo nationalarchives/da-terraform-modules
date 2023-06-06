@@ -7,7 +7,7 @@ function die {
     exit 1
 }
 
-log "Enabling PAT..."
+log "Enabling PAT"
 dnf update -y
 dnf install -y iptables
 sysctl -q -w net.ipv4.ip_forward=1 net.ipv4.conf.ens5.send_redirects=0 && (
