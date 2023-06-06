@@ -33,11 +33,13 @@ variable "elastic_ip_ids" {
 
 variable "nat_instance_settings" {
   type = object({
-    security_group                = string
+    security_group                = optional(string)
     nat_instance_type             = optional(string, "t4g.nano")
     nat_instance_iam_profile_name = optional(string)
     nat_instance_iam_role_name    = optional(string)
   })
+  default     = {}
+  description = "Settings for the NAT instance. Must be provided if create_nat_gateway is false"
 }
 
 variable "enable_dns_hostnames" {
