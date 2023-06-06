@@ -21,16 +21,23 @@ variable "subnet_cidr_prefix" {
   description = "The cidr prefix to determine the subnet sizes"
 }
 
+variable "create_nat_gateway" {
+  default = false
+}
+
 variable "elastic_ip_ids" {
-  description = "A list of elastic IPs to assign to the NAT gateway if it is used. Can't be used with network_interface_ids"
+  description = "A list of elastic IPs to assign to the NAT gateway or the NAT instance"
   type        = list(string)
   default     = []
 }
 
-variable "network_interface_ids" {
-  description = "A list of EC2 ENI ids to attach to a route table. Can't be used with elastic_ip_ids"
-  type        = list(string)
-  default     = []
+variable "nat_instance_settings" {
+  type = object({
+    security_group                = string
+    nat_instance_type             = optional(string, "t4g.nano")
+    nat_instance_iam_profile_name = optional(string)
+    nat_instance_iam_role_name    = optional(string)
+  })
 }
 
 variable "enable_dns_hostnames" {
