@@ -127,21 +127,37 @@ data "aws_ami" "ami" {
 }
 
 resource "aws_instance" "nat_instance" {
-  for_each      = var.network_interface_ids
+  count         = length(var.network_interface_ids)
   ami           = data.aws_ami.ami[0].id
   user_data     = data.cloudinit_config.user_data_config[0].rendered
   instance_type = "t3.nano"
   network_interface {
-    device_index         = 0
-    network_interface_id = each.value
+    device_index         = count.index
+    network_interface_id = var.network_interface_ids[count.index]
   }
+  iam_instance_profile = aws_iam_instance_profile.instance_profile.id
+}
+
+resource "aws_iam_role" "instance_role" {
+  assume_role_policy = templatefile("${path.module}/templates/ec2_assume_role.json.tpl", {})
+  name               = "${var.vpc_name}-iam-role"
+}
+
+resource "aws_iam_role_policy_attachment" "instance_role_policy_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.instance_role.name
+}
+
+resource "aws_iam_instance_profile" "instance_profile" {
+  role = aws_iam_role.instance_role.name
+  name = "${var.vpc_name}-instance-profile"
 }
 
 resource "aws_route_table_association" "private_nat_instance" {
   count     = length(var.network_interface_ids) > 0 ? var.az_count : 0
   subnet_id = aws_subnet.private.*.id[count.index]
   // If AZ count is higher than the number of ENI ids provided, assign all remaining subnets to the last ENI
-  route_table_id = count.index > length(var.network_interface_ids) - 1 ? var.network_interface_ids[length(var.network_interface_ids) - 1] : var.network_interface_ids[count.index]
+  route_table_id = count.index > length(var.network_interface_ids) - 1 ? aws_route_table.private_nat_instance.*.id[length(var.network_interface_ids) - 1] : aws_route_table.private_nat_instance.*.id[count.index]
 }
 
 resource "aws_route_table_association" "private_nat_gateway" {
