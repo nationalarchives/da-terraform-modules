@@ -106,16 +106,6 @@ resource "aws_route_table" "private_nat_instance" {
   )
 }
 
-data "cloudinit_config" "user_data_config" {
-  count = length(var.network_interface_ids) > 0 ? 1 : 0
-  part {
-    filename     = "cloud-config.yaml"
-    content_type = "text/cloud-config"
-
-    content = file("${path.module}/templates/cloud_config.yml")
-  }
-}
-
 data "aws_ami" "ami" {
   count       = length(var.network_interface_ids) > 0 ? 1 : 0
   most_recent = true
@@ -129,7 +119,7 @@ data "aws_ami" "ami" {
 resource "aws_instance" "nat_instance" {
   count         = length(var.network_interface_ids)
   ami           = data.aws_ami.ami[0].id
-  user_data     = data.cloudinit_config.user_data_config[0].rendered
+  user_data     = templatefile("${path.module}/templates/nat_instance_user_data.sh.tpl", { vpc_cidr_range = aws_vpc.main.cidr_block })
   instance_type = "t3.nano"
   network_interface {
     device_index         = count.index

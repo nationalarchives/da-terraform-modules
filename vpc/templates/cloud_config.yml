@@ -1,9 +1,0 @@
-repo_update: true
-repo_upgrade: all
-
-packages:
-  - iptables
-
-runcmd:
-  - systemctl enable iptables
-  - systemctl start iptables
