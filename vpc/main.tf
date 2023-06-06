@@ -106,6 +106,37 @@ resource "aws_route_table" "private_nat_instance" {
   )
 }
 
+data "cloudinit_config" "user_data_config" {
+  count = length(var.network_interface_ids) > 0 ? 1 : 0
+  part {
+    filename     = "cloud-config.yaml"
+    content_type = "text/cloud-config"
+
+    content = file("${path.module}/templates/cloud_config.yml")
+  }
+}
+
+data "aws_ami" "ami" {
+  count       = length(var.network_interface_ids) > 0 ? 1 : 0
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*x86_64"]
+  }
+  owners = ["137112412989"]
+}
+
+resource "aws_instance" "nat_instance" {
+  for_each      = var.network_interface_ids
+  ami           = data.aws_ami.ami[0].id
+  user_data     = data.cloudinit_config.user_data_config[0].rendered
+  instance_type = "t3.nano"
+  network_interface {
+    device_index         = 0
+    network_interface_id = each.value
+  }
+}
+
 resource "aws_route_table_association" "private_nat_instance" {
   count     = length(var.network_interface_ids) > 0 ? var.az_count : 0
   subnet_id = aws_subnet.private.*.id[count.index]
