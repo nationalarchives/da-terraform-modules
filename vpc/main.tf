@@ -54,6 +54,12 @@ resource "aws_subnet" "public" {
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-internet-gateway-${data.aws_availability_zones.available.names[0]}" }
+    )
+  )
 }
 
 resource "aws_route" "internet_access" {
@@ -153,6 +159,12 @@ module "alternat_instances" {
       }
     }
   }
+  tags = merge(
+    var.tags,
+    tomap({
+      Name = "NAT instance resource"
+    })
+  )
 }
 
 resource "aws_route_table_association" "private_nat_gateway" {
@@ -165,6 +177,6 @@ resource "aws_route_table_association" "private_nat_gateway" {
 resource "aws_route_table_association" "private_nat_instance" {
   count     = local.nat_instance_count > 0 ? var.az_count : 0
   subnet_id = aws_subnet.private.*.id[count.index]
-  // If AZ count is higher than the number of elastic IPs provided, assign all remaining subnets to the last NAT gateway
+  // If AZ count is higher than the number of elastic IPs provided, assign all remaining subnets to the last NAT instance
   route_table_id = count.index > length(var.elastic_ip_ids) - 1 ? aws_route_table.private_nat_instance.*.id[length(var.elastic_ip_ids) - 1] : aws_route_table.private_nat_instance.*.id[count.index]
 }
