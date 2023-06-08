@@ -69,7 +69,7 @@ resource "aws_internet_gateway" "gw" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-igw-${data.aws_availability_zones.available.names[count.index]}" }
+      { "Name" = "${var.vpc_name}-igw" }
     )
   )
 }
@@ -81,7 +81,7 @@ resource "aws_route" "internet_access" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-public-route-${data.aws_availability_zones.available.names[0]}" }
+      { "Name" = "${var.vpc_name}-public-route" }
     )
   )
 }
@@ -175,7 +175,7 @@ resource "aws_iam_role" "instance_role" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-nat-instance-role-${data.aws_availability_zones.available.names[count.index]}" }
+      { "Name" = "${var.vpc_name}-nat-instance-role" }
     )
   )
 }
