@@ -1,5 +1,13 @@
 locals {
-  new_bits = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
+  new_bits           = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
+  ip_count           = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
+  count_nat_gateway  = var.use_nat_gateway ? local.ip_count : 0
+  count_nat_instance = var.use_nat_gateway ? 0 : local.ip_count
+}
+
+resource "aws_eip" "eip" {
+  count  = length(var.elastic_ip_allocation_ids) > 0 ? 0 : var.az_count
+  domain = "vpc"
 }
 
 data "aws_availability_zones" "available" {
@@ -60,9 +68,9 @@ resource "aws_route" "internet_access" {
 }
 
 resource "aws_nat_gateway" "gw" {
-  count         = length(var.elastic_ip_ids)
+  count         = local.count_nat_gateway
   subnet_id     = aws_subnet.public.*.id[count.index]
-  allocation_id = var.elastic_ip_ids[count.index]
+  allocation_id = var.elastic_ip_allocation_ids[count.index]
 
   tags = merge(
     var.tags,
@@ -73,7 +81,7 @@ resource "aws_nat_gateway" "gw" {
 }
 
 resource "aws_route_table" "private_nat_gateway" {
-  count  = length(var.elastic_ip_ids)
+  count  = local.count_nat_gateway
   vpc_id = aws_vpc.main.id
 
   route {
@@ -90,12 +98,12 @@ resource "aws_route_table" "private_nat_gateway" {
 }
 
 resource "aws_route_table" "private_nat_instance" {
-  count  = length(var.network_interface_ids)
+  count  = local.count_nat_instance
   vpc_id = aws_vpc.main.id
 
   route {
     cidr_block           = "0.0.0.0/0"
-    network_interface_id = var.network_interface_ids[count.index]
+    network_interface_id = aws_instance.nat_instance[count.index].primary_network_interface_id
   }
 
   tags = merge(
@@ -104,10 +112,11 @@ resource "aws_route_table" "private_nat_instance" {
       { "Name" = "${var.vpc_name}-route-table-${count.index}" }
     )
   )
+  depends_on = [aws_instance.nat_instance]
 }
 
 data "aws_ami" "ami" {
-  count       = length(var.network_interface_ids) > 0 ? 1 : 0
+  count       = var.use_nat_gateway ? 0 : 1
   most_recent = true
   filter {
     name   = "name"
@@ -117,17 +126,22 @@ data "aws_ami" "ami" {
 }
 
 resource "aws_instance" "nat_instance" {
-  count         = length(var.network_interface_ids)
-  ami           = data.aws_ami.ami[0].id
-  user_data     = templatefile("${path.module}/templates/nat_instance_user_data.sh.tpl", { vpc_cidr_range = aws_vpc.main.cidr_block })
-  instance_type = "t3.nano"
-  network_interface {
-    device_index         = count.index
-    network_interface_id = var.network_interface_ids[count.index]
-  }
-  source_dest_check           = false
+  count             = local.count_nat_instance
+  ami               = data.aws_ami.ami[0].id
+  user_data         = templatefile("${path.module}/templates/nat_instance_user_data.sh.tpl", { vpc_cidr_range = aws_vpc.main.cidr_block })
+  instance_type     = "t3.nano"
+  source_dest_check = false
+
   iam_instance_profile        = aws_iam_instance_profile.instance_profile.id
   user_data_replace_on_change = true
+  subnet_id                   = aws_subnet.public[count.index].id
+  vpc_security_group_ids      = var.nat_instance_security_groups
+}
+
+resource "aws_eip_association" "eip_assoc" {
+  count         = local.count_nat_instance
+  instance_id   = aws_instance.nat_instance[count.index].id
+  allocation_id = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip[count.index].allocation_id : var.elastic_ip_allocation_ids[count.index]
 }
 
 resource "aws_iam_role" "instance_role" {
@@ -146,15 +160,15 @@ resource "aws_iam_instance_profile" "instance_profile" {
 }
 
 resource "aws_route_table_association" "private_nat_instance" {
-  count     = length(var.network_interface_ids) > 0 ? var.az_count : 0
+  count     = local.count_nat_instance > 0 ? var.az_count : 0
   subnet_id = aws_subnet.private.*.id[count.index]
   // If AZ count is higher than the number of ENI ids provided, assign all remaining subnets to the last ENI
-  route_table_id = count.index > length(var.network_interface_ids) - 1 ? aws_route_table.private_nat_instance.*.id[length(var.network_interface_ids) - 1] : aws_route_table.private_nat_instance.*.id[count.index]
+  route_table_id = count.index > local.count_nat_instance - 1 ? aws_route_table.private_nat_instance.*.id[local.count_nat_instance - 1] : aws_route_table.private_nat_instance.*.id[count.index]
 }
 
 resource "aws_route_table_association" "private_nat_gateway" {
-  count     = length(var.elastic_ip_ids) > 0 ? var.az_count : 0
+  count     = local.count_nat_gateway > 0 ? var.az_count : 0
   subnet_id = aws_subnet.private.*.id[count.index]
   // If AZ count is higher than the number of elastic IPs provided, assign all remaining subnets to the last NAT gateway
-  route_table_id = count.index > length(var.elastic_ip_ids) - 1 ? aws_route_table.private_nat_gateway.*.id[length(var.elastic_ip_ids) - 1] : aws_route_table.private_nat_gateway.*.id[count.index]
+  route_table_id = count.index > local.count_nat_gateway - 1 ? aws_route_table.private_nat_gateway.*.id[local.count_nat_gateway - 1] : aws_route_table.private_nat_gateway.*.id[count.index]
 }
