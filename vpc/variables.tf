@@ -33,6 +33,11 @@ variable "nat_instance_security_groups" {
   default     = []
 }
 
+variable "nat_instance_type" {
+  description = "The instance type for the NAT instance"
+  default     = "t3.nano"
+}
+
 variable "use_nat_gateway" {
   description = "Will create a nat gateway if set to true and a nat instance otherwise"
   default     = false

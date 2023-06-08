@@ -130,7 +130,7 @@ resource "aws_instance" "nat_instance" {
   count             = local.count_nat_instance
   ami               = data.aws_ami.ami[0].id
   user_data         = templatefile("${path.module}/templates/nat_instance_user_data.sh.tpl", { vpc_cidr_range = aws_vpc.main.cidr_block })
-  instance_type     = "t3.nano"
+  instance_type     = var.nat_instance_type
   source_dest_check = false
 
   iam_instance_profile        = aws_iam_instance_profile.instance_profile.id
