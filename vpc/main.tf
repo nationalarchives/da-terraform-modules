@@ -125,6 +125,7 @@ resource "aws_instance" "nat_instance" {
     device_index         = count.index
     network_interface_id = var.network_interface_ids[count.index]
   }
+  source_dest_check           = false
   iam_instance_profile        = aws_iam_instance_profile.instance_profile.id
   user_data_replace_on_change = true
 }
