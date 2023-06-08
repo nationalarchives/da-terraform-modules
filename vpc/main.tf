@@ -69,7 +69,7 @@ resource "aws_internet_gateway" "gw" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-igw-${count.index}" }
+      { "Name" = "${var.vpc_name}-igw-${data.aws_availability_zones.available.names[count.index]}" }
     )
   )
 }
@@ -81,7 +81,7 @@ resource "aws_route" "internet_access" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-public-route-${count.index}" }
+      { "Name" = "${var.vpc_name}-public-route-${data.aws_availability_zones.available.names[0]}" }
     )
   )
 }
@@ -94,7 +94,7 @@ resource "aws_nat_gateway" "gw" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-nat-gateway-${count.index}" }
+      { "Name" = "${var.vpc_name}-nat-gateway-${data.aws_availability_zones.available.names[count.index]}" }
     )
   )
 }
@@ -111,7 +111,7 @@ resource "aws_route_table" "private_nat_gateway" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-nat-gateway-route-table-${count.index}" }
+      { "Name" = "${var.vpc_name}-nat-gateway-route-table-${data.aws_availability_zones.available.names[count.index]}" }
     )
   )
 }
@@ -128,7 +128,7 @@ resource "aws_route_table" "private_nat_instance" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-nat-instance-route-table-${count.index}" }
+      { "Name" = "${var.vpc_name}-nat-instance-route-table-${data.aws_availability_zones.available.names[count.index]}" }
     )
   )
   depends_on = [aws_instance.nat_instance]
