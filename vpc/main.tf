@@ -78,12 +78,6 @@ resource "aws_route" "internet_access" {
   route_table_id         = aws_vpc.main.main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw.id
-  tags = merge(
-    var.tags,
-    tomap(
-      { "Name" = "${var.vpc_name}-public-route" }
-    )
-  )
 }
 
 resource "aws_nat_gateway" "gw" {
@@ -191,7 +185,7 @@ resource "aws_iam_instance_profile" "instance_profile" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-nat-instance-profile-${data.aws_availability_zones.available.names[count.index]}" }
+      { "Name" = "${var.vpc_name}-nat-instance-profile" }
     )
   )
 }
