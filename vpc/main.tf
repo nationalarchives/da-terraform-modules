@@ -3,6 +3,7 @@ locals {
   ip_count           = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
   count_nat_gateway  = var.use_nat_gateway ? local.ip_count : 0
   count_nat_instance = var.use_nat_gateway ? 0 : local.ip_count
+  allocation_ids     = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
 }
 
 resource "aws_eip" "eip" {
@@ -70,7 +71,7 @@ resource "aws_route" "internet_access" {
 resource "aws_nat_gateway" "gw" {
   count         = local.count_nat_gateway
   subnet_id     = aws_subnet.public.*.id[count.index]
-  allocation_id = var.elastic_ip_allocation_ids[count.index]
+  allocation_id = local.allocation_ids[count.index]
 
   tags = merge(
     var.tags,
@@ -141,7 +142,7 @@ resource "aws_instance" "nat_instance" {
 resource "aws_eip_association" "eip_assoc" {
   count         = local.count_nat_instance
   instance_id   = aws_instance.nat_instance[count.index].id
-  allocation_id = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip[count.index].allocation_id : var.elastic_ip_allocation_ids[count.index]
+  allocation_id = local.allocation_ids[count.index]
 }
 
 resource "aws_iam_role" "instance_role" {

@@ -17,8 +17,8 @@ variable "cidr_block" {
 }
 
 variable "subnet_cidr_prefix" {
-  default     = "/24"
   description = "The cidr prefix to determine the subnet sizes"
+  default     = "/24"
 }
 
 variable "elastic_ip_allocation_ids" {
@@ -28,10 +28,12 @@ variable "elastic_ip_allocation_ids" {
 }
 
 variable "nat_instance_security_groups" {
-  type    = list(string)
-  default = []
+  description = "A list of security groups for the NAT instance"
+  type        = list(string)
+  default     = []
 }
 
 variable "use_nat_gateway" {
-  default = false
+  description = "Will create a nat gateway if set to true and a nat instance otherwise"
+  default     = false
 }
