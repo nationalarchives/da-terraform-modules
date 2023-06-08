@@ -9,6 +9,12 @@ locals {
 resource "aws_eip" "eip" {
   count  = length(var.elastic_ip_allocation_ids) > 0 ? 0 : var.az_count
   domain = "vpc"
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-elastic-ip-${data.aws_availability_zones.available.names[count.index]}" }
+    )
+  )
 }
 
 data "aws_availability_zones" "available" {
@@ -60,12 +66,24 @@ resource "aws_subnet" "public" {
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-igw-${count.index}" }
+    )
+  )
 }
 
 resource "aws_route" "internet_access" {
   route_table_id         = aws_vpc.main.main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw.id
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-public-route-${count.index}" }
+    )
+  )
 }
 
 resource "aws_nat_gateway" "gw" {
@@ -93,7 +111,7 @@ resource "aws_route_table" "private_nat_gateway" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-route-table-${count.index}" }
+      { "Name" = "${var.vpc_name}-nat-gateway-route-table-${count.index}" }
     )
   )
 }
@@ -110,7 +128,7 @@ resource "aws_route_table" "private_nat_instance" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.vpc_name}-route-table-${count.index}" }
+      { "Name" = "${var.vpc_name}-nat-instance-route-table-${count.index}" }
     )
   )
   depends_on = [aws_instance.nat_instance]
@@ -137,6 +155,12 @@ resource "aws_instance" "nat_instance" {
   user_data_replace_on_change = true
   subnet_id                   = aws_subnet.public[count.index].id
   vpc_security_group_ids      = var.nat_instance_security_groups
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-nat-instance-${data.aws_availability_zones.available.names[count.index]}" }
+    )
+  )
 }
 
 resource "aws_eip_association" "eip_assoc" {
@@ -148,6 +172,12 @@ resource "aws_eip_association" "eip_assoc" {
 resource "aws_iam_role" "instance_role" {
   assume_role_policy = templatefile("${path.module}/templates/ec2_assume_role.json.tpl", {})
   name               = "${var.vpc_name}-iam-role"
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-nat-instance-role-${data.aws_availability_zones.available.names[count.index]}" }
+    )
+  )
 }
 
 resource "aws_iam_role_policy_attachment" "instance_role_policy_attach" {
@@ -158,6 +188,12 @@ resource "aws_iam_role_policy_attachment" "instance_role_policy_attach" {
 resource "aws_iam_instance_profile" "instance_profile" {
   role = aws_iam_role.instance_role.name
   name = "${var.vpc_name}-instance-profile"
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-nat-instance-profile-${data.aws_availability_zones.available.names[count.index]}" }
+    )
+  )
 }
 
 resource "aws_route_table_association" "private_nat_instance" {
