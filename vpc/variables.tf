@@ -17,18 +17,28 @@ variable "cidr_block" {
 }
 
 variable "subnet_cidr_prefix" {
-  default     = "/24"
   description = "The cidr prefix to determine the subnet sizes"
+  default     = "/24"
 }
 
-variable "elastic_ip_ids" {
-  description = "A list of elastic IPs to assign to the NAT gateway if it is used. Can't be used with network_interface_ids"
+variable "elastic_ip_allocation_ids" {
+  description = "A list of elastic IPs to assign to the NAT gateway if it is used."
   type        = list(string)
   default     = []
 }
 
-variable "network_interface_ids" {
-  description = "A list of EC2 ENI ids to attach to a route table. Can't be used with elastic_ip_ids"
+variable "nat_instance_security_groups" {
+  description = "A list of security groups for the NAT instance"
   type        = list(string)
   default     = []
+}
+
+variable "nat_instance_type" {
+  description = "The instance type for the NAT instance"
+  default     = "t3.nano"
+}
+
+variable "use_nat_gateway" {
+  description = "Will create a nat gateway if set to true and a nat instance otherwise"
+  default     = false
 }

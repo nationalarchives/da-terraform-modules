@@ -41,8 +41,9 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 }
 
 locals {
-  encrypted_env_vars = { for k, v in var.encrypted_env_vars : k => aws_kms_ciphertext.encrypted_environment_variables[k].ciphertext_blob }
-  all_env_vars       = merge(local.encrypted_env_vars, var.plaintext_env_vars)
+  encrypted_env_vars      = { for k, v in var.encrypted_env_vars : k => aws_kms_ciphertext.encrypted_environment_variables[k].ciphertext_blob }
+  all_env_vars            = merge(local.encrypted_env_vars, var.plaintext_env_vars)
+  vpc_config_policy_count = var.vpc_config.subnet_ids == [] ? 0 : 1
 }
 
 resource "aws_kms_ciphertext" "encrypted_environment_variables" {
@@ -103,5 +104,18 @@ resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
 resource "aws_iam_role_policy_attachment" "existing_policy_attachment" {
   for_each   = var.policy_attachments
   policy_arn = each.value
+  role       = aws_iam_role.lambda_iam_role.name
+}
+
+resource "aws_iam_policy" "vpc_access_policy" {
+  count       = local.vpc_config_policy_count
+  policy      = templatefile("${path.module}/templates/lambda_vpc_policy.json.tpl", {})
+  name        = "${var.function_name}-vpc-policy"
+  description = "Allows access to the VPC for function ${var.function_name}"
+}
+
+resource "aws_iam_role_policy_attachment" "vpc_access_policy_attachment" {
+  count      = local.vpc_config_policy_count
+  policy_arn = aws_iam_policy.vpc_access_policy[count.index].arn
   role       = aws_iam_role.lambda_iam_role.name
 }
