@@ -64,9 +64,9 @@ variable "vpc_config" {
 }
 
 variable "lambda_sqs_queue_mappings" {
-  type        = set(string)
-  default     = []
-  description = "A list of sqs queue arns which can trigger this lambda"
+  type        = map(string)
+  default     = {}
+  description = "A map of queue name to queue arn to trigger the lambda"
 }
 
 variable "storage_size" {
@@ -105,4 +105,9 @@ variable "sqs_queue_batching_window" {
 
 variable "sqs_queue_concurrency" {
   default = null
+}
+
+variable "filename" {
+  description = "Allows a filename to be passed directly to the module instead of using the generic ones"
+  default     = ""
 }

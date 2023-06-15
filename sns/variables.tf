@@ -14,11 +14,13 @@ variable "kms_key_arn" {
 }
 
 variable "lambda_subscriptions" {
-  type        = list(string)
-  description = "A list of lambda arns to subscribe to this topic"
+  type        = map(string)
+  description = "A map of lambda names to arns to subscribe to this topic"
+  default     = {}
 }
 
 variable "sqs_subscriptions" {
-  type        = list(string)
-  description = "A list of SQS arns to subscribe to this topic"
+  type        = map(string)
+  description = "A map of SQS names to arns to subscribe to this topic"
+  default     = {}
 }
