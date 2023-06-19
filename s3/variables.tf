@@ -15,3 +15,8 @@ variable "logging_bucket_policy" {
 variable "bucket_policy" {
   default = ""
 }
+
+variable "sns_topic_config" {
+  type    = map(string)
+  default = {}
+}

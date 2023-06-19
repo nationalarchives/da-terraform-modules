@@ -95,3 +95,14 @@ resource "aws_s3_bucket_policy" "logging_bucket_policy" {
   policy     = var.logging_bucket_policy
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  for_each = var.sns_topic_config
+  bucket   = aws_s3_bucket.bucket.id
+
+  topic {
+    topic_arn = each.value
+    events    = [each.key]
+  }
+}
+

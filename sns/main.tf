@@ -16,7 +16,7 @@ resource "aws_sns_topic_subscription" "lambda_subscriptions" {
   endpoint             = each.value
   protocol             = "lambda"
   topic_arn            = aws_sns_topic.sns_topic.arn
-  raw_message_delivery = true
+  raw_message_delivery = false
 }
 
 resource "aws_sns_topic_subscription" "sqs_subscriptions" {

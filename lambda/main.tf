@@ -3,7 +3,7 @@ resource "aws_lambda_function" "lambda_function" {
   handler       = var.handler
   role          = aws_iam_role.lambda_iam_role.arn
   runtime       = var.runtime
-  filename      = startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip"
+  filename      = var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
 
@@ -55,7 +55,7 @@ resource "aws_kms_ciphertext" "encrypted_environment_variables" {
 
 resource "aws_lambda_event_source_mapping" "sqs_queue_mappings" {
   for_each                           = var.lambda_sqs_queue_mappings
-  event_source_arn                   = each.key
+  event_source_arn                   = each.value
   function_name                      = aws_lambda_function.lambda_function.*.arn[0]
   batch_size                         = var.sqs_queue_mapping_batch_size
   maximum_batching_window_in_seconds = var.sqs_queue_batching_window
