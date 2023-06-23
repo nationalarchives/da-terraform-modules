@@ -34,6 +34,10 @@ variable "namespace" {
   description = "The namespace configured in Cloudwatch agent. Defaults to CWAgent"
 }
 
+variable "name" {
+  description = "The name of the alarm"
+}
+
 variable "notification_topic" {
   default     = ""
   description = "The SNS topic to send alarm notifications to"

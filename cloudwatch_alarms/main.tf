@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "cloudwatch_metric_alarm" {
-  alarm_name          = "${var.environment}-${var.queue_name}-DLQ-alarm"
+  alarm_name          = var.name
   comparison_operator = var.comparison_operator
   evaluation_periods  = var.evaluation_period
   datapoints_to_alarm = var.datapoints_to_alarm
