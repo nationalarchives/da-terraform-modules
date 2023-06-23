@@ -144,7 +144,9 @@ resource "aws_instance" "nat_instance" {
   user_data         = templatefile("${path.module}/templates/nat_instance_user_data.sh.tpl", { vpc_cidr_range = aws_vpc.main.cidr_block })
   instance_type     = var.nat_instance_type
   source_dest_check = false
-
+  root_block_device {
+    encrypted = true
+  }
   iam_instance_profile        = aws_iam_instance_profile.instance_profile.id
   user_data_replace_on_change = true
   subnet_id                   = aws_subnet.public[count.index].id
@@ -164,7 +166,7 @@ resource "aws_eip_association" "eip_assoc" {
 }
 
 resource "aws_iam_role" "instance_role" {
-  assume_role_policy = templatefile("${path.module}/templates/ec2_assume_role.json.tpl", {})
+  assume_role_policy = templatefile("${path.module}/templates/service_assume_role.json.tpl", { service = "ec2" })
   name               = "${var.vpc_name}-iam-role"
   tags = merge(
     var.tags,
@@ -202,4 +204,42 @@ resource "aws_route_table_association" "private_nat_gateway" {
   subnet_id = aws_subnet.private.*.id[count.index]
   // If AZ count is higher than the number of elastic IPs provided, assign all remaining subnets to the last NAT gateway
   route_table_id = count.index > local.count_nat_gateway - 1 ? aws_route_table.private_nat_gateway.*.id[local.count_nat_gateway - 1] : aws_route_table.private_nat_gateway.*.id[count.index]
+}
+
+resource "aws_flow_log" "flow_log" {
+  iam_role_arn    = aws_iam_role.flow_log_role.arn
+  log_destination = aws_cloudwatch_log_group.flow_log_log_group.arn
+  traffic_type    = "ALL"
+  vpc_id          = aws_vpc.main.id
+}
+
+resource "aws_iam_role" "flow_log_role" {
+  assume_role_policy = templatefile("${path.module}/templates/service_assume_role.json.tpl", { service = "vpc-flow-logs" })
+  name               = "${title(var.environment)}VpcFlowlogRole"
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-flow-logs-iam-role" }
+    )
+  )
+}
+
+resource "aws_iam_policy" "flow_log_policy" {
+  name   = "${title(var.environment)}VpcFlowlogPolicy"
+  policy = templatefile("${path.module}/templates/flow_logs_policy.json.tpl", { log_group_arn = aws_cloudwatch_log_group.flow_log_log_group.arn })
+}
+
+resource "aws_iam_role_policy_attachment" "flow_logs_attachment" {
+  policy_arn = aws_iam_policy.flow_log_policy.arn
+  role       = aws_iam_role.flow_log_role.name
+}
+
+resource "aws_cloudwatch_log_group" "flow_log_log_group" {
+  name = "/flowlogs/${var.vpc_name}"
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "flowlogs/${var.vpc_name}" }
+    )
+  )
 }

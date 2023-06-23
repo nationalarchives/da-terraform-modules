@@ -42,3 +42,5 @@ variable "use_nat_gateway" {
   description = "Will create a nat gateway if set to true and a nat instance otherwise"
   default     = false
 }
+
+variable "environment" {}
