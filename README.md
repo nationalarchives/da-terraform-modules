@@ -20,6 +20,9 @@ Set environment secrets in GitHub
 ## Lambda
 Create lambdas
 
+## Cloudwatch Alarms
+Creates a cloudwatch alarm. Can send to a lambda, an SQS, an SNS topic or a mix of all of them.
+
 ## Cloudwatch Events
 Creates a cloudwatch event based on either an event pattern or a schedule. Can send to a lambda, an SQS, an SNS topic or a mix of all of them.
 
