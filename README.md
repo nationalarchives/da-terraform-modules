@@ -33,7 +33,11 @@ Creates an IAM policy from a string
 Creates an IAM role and attaches the policies passed to it.
 
 ## KMS
-Creates A KMS key. It also creates an admin policy which has permissions to administer the key but not to decrypt of encrypt with it.
+Creates A KMS key. 
+
+It also creates an admin role which has permissions to administer the key but not to decrypt of encrypt with it. 
+The trust policy of this role is set to deny access to everything. To assume this role, you will need to change the trust policy.
+
 The key policy allows the root user full KMS permissions. You can optionally provide lists of roles which will be added to the key policy.
 * User roles - these have permissions to decrypt and encrypt but not to make changes to the key.
 * CI roles - these have permissions to administer the key but not to delete it or use it to encrypt and decrypt.
