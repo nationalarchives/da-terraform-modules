@@ -3,12 +3,7 @@ data "aws_caller_identity" "current" {}
 resource "aws_kms_key" "encryption" {
   description         = var.key_description
   enable_key_rotation = true
-  policy = var.key_policy == "" ? templatefile("${path.module}/templates/default_key_policy.json.tpl", {
-    admin_role_arn            = module.kms_admin_role.role_arn
-    account_id                = data.aws_caller_identity.current.account_id
-    user_roles                = jsonencode(var.default_policy_variables.user_roles)
-    persistent_resource_roles = jsonencode(var.default_policy_variables.persistent_resource_roles)
-  }) : var.key_policy
+  policy              = var.key_policy == "" ? data.aws_iam_policy_document.key_policy.json : var.key_policy
   tags = merge(
     var.tags,
     tomap(
@@ -35,4 +30,103 @@ module "kms_admin_role" {
       { "Name" = "${var.key_name}-admin" }
     )
   )
+}
+
+data "aws_iam_policy_document" "key_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions   = ["kms:*"]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      values   = ["Account"]
+      variable = "aws:PrincipalType"
+    }
+  }
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [module.kms_admin_role.role_arn]
+    }
+    actions = [
+      "kms:Create*",
+      "kms:Describe*",
+      "kms:Enable*",
+      "kms:List*",
+      "kms:Put*",
+      "kms:Update*",
+      "kms:Revoke*",
+      "kms:Disable*",
+      "kms:Get*",
+      "kms:Delete*",
+      "kms:TagResource",
+      "kms:UntagResource",
+      "kms:ScheduleKeyDeletion",
+      "kms:CancelKeyDeletion"
+    ]
+    resources = ["*"]
+  }
+  dynamic "statement" {
+    for_each = length(var.default_policy_variables.ci_roles) == 0 ? [] : ["ci_roles"]
+    content {
+      principals {
+        type        = "AWS"
+        identifiers = var.default_policy_variables.ci_roles
+      }
+      actions = [
+        "kms:Create*",
+        "kms:Describe*",
+        "kms:Enable*",
+        "kms:List*",
+        "kms:Put*",
+        "kms:Update*",
+        "kms:Revoke*",
+        "kms:Disable*",
+        "kms:Get*",
+        "kms:TagResource",
+        "kms:UntagResource"
+      ]
+      resources = ["*"]
+    }
+  }
+  dynamic "statement" {
+    for_each = length(var.default_policy_variables.user_roles) == 0 ? [] : ["user_roles"]
+    content {
+      principals {
+        type        = "AWS"
+        identifiers = var.default_policy_variables.user_roles
+      }
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+    }
+  }
+  dynamic "statement" {
+    for_each = length(var.default_policy_variables.persistent_resource_roles) == 0 ? [] : ["persistent_resource_roles"]
+    content {
+      principals {
+        type        = "AWS"
+        identifiers = var.default_policy_variables.persistent_resource_roles
+      }
+      actions = [
+        "kms:CreateGrant",
+        "kms:ListGrants",
+        "kms:RevokeGrant"
+      ]
+      resources = ["*"]
+      condition {
+        test     = "Bool"
+        values   = ["kms:GrantIsForAWSResource"]
+        variable = "true"
+      }
+    }
+  }
 }
