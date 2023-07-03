@@ -29,12 +29,10 @@ module "kms_admin_role" {
   policy_attachments = {
     kms_power_user = "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
   }
-  tags = {
-    tags = merge(
-      var.tags,
-      tomap(
-        { "Name" = "${var.key_name}-admin" }
-      )
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.key_name}-admin" }
     )
-  }
+  )
 }
