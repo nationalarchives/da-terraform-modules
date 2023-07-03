@@ -20,3 +20,5 @@ variable "sns_topic_config" {
   type    = map(string)
   default = {}
 }
+
+variable "kms_key_arn" {}

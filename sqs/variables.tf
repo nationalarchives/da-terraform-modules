@@ -17,9 +17,7 @@ variable "visibility_timeout" {
   default = 30
 }
 
-variable "kms_key_id" {
-  default = ""
-}
+variable "kms_key_id" {}
 
 variable "message_retention_seconds" {
   type    = number
@@ -44,10 +42,4 @@ variable "receive_wait_time_seconds" {
 variable "fifo_queue" {
   type    = bool
   default = false
-}
-
-variable "encrypt_with_sse_sqs" {
-  type        = bool
-  description = "Encrypt the queue contents at rest with SQS encryption keys. "
-  default     = true
 }

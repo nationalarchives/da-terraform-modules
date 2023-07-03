@@ -8,7 +8,7 @@ resource "aws_sns_topic" "sns_topic" {
       { "Name" = var.topic_name }
     )
   )
-  kms_master_key_id = var.kms_key_arn != "" ? var.kms_key_arn : null
+  kms_master_key_id = var.kms_key_arn
 }
 
 resource "aws_sns_topic_subscription" "lambda_subscriptions" {
