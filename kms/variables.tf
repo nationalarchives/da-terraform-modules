@@ -22,6 +22,10 @@ variable "default_policy_variables" {
     user_roles                = optional(list(string), [])
     persistent_resource_roles = optional(list(string), [])
   })
+  default = {
+    user_roles                = []
+    persistent_resource_roles = []
+  }
 }
 
 variable "user_roles" {
