@@ -143,4 +143,18 @@ data "aws_iam_policy_document" "key_policy" {
       }
     }
   }
+  dynamic "statement" {
+    for_each = var.default_policy_variables.service_names
+    content {
+      principals {
+        type        = "Service"
+        identifiers = [statement.value]
+      }
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey*"
+      ]
+      effect = "Allow"
+    }
+  }
 }
