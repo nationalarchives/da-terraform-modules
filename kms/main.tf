@@ -148,7 +148,7 @@ data "aws_iam_policy_document" "key_policy" {
     content {
       principals {
         type        = "Service"
-        identifiers = [statement.value]
+        identifiers = ["${statement.value}.amazonaws.com"]
       }
       actions = [
         "kms:Decrypt",
