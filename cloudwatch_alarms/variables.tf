@@ -1,7 +1,3 @@
-variable "environment" {}
-variable "function" {}
-variable "project" {}
-
 variable "evaluation_period" {
   default     = 1
   description = "The number of periods over which data is compared to the specified threshold."
