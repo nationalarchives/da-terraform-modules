@@ -34,6 +34,7 @@ module "kms_admin_role" {
 
 data "aws_iam_policy_document" "key_policy" {
   statement {
+    sid = "RootUserAllowAll"
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
@@ -47,6 +48,7 @@ data "aws_iam_policy_document" "key_policy" {
     }
   }
   statement {
+    sid = "AccountRootDescribeKey"
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
@@ -55,6 +57,7 @@ data "aws_iam_policy_document" "key_policy" {
     resources = ["*"]
   }
   statement {
+    sid = "AdminRoleAdministerKey"
     principals {
       type        = "AWS"
       identifiers = [module.kms_admin_role.role_arn]
@@ -80,6 +83,7 @@ data "aws_iam_policy_document" "key_policy" {
   dynamic "statement" {
     for_each = length(var.default_policy_variables.ci_roles) == 0 ? [] : ["ci_roles"]
     content {
+      sid = "CIRolesAdministerWithoutDelete"
       principals {
         type        = "AWS"
         identifiers = var.default_policy_variables.ci_roles
@@ -103,6 +107,7 @@ data "aws_iam_policy_document" "key_policy" {
   dynamic "statement" {
     for_each = length(var.default_policy_variables.user_roles) == 0 ? [] : ["user_roles"]
     content {
+      sid = "UserRolesEncryptAndDecrypt"
       principals {
         type        = "AWS"
         identifiers = var.default_policy_variables.user_roles
@@ -120,6 +125,7 @@ data "aws_iam_policy_document" "key_policy" {
   dynamic "statement" {
     for_each = length(var.default_policy_variables.persistent_resource_roles) == 0 ? [] : ["persistent_resource_roles"]
     content {
+      sid = "ResourceRolesGrants"
       principals {
         type        = "AWS"
         identifiers = var.default_policy_variables.persistent_resource_roles
