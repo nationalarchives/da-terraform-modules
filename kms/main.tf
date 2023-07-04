@@ -152,7 +152,8 @@ data "aws_iam_policy_document" "key_policy" {
       }
       actions = [
         "kms:Decrypt",
-        "kms:GenerateDataKey*"
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
       ]
       effect = "Allow"
     }
