@@ -30,9 +30,3 @@ variable "default_policy_variables" {
     ci_roles                  = []
   }
 }
-
-variable "user_roles" {
-  default     = []
-  type        = list(string)
-  description = "A list of IAM roles who will have access to decrypt"
-}
