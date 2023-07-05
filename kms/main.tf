@@ -157,6 +157,11 @@ data "aws_iam_policy_document" "key_policy" {
       ]
       effect    = "Allow"
       resources = ["*"]
+      condition {
+        test     = "StringEquals"
+        values   = [data.aws_caller_identity.current.account_id]
+        variable = "aws:SourceAccount"
+      }
     }
   }
 }
