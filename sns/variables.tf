@@ -10,6 +10,7 @@ variable "sns_policy" {
 
 variable "kms_key_arn" {
   description = "A KMS key arn to be used to encrypt the queue contents at rest"
+  default     = null
 }
 
 variable "lambda_subscriptions" {

@@ -7,6 +7,7 @@ resource "aws_sqs_queue" "sqs_queue" {
   delay_seconds             = var.delay_seconds
   fifo_queue                = var.fifo_queue
   kms_master_key_id         = var.kms_key_id
+  sqs_managed_sse_enabled   = var.kms_key_id == null ? true : false
   message_retention_seconds = var.message_retention_seconds
   max_message_size          = var.max_message_size
   policy                    = var.sqs_policy
