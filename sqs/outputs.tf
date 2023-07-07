@@ -13,3 +13,7 @@ output "sqs_queue_url" {
 output "dlq_sqs_url" {
   value = aws_sqs_queue.dlq.url
 }
+
+output "dlq_cloudwatch_alarm_arn" {
+  value = module.dlq_metadata_and_files_cloudwatch_alarm.cloudwatch_alarm_arn
+}

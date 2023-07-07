@@ -28,3 +28,19 @@ resource "aws_sqs_queue" "dlq" {
   name                      = "${var.queue_name}-dlq"
   message_retention_seconds = 1209600
 }
+
+module "dlq_metadata_and_files_cloudwatch_alarm" {
+  count               = var.dlq_notification_topic == "" ? 0 : 1
+  source              = "../cloudwatch_alarms"
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  name                = "${var.queue_name}-alarm"
+  threshold           = "0"
+  comparison_operator = "GreaterThanThreshold"
+  statistic           = "Sum"
+  datapoints_to_alarm = 1
+  dimensions = {
+    QueueName = aws_sqs_queue.dlq.name
+  }
+  notification_topic = var.dlq_notification_topic
+}
