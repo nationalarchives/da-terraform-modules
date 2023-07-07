@@ -20,7 +20,7 @@ resource "aws_kms_alias" "encryption" {
 module "kms_admin_role" {
   source             = "../iam_role"
   assume_role_policy = templatefile("${path.module}/templates/deny_all.json.tpl", {})
-  name               = "kms-${var.key_name}-admin"
+  name               = "${var.key_name}-admin"
   policy_attachments = {
     kms_power_user = "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
   }
