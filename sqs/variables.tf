@@ -18,7 +18,7 @@ variable "visibility_timeout" {
 }
 
 variable "kms_key_id" {
-  default = ""
+  default = null
 }
 
 variable "message_retention_seconds" {

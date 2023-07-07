@@ -1,5 +1,5 @@
 output "sqs_arn" {
-  value = aws_sqs_queue.sqs_queue.arn
+  value = var.kms_key_id == null ? aws_sqs_queue.sqs_queue_with_sse[0].arn : aws_sqs_queue.sqs_queue_with_kms[0].arn
 }
 
 output "dlq_sqs_arn" {
@@ -7,7 +7,7 @@ output "dlq_sqs_arn" {
 }
 
 output "sqs_queue_url" {
-  value = aws_sqs_queue.sqs_queue.url
+  value = var.kms_key_id == null ? aws_sqs_queue.sqs_queue_with_sse[0].url : aws_sqs_queue.sqs_queue_with_kms[0].url
 }
 
 output "dlq_sqs_url" {
