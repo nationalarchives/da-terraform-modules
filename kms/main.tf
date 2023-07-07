@@ -146,7 +146,7 @@ data "aws_iam_policy_document" "key_policy" {
   dynamic "statement" {
     for_each = var.default_policy_variables.service_names
     content {
-      sid = "AllowSameAccountServiceAccess"
+      sid = "AllowSameAccountServiceAccess${title(statement.value)}"
       principals {
         type        = "Service"
         identifiers = ["${statement.value}.amazonaws.com"]
