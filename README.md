@@ -32,6 +32,21 @@ Creates an IAM policy from a string
 ## IAM Role
 Creates an IAM role and attaches the policies passed to it.
 
+## KMS
+Creates A KMS key. 
+
+It also creates an admin role which has permissions to administer the key but not to decrypt or encrypt with it. 
+The trust policy of this role is set to deny access to everything. To assume this role, you will need to change the trust policy.
+
+The key policy allows the root user full KMS permissions. You can optionally provide lists of roles which will be added to the key policy.
+* User roles - these have permissions to decrypt and encrypt but not to make changes to the key.
+* CI roles - these have permissions to administer the key but not to delete it or use it to encrypt and decrypt.
+* Persistent resource roles - these have permissions to grant other AWS services access to the key.
+* Service names - a list of AWS services which are permitted to use the key. Only the service name is needed, e.g. cloudwatch instead of cloudwatch.amazonaws.com
+  There is a condition on this statement that only services within the calling account can access the key.
+
+If any of these roles or services are not provided, the relevant policy statements won't be added. 
+
 ## SSM Parameter
 Takes a list of objects describing the ssm parameters. You can optionally ignore value changes so terraform won't overwrite changes made elsewhere.
 

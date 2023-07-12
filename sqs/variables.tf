@@ -18,7 +18,7 @@ variable "visibility_timeout" {
 }
 
 variable "kms_key_id" {
-  default = ""
+  default = null
 }
 
 variable "message_retention_seconds" {
@@ -46,8 +46,7 @@ variable "fifo_queue" {
   default = false
 }
 
-variable "encrypt_with_sse_sqs" {
-  type        = bool
-  description = "Encrypt the queue contents at rest with SQS encryption keys. "
-  default     = true
+variable "dlq_notification_topic" {
+  description = "A topic arn which will be used to send ALARM events if a message is put into the DLQ and OK events when it is removed."
+  default     = ""
 }
