@@ -13,7 +13,7 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
   policy                    = var.sqs_policy
   receive_wait_time_seconds = var.receive_wait_time_seconds
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.dlq.arn
+    deadLetterTargetArn = aws_sqs_queue.dlq_with_sse[count.index].arn
     maxReceiveCount     = var.redrive_maximum_receives
   })
   tags = merge(
@@ -36,7 +36,7 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
   policy                    = var.sqs_policy
   receive_wait_time_seconds = var.receive_wait_time_seconds
   redrive_policy = jsonencode({
-    deadLetterTargetArn = aws_sqs_queue.dlq.arn
+    deadLetterTargetArn = aws_sqs_queue.dlq_with_kms[count.index].arn
     maxReceiveCount     = var.redrive_maximum_receives
   })
   tags = merge(
@@ -48,9 +48,18 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
   visibility_timeout_seconds = var.visibility_timeout
 }
 
-resource "aws_sqs_queue" "dlq" {
+resource "aws_sqs_queue" "dlq_with_kms" {
+  count                     = var.kms_key_id == null ? 0 : 1
   name                      = "${var.queue_name}-dlq"
   message_retention_seconds = 1209600
+  kms_master_key_id         = var.kms_key_id
+}
+
+resource "aws_sqs_queue" "dlq_with_sse" {
+  count                     = var.kms_key_id == null ? 1 : 0
+  name                      = "${var.queue_name}-dlq"
+  message_retention_seconds = 1209600
+  sqs_managed_sse_enabled   = true
 }
 
 module "dlq_cloudwatch_alarm" {
@@ -64,7 +73,7 @@ module "dlq_cloudwatch_alarm" {
   statistic           = "Sum"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = aws_sqs_queue.dlq.name
+    QueueName = aws_sqs_queue.dlq_with_kms.name
   }
   notification_topic = var.dlq_notification_topic
 }

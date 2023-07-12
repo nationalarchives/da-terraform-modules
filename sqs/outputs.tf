@@ -3,7 +3,7 @@ output "sqs_arn" {
 }
 
 output "dlq_sqs_arn" {
-  value = aws_sqs_queue.dlq.arn
+  value = aws_sqs_queue.dlq_with_kms.arn
 }
 
 output "sqs_queue_url" {
@@ -11,7 +11,7 @@ output "sqs_queue_url" {
 }
 
 output "dlq_sqs_url" {
-  value = aws_sqs_queue.dlq.url
+  value = aws_sqs_queue.dlq_with_kms.url
 }
 
 output "dlq_cloudwatch_alarm_arn" {
