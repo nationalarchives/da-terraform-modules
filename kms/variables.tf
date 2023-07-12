@@ -25,11 +25,13 @@ variable "default_policy_variables" {
     ci_roles                  = optional(list(string), [])
     persistent_resource_roles = optional(list(string), [])
     service_names             = optional(list(string), [])
+    service_source_account    = optional(string, "")
   })
   default = {
     user_roles                = []
     persistent_resource_roles = []
     ci_roles                  = []
     service_names             = []
+    service_source_account    = data.aws_caller_identity.current.account_id
   }
 }
