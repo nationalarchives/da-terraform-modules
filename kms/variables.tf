@@ -32,6 +32,6 @@ variable "default_policy_variables" {
     persistent_resource_roles = []
     ci_roles                  = []
     service_names             = []
-    service_source_account    = data.aws_caller_identity.current.account_id
+    service_source_account    = ""
   }
 }

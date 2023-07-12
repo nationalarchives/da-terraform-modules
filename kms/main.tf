@@ -160,7 +160,7 @@ data "aws_iam_policy_document" "key_policy" {
       resources = ["*"]
       condition {
         test     = "StringEquals"
-        values   = [var.default_policy_variables.service_source_account]
+        values   = [var.default_policy_variables.service_source_account == "" ? data.aws_caller_identity.current.account_id : var.default_policy_variables.service_source_account]
         variable = "aws:SourceAccount"
       }
     }
