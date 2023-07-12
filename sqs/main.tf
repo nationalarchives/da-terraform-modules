@@ -69,7 +69,7 @@ module "dlq_cloudwatch_alarm" {
   source              = "../cloudwatch_alarms"
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
-  name                = "${var.queue_name}-alarm"
+  name                = "${var.queue_name}-dlq-alarm"
   threshold           = "0"
   comparison_operator = "GreaterThanThreshold"
   statistic           = "Sum"
