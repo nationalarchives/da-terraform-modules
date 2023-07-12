@@ -73,7 +73,7 @@ module "dlq_cloudwatch_alarm" {
   statistic           = "Sum"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = aws_sqs_queue.dlq_with_kms.name
+    QueueName = var.kms_key_id == null ? aws_sqs_queue.dlq_with_sse[0].name : aws_sqs_queue.dlq_with_kms[0].name
   }
   notification_topic = var.dlq_notification_topic
 }
