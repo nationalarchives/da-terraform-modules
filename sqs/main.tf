@@ -1,5 +1,7 @@
 locals {
   queue_name_suffix = var.fifo_queue ? ".fifo" : ""
+  sqs_queue         = var.kms_key_id == null ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
+  sqs_dlq           = var.kms_key_id == null ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0]
 }
 
 resource "aws_sqs_queue" "sqs_queue_with_sse" {
@@ -73,7 +75,7 @@ module "dlq_cloudwatch_alarm" {
   statistic           = "Sum"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = var.kms_key_id == null ? aws_sqs_queue.dlq_with_sse[0].name : aws_sqs_queue.dlq_with_kms[0].name
+    QueueName = local.sqs_dlq.name
   }
   notification_topic = var.dlq_notification_topic
 }
