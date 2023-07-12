@@ -53,7 +53,7 @@ resource "aws_sqs_queue" "dlq" {
   message_retention_seconds = 1209600
 }
 
-module "dlq_metadata_and_files_cloudwatch_alarm" {
+module "dlq_cloudwatch_alarm" {
   count               = var.dlq_notification_topic == "" ? 0 : 1
   source              = "../cloudwatch_alarms"
   metric_name         = "ApproximateNumberOfMessagesVisible"
