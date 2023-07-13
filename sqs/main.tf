@@ -73,6 +73,7 @@ module "dlq_cloudwatch_alarm" {
   threshold           = "0"
   comparison_operator = "GreaterThanThreshold"
   statistic           = "Sum"
+  treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
     QueueName = local.sqs_dlq.name
