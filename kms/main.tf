@@ -27,7 +27,7 @@ module "kms_admin_role" {
   tags = merge(
     var.tags,
     tomap(
-      { "Name" = "${var.key_name}-admin" }
+      { "Name" = "${var.key_name}-admin", "Type" = "kms-admin-role" }
     )
   )
 }
