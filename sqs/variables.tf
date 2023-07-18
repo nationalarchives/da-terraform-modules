@@ -10,7 +10,7 @@ variable "sqs_policy" {
 }
 
 variable "redrive_maximum_receives" {
-  default = 3
+  default = 10
 }
 
 variable "visibility_timeout" {

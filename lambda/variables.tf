@@ -6,7 +6,7 @@ variable "handler" {
   description = "The lambda function handler"
 }
 
-variable "kms_key_arn" {
+variable "environment_variables_key_arn" {
   description = "The kms key to use to encrypt environment variables if necessary"
   default     = ""
 }
@@ -61,6 +61,11 @@ variable "vpc_config" {
     subnet_ids         = [],
     security_group_ids = []
   }
+}
+
+variable "log_group_kms_key" {
+  description = "A kms key arn to encrypt the lambda log group with"
+  default     = null
 }
 
 variable "lambda_sqs_queue_mappings" {
