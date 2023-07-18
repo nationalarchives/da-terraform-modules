@@ -37,7 +37,7 @@ resource "aws_lambda_function" "lambda_function" {
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.lambda_function.function_name}"
   retention_in_days = var.log_retention
-  kms_key_id        = var.log_group_kms_key
+  kms_key_id        = var.log_group_kms_key_arn
   tags              = var.tags
 }
 
@@ -49,7 +49,7 @@ locals {
 
 resource "aws_kms_ciphertext" "encrypted_environment_variables" {
   for_each  = var.encrypted_env_vars
-  key_id    = var.environment_variables_key_arn
+  key_id    = var.environment_variables_kms_key_arn
   plaintext = each.value
   context   = { "LambdaFunctionName" = var.function_name }
 }
