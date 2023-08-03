@@ -19,3 +19,7 @@ variable "hash_key_type" {}
 variable "common_tags" {
   default = {}
 }
+
+variable "deletion_protection_enabled" {
+  default = false
+}
