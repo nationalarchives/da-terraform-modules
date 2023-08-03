@@ -151,7 +151,13 @@ data "aws_iam_policy_document" "key_policy" {
         type        = "Service"
         identifiers = ["${statement.value}.amazonaws.com"]
       }
-      actions = [
+      actions = startswith(statement.value, "logs.") ? [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+        ] : [
         "kms:Decrypt",
         "kms:GenerateDataKey*",
         "kms:DescribeKey"
