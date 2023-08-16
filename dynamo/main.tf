@@ -1,10 +1,15 @@
 resource "aws_dynamodb_table" "table" {
-  name           = var.table_name
-  billing_mode   = var.billing_mode
-  read_capacity  = var.billing_mode == "PAY_PER_REQUEST" ? null : var.read_capacity
-  write_capacity = var.billing_mode == "PAY_PER_REQUEST" ? null : var.write_capacity
-  hash_key       = var.hash_key.name
-  range_key      = var.range_key.name == null ? null : var.range_key.name
+  name                        = var.table_name
+  billing_mode                = var.billing_mode
+  read_capacity               = var.billing_mode == "PAY_PER_REQUEST" ? null : var.read_capacity
+  write_capacity              = var.billing_mode == "PAY_PER_REQUEST" ? null : var.write_capacity
+  hash_key                    = var.hash_key.name
+  range_key                   = var.range_key.name == null ? null : var.range_key.name
+  deletion_protection_enabled = var.deletion_protection_enabled
+  server_side_encryption {
+    enabled     = var.server_side_encryption_enabled
+    kms_key_arn = var.kms_key_arn
+  }
 
   dynamic "attribute" {
     for_each = toset(flatten([var.range_key.name == null ? [] : [var.range_key], var.additional_attributes, [var.hash_key]]))
