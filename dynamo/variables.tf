@@ -57,3 +57,8 @@ variable "server_side_encryption_enabled" {
 variable "kms_key_arn" {
   default = ""
 }
+
+variable "point_in_time_recovery_enabled" {
+  type    = bool
+  default = false
+}

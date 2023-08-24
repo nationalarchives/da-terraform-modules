@@ -6,6 +6,11 @@ resource "aws_dynamodb_table" "table" {
   hash_key                    = var.hash_key.name
   range_key                   = var.range_key.name == null ? null : var.range_key.name
   deletion_protection_enabled = var.deletion_protection_enabled
+
+  point_in_time_recovery {
+    enabled = var.point_in_time_recovery_enabled
+  }
+
   server_side_encryption {
     enabled     = var.server_side_encryption_enabled
     kms_key_arn = var.kms_key_arn
