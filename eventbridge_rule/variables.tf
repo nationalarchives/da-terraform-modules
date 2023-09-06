@@ -1,5 +1,3 @@
-resource "random_uuid" "id" {}
-
 variable "targets" {
   type = list(object({
     id       = optional(string, null),
