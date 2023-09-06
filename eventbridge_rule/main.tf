@@ -1,7 +1,6 @@
 resource "aws_cloudwatch_event_rule" "rule" {
   name        = var.name
   description = var.description
-
   event_pattern = var.event_pattern
 }
 
@@ -14,5 +13,11 @@ resource "aws_cloudwatch_event_target" "target" {
   rule              = aws_cloudwatch_event_rule.rule.name
   input             = var.input
   input_path        = var.input_path
-  input_transformer = var.input_transformer
+  dynamic "input_transformer" {
+    for_each = var.input_transformer == null ? [] : [var.input_transformer]
+    content {
+      input_template = each.value.input_template
+      input_paths = each.value.input_paths
+    }
+  }
 }
