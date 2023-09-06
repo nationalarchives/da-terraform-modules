@@ -1,10 +1,4 @@
-variable "targets" {
-  type = list(object({
-    id       = optional(string, null),
-    arn      = string
-    role_arn = optional(string, null)
-  }))
-}
+variable "api_destination_arn" {}
 
 variable "name" {}
 variable "description" {

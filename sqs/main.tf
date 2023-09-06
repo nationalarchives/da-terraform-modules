@@ -81,7 +81,7 @@ module "dlq_cloudwatch_alarm" {
 }
 
 module "dlq_eventbridge_notification" {
-  source            = "../eventbridge_rule"
+  source            = "../eventbridge_api_destination_rule"
   event_pattern     = ""
   input_transformer = ""
   name              = ""
