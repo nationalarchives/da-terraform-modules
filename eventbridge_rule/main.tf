@@ -5,17 +5,9 @@ resource "aws_cloudwatch_event_rule" "rule" {
   event_pattern = var.event_pattern
 }
 
-variable "input" {
-  default = null
-}
-variable "input_path" {
-  default = null
-}
-
-
 resource "aws_cloudwatch_event_target" "target" {
   for_each          = var.targets
-  id                = each.value.id
+  id                = each.value.id == null ? "$Id${random_uuid.id.result}" : each.value.id
   target_id         = var.name
   arn               = each.value.arn
   role_arn          = each.value.role_arn

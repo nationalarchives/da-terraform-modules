@@ -2,7 +2,7 @@ resource "random_uuid" "id" {}
 
 variable "targets" {
   type = list(object({
-    id       = optional(string, random_uuid.id.result),
+    id       = optional(string, null),
     arn      = string
     role_arn = optional(string, null)
   }))
@@ -21,3 +21,11 @@ variable "input_transformer" {
   })
   default = null
 }
+
+variable "input" {
+  default = null
+}
+variable "input_path" {
+  default = null
+}
+
