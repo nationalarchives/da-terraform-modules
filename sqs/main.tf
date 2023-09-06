@@ -78,5 +78,12 @@ module "dlq_cloudwatch_alarm" {
   dimensions = {
     QueueName = local.sqs_dlq.name
   }
-  notification_topic = var.dlq_notification_topic
+}
+
+module "dlq_eventbridge_notification" {
+  source            = "../eventbridge_rule"
+  event_pattern     = ""
+  input_transformer = ""
+  name              = ""
+  targets           = []
 }
