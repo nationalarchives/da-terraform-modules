@@ -1,18 +1,3 @@
-variable "invocation_rate" {
-  default = 300
-}
-variable "http_method" {
-  default = "POST"
-}
-variable "invocation_endpoint" {
-  default = "https://slack.com/api/chat.postMessage"
-}
-variable "description" {
-  default = ""
-}
-variable "name" {}
-variable "authorisation_header_value" {}
-
 resource "aws_cloudwatch_event_connection" "api_connection" {
   name               = "${var.name}-connection"
   description        = "A connection for ${var.description}"

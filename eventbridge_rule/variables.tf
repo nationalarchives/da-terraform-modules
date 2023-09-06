@@ -15,10 +15,9 @@ variable "description" {
 variable "event_pattern" {}
 
 variable "input_transformer" {
-  type = optional(
-    object({
-      input_paths    = map(string)
-      input_template = string
-    }), null
-  )
+  type = object({
+    input_paths    = map(string)
+    input_template = string
+  })
+  default = null
 }
