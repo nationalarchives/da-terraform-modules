@@ -17,9 +17,7 @@ module "api_destination_role" {
   policy_attachments = {
     api_destination_policy = module.api_destination_policy.policy_arn
   }
-  tags = {
-    name = "${var.name}-role"
-  }
+  tags = {}
 }
 
 resource "aws_cloudwatch_event_target" "target" {
@@ -32,8 +30,8 @@ resource "aws_cloudwatch_event_target" "target" {
   dynamic "input_transformer" {
     for_each = var.input_transformer == null ? [] : [var.input_transformer]
     content {
-      input_template = each.value.input_template
-      input_paths = each.value.input_paths
+      input_template = input_transformer.value.input_template
+      input_paths = input_transformer.value.input_paths
     }
   }
 }
