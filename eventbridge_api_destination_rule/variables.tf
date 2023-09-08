@@ -21,3 +21,6 @@ variable "input_path" {
   default = null
 }
 
+variable "event_bus_name" {
+  default = "default"
+}

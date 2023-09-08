@@ -1,7 +1,8 @@
 resource "aws_cloudwatch_event_rule" "rule" {
-  name          = var.name
-  description   = var.description
-  event_pattern = var.event_pattern
+  name           = var.name
+  description    = var.description
+  event_pattern  = var.event_pattern
+  event_bus_name = var.event_bus_name
 }
 
 module "api_destination_policy" {
@@ -21,12 +22,13 @@ module "api_destination_role" {
 }
 
 resource "aws_cloudwatch_event_target" "target" {
-  target_id  = var.name
-  arn        = var.api_destination_arn
-  role_arn   = module.api_destination_role.role_arn
-  rule       = aws_cloudwatch_event_rule.rule.name
-  input      = var.input
-  input_path = var.input_path
+  target_id      = var.name
+  event_bus_name = var.event_bus_name
+  arn            = var.api_destination_arn
+  role_arn       = module.api_destination_role.role_arn
+  rule           = aws_cloudwatch_event_rule.rule.name
+  input          = var.input
+  input_path     = var.input_path
   dynamic "input_transformer" {
     for_each = var.input_transformer == null ? [] : [var.input_transformer]
     content {

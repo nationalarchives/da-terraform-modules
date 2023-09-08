@@ -65,6 +65,7 @@ resource "aws_sqs_queue" "dlq_with_sse" {
 }
 
 module "dlq_cloudwatch_alarm" {
+  count               = var.dlq_notification_topic == "" ? 0 : 1
   source              = "../cloudwatch_alarms"
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
@@ -77,4 +78,5 @@ module "dlq_cloudwatch_alarm" {
   dimensions = {
     QueueName = local.sqs_dlq.name
   }
+  notification_topic = var.dlq_notification_topic
 }
