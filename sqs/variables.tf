@@ -46,7 +46,11 @@ variable "fifo_queue" {
   default = false
 }
 
+variable "create_cloudwatch_alarm" {
+  default = true
+}
+
 variable "dlq_notification_topic" {
   description = "A topic arn which will be used to send ALARM events if a message is put into the DLQ and OK events when it is removed."
-  default     = ""
+  default     = null
 }

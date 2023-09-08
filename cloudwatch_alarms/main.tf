@@ -8,9 +8,9 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_metric_alarm" {
   dimensions          = var.dimensions
   metric_name         = var.metric_name
   namespace           = var.namespace
-  actions_enabled     = var.notification_topic == "" ? false : true
-  alarm_actions       = var.notification_topic == "" ? [] : [var.notification_topic]
-  ok_actions          = var.notification_topic == "" ? [] : [var.notification_topic]
+  actions_enabled     = var.notification_topic == null ? false : true
+  alarm_actions       = var.notification_topic == null ? [] : [var.notification_topic]
+  ok_actions          = var.notification_topic == null ? [] : [var.notification_topic]
   statistic           = var.statistic
   period              = var.period
 }
