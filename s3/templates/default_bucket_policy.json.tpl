@@ -15,18 +15,6 @@
           "aws:SecureTransport": "false"
         }
       }
-    },
-    {
-      "Sid": "DenyUnencryptedObjectUploads",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:PutObject",
-      "Resource": "arn:aws:s3:::${bucket_name}/*",
-      "Condition":{
-        "StringNotEquals":{
-          "s3:x-amz-server-side-encryption":"${encryption_type}"
-        }
-      }
     }
   ]
 }
