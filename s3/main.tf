@@ -43,7 +43,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "delete_incomplete_multipart_up
     id     = "delete-incomplete-multipart-uploads"
     status = "Enabled"
     abort_incomplete_multipart_upload {
-      days_after_initiation = var.abort_incomplete_multipart_upload_timeout
+      days_after_initiation = var.abort_incomplete_multipart_upload_days
     }
   }
 }
@@ -104,9 +104,11 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
 }
 
 resource "aws_s3_bucket_policy" "logging_bucket_policy" {
-  count      = local.log_bucket_count
-  bucket     = aws_s3_bucket.logging_bucket[count.index].id
-  policy     = var.logging_bucket_policy
+  count  = local.log_bucket_count
+  bucket = aws_s3_bucket.logging_bucket[count.index].id
+  policy = var.logging_bucket_policy == "" ? templatefile("${path.module}/templates/default_bucket_policy.json.tpl", {
+    bucket_name = var.bucket_name
+  }) : var.logging_bucket_policy
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
 
