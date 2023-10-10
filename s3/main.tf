@@ -38,8 +38,11 @@ resource "aws_s3_bucket_versioning" "versioning" {
 }
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket     = aws_s3_bucket.bucket.*.id[0]
-  policy     = var.bucket_policy
+  bucket = aws_s3_bucket.bucket.*.id[0]
+  policy = var.bucket_policy == "" ? templatefile("${path.module}/templates/default_bucket_policy.json.tpl", {
+    bucket_name     = var.bucket_name
+    encryption_type = var.kms_key_arn == null ? "AES256" : "aws:kms"
+  }) : var.bucket_policy
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
 
