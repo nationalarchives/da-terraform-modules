@@ -21,8 +21,9 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_vpc" "main" {
-  cidr_block = var.cidr_block
-
+  cidr_block           = var.cidr_block
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
   tags = merge(
     var.tags,
     tomap(
@@ -242,4 +243,50 @@ resource "aws_cloudwatch_log_group" "flow_log_log_group" {
       { "Name" = "flowlogs/${var.vpc_name}" }
     )
   )
+}
+
+resource "aws_network_acl" "private_nacl" {
+  vpc_id     = aws_vpc.main.id
+  subnet_ids = aws_subnet.private.*.id
+}
+
+resource "aws_network_acl" "public_nacl" {
+  vpc_id     = aws_vpc.main.id
+  subnet_ids = aws_subnet.public.*.id
+}
+
+resource "aws_network_acl_rule" "private_nacl_rule" {
+  for_each       = { for rule in var.private_nacl_rules : "rule${rule.rule_no}_${rule.egress}" => rule }
+  network_acl_id = aws_network_acl.private_nacl.id
+  protocol       = "tcp"
+  rule_action    = each.value.action
+  rule_number    = each.value.rule_no
+  cidr_block     = each.value.cidr_block
+  from_port      = each.value.from_port
+  to_port        = each.value.to_port
+  egress         = each.value.egress
+}
+
+resource "aws_network_acl_rule" "public_nacl_rule" {
+  for_each       = { for rule in var.public_nacl_rules : "rule${rule.rule_no}_${rule.egress}" => rule }
+  network_acl_id = aws_network_acl.public_nacl.id
+  protocol       = "tcp"
+  rule_action    = each.value.action
+  rule_number    = each.value.rule_no
+  cidr_block     = each.value.cidr_block
+  from_port      = each.value.from_port
+  to_port        = each.value.to_port
+  egress         = each.value.egress
+}
+
+resource "aws_vpc_endpoint" "s3_endpoint" {
+  count        = var.create_s3_gateway_endpoint ? 1 : 0
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.${var.region}.s3"
+}
+
+resource "aws_vpc_endpoint" "dynamo_endpoint" {
+  count        = var.create_dynamo_gateway_endpoint ? 1 : 0
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.${var.region}.dynamodb"
 }
