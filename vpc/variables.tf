@@ -70,12 +70,12 @@ variable "public_nacl_rules" {
 }
 
 variable "create_s3_gateway_endpoint" {
-  default = false
+  default = true
 }
 
 variable "create_dynamo_gateway_endpoint" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "enable_dns_hostnames" {
