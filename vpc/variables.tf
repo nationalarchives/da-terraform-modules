@@ -44,3 +44,48 @@ variable "use_nat_gateway" {
 }
 
 variable "environment" {}
+
+variable "private_nacl_rules" {
+  type = set(object({
+    rule_no    = number
+    cidr_block = string
+    action     = string
+    from_port  = number
+    to_port    = number
+    egress     = bool
+  }))
+  default = []
+}
+
+variable "public_nacl_rules" {
+  type = set(object({
+    rule_no    = number
+    cidr_block = string
+    action     = string
+    from_port  = number
+    to_port    = number
+    egress     = bool
+  }))
+  default = []
+}
+
+variable "create_s3_gateway_endpoint" {
+  default = false
+}
+
+variable "create_dynamo_gateway_endpoint" {
+  type    = bool
+  default = false
+}
+
+variable "enable_dns_hostnames" {
+  default = true
+}
+
+variable "enable_dns_support" {
+  default = true
+}
+
+variable "region" {
+  default = "eu-west-2"
+}
