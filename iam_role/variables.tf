@@ -13,3 +13,9 @@ variable "tags" {
   description = "A list of tags to apply to the resource"
   type        = map(string)
 }
+
+variable "permissions_boundary" {
+  description = "Permissions boundary to attach to the role"
+  type = string
+  default = null
+}

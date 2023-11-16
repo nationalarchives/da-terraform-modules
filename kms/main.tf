@@ -4,6 +4,7 @@ resource "aws_kms_key" "encryption" {
   description         = var.key_description
   enable_key_rotation = true
   policy              = var.key_policy == "" ? data.aws_iam_policy_document.key_policy.json : var.key_policy
+  permissions_boundary = var.permissions_boundary
   tags = merge(
     var.tags,
     tomap(
