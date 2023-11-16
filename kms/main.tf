@@ -4,7 +4,6 @@ resource "aws_kms_key" "encryption" {
   description         = var.key_description
   enable_key_rotation = true
   policy              = var.key_policy == "" ? data.aws_iam_policy_document.key_policy.json : var.key_policy
-  permissions_boundary = var.permissions_boundary
   tags = merge(
     var.tags,
     tomap(
@@ -22,6 +21,7 @@ module "kms_admin_role" {
   source             = "../iam_role"
   assume_role_policy = templatefile("${path.module}/templates/deny_all.json.tpl", {})
   name               = "${var.key_name}-admin"
+  permissions_boundary = var.permissions_boundary
   policy_attachments = {
     kms_power_user = "arn:aws:iam::aws:policy/AWSKeyManagementServicePowerUser"
   }
