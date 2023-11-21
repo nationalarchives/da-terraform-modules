@@ -38,6 +38,6 @@ variable "default_policy_variables" {
 
 variable "permissions_boundary" {
   description = "Permissions boundary to attach to the role"
-  type = string
-  default = null
+  type        = string
+  default     = null
 }
