@@ -35,3 +35,9 @@ variable "default_policy_variables" {
     service_source_account    = ""
   }
 }
+
+variable "permissions_boundary" {
+  description = "Permissions boundary to attach to the role"
+  type        = string
+  default     = null
+}
