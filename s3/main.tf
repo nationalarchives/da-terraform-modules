@@ -1,5 +1,6 @@
 locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
+  log_bucket_name  = "${var.bucket_name}-logs"
 }
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
@@ -58,7 +59,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 
 resource "aws_s3_bucket" "logging_bucket" {
   count  = local.log_bucket_count
-  bucket = "${var.bucket_name}-logs"
+  bucket = local.log_bucket_name
   tags = merge(
     var.common_tags,
     tomap(
@@ -106,8 +107,10 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
 resource "aws_s3_bucket_policy" "logging_bucket_policy" {
   count  = local.log_bucket_count
   bucket = aws_s3_bucket.logging_bucket[count.index].id
-  policy = var.logging_bucket_policy == "" ? templatefile("${path.module}/templates/default_bucket_policy.json.tpl", {
-    bucket_name = var.bucket_name
+  policy = var.logging_bucket_policy == "" ? templatefile("${path.module}/templates/default_log_bucket_policy.json.tpl", {
+    bucket_name     = var.bucket_name
+    log_bucket_name = local.log_bucket_name
+    account_id      = data.aws_caller_identity.current.account_id
   }) : var.logging_bucket_policy
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
