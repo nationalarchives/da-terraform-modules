@@ -145,14 +145,14 @@ data "aws_iam_policy_document" "key_policy" {
     }
   }
   dynamic "statement" {
-    for_each = var.default_policy_variables.service_names
+    for_each = var.default_policy_variables.service_details
     content {
-      sid = "AllowSameAccountServiceAccess${title(statement.value)}"
+      sid = "AllowSameAccountServiceAccess${title(statement.value["service_name"])}${index(var.default_policy_variables.service_details, statement.value)}"
       principals {
         type        = "Service"
-        identifiers = ["${statement.value}.amazonaws.com"]
+        identifiers = ["${statement.value["service_name"]}.amazonaws.com"]
       }
-      actions = startswith(statement.value, "logs.") ? [
+      actions = startswith(statement.value["service_name"], "logs.") ? [
         "kms:Encrypt*",
         "kms:Decrypt*",
         "kms:ReEncrypt*",
@@ -167,7 +167,7 @@ data "aws_iam_policy_document" "key_policy" {
       resources = ["*"]
       condition {
         test     = "StringEquals"
-        values   = [var.default_policy_variables.service_source_account == "" ? data.aws_caller_identity.current.account_id : var.default_policy_variables.service_source_account]
+        values   = [statement.value["service_source_account"] == null ? data.aws_caller_identity.current.account_id : statement.value["service_source_account"]]
         variable = "aws:SourceAccount"
       }
     }

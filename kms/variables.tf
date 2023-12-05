@@ -24,15 +24,16 @@ variable "default_policy_variables" {
     user_roles                = optional(list(string), [])
     ci_roles                  = optional(list(string), [])
     persistent_resource_roles = optional(list(string), [])
-    service_names             = optional(list(string), [])
-    service_source_account    = optional(string, "")
+    service_details = optional(list(object({
+      service_name           = string
+      service_source_account = optional(string, null)
+    })), [])
   })
   default = {
     user_roles                = []
     persistent_resource_roles = []
     ci_roles                  = []
-    service_names             = []
-    service_source_account    = ""
+    service_details           = []
   }
 }
 
