@@ -31,6 +31,7 @@ resource "aws_wafv2_web_acl" "aws_managed_rules" {
     metric_name                = "AWS-Managed-Rules"
     sampled_requests_enabled   = false
   }
+  tags = var.common_tags
 }
 
 resource "aws_wafv2_web_acl_association" "waf_association_aws_managed_rules" {
