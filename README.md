@@ -63,14 +63,14 @@ Creates an SQS queue.
 Creates a security group with rules passed to it.
 
 ## WAFv2 AWS Managed Rules
-Create a set of AWS managed WAF rules to be associated with the given AWS resources.
+Creates a set of AWS managed WAF rules to be associated with the given AWS resources.
 
-Provides a default set of AWS managed rules. The default rules are in the "free" and non language and OS specific:
+Provides a default set of AWS managed rules. The default rules are "free" and non-language and non-OS specific:
 * `AWSManagedRulesAmazonIpReputationList`
 * `AWSManagedRulesCommonRuleSet`
 * `AWSManagedRulesCommonRuleSet`
 
-Calling clients are free to define whatever set of AWS managed rules are needed and not restricted to the default rules.
+Calling clients are can define whatever set of AWS managed rules are needed and are not restricted to the default rules.
 
 Full list of the available AWS managed rules is available here: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html
 
