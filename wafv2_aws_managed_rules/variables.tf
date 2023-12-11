@@ -10,7 +10,13 @@ variable "arn_associations" {
 
 variable "aws_managed_rules" {
   description = "List of AWS managed rules to be applied"
-  type        = list(any)
+  type        = list(object({
+    name = string
+    priority = number
+    managed_rule_group_statement_name = string
+    managed_rule_group_statement_vendor_name = string
+    metric_name = string
+  }))
   default = [
     {
       name                                     = "AWS-AWSManagedRulesAmazonIpReputationList"
