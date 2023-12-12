@@ -62,6 +62,18 @@ Creates an SQS queue.
 ## Security Group
 Creates a security group with rules passed to it.
 
+## WAFv2 AWS Managed Rules
+Creates a set of AWS managed WAF rules to be associated with the given AWS resources.
+
+Provides a default set of AWS managed rules. The default rules are "free" and non-language and non-OS specific:
+* `AWSManagedRulesAmazonIpReputationList`
+* `AWSManagedRulesCommonRuleSet`
+* `AWSManagedRulesCommonRuleSet`
+
+Calling modules can choose whatever set of AWS managed rules are most appropriate for the particular service and are not restricted to the default rules.
+
+Full list of the available AWS managed rules is available here: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html
+
 ## Using the modules
 You can either clone this repository into the root of your existing terraform project and reference the modules directly
 ```hcl
