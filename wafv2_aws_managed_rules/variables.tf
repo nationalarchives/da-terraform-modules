@@ -21,21 +21,21 @@ variable "aws_managed_rules" {
     {
       name                                     = "AWS-AWSManagedRulesAmazonIpReputationList"
       priority                                 = 0
-      managed_rule_group_statement_name        = "AAWS-AWSManagedRulesAmazonIpReputationList"
+      managed_rule_group_statement_name        = "AWSManagedRulesAmazonIpReputationList"
       managed_rule_group_statement_vendor_name = "AWS"
       metric_name                              = "AWS-AWSManagedRulesAmazonIpReputationList"
     },
     {
       name                                     = "AWS-AWSManagedRulesCommonRuleSet"
       priority                                 = 1
-      managed_rule_group_statement_name        = "AWS-AWSManagedRulesCommonRuleSet"
+      managed_rule_group_statement_name        = "AWSManagedRulesCommonRuleSet"
       managed_rule_group_statement_vendor_name = "AWS"
       metric_name                              = "AWS-AWSManagedRulesCommonRuleSet"
     },
     {
       name                                     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
       priority                                 = 2
-      managed_rule_group_statement_name        = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+      managed_rule_group_statement_name        = "AWSManagedRulesKnownBadInputsRuleSet"
       managed_rule_group_statement_vendor_name = "AWS"
       metric_name                              = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     },
