@@ -1,6 +1,6 @@
 locals {
   queue_name_suffix = var.fifo_queue ? ".fifo" : ""
-  sqs_queue         = var.encryption_type == "sse" == null ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
+  sqs_queue         = var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
   sqs_dlq           = var.encryption_type == "sse" ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0]
 }
 
