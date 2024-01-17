@@ -50,6 +50,14 @@ variable "create_cloudwatch_alarm" {
   default = true
 }
 
+variable "encryption_type" {
+  default = "sse"
+  validation {
+    condition = contains(["sse", "kms"], var.encryption_type)
+    error_message = "You must select either sse or kms encryption"
+  }
+}
+
 variable "dlq_notification_topic" {
   description = "A topic arn which will be used to send ALARM events if a message is put into the DLQ and OK events when it is removed."
   default     = null
