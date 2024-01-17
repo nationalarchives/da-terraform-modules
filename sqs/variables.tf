@@ -51,7 +51,7 @@ variable "create_cloudwatch_alarm" {
 }
 
 variable "encryption_type" {
-  default = "sse"
+  default = "kms"
   validation {
     condition = contains(["sse", "kms"], var.encryption_type)
     error_message = "You must select either sse or kms encryption"
