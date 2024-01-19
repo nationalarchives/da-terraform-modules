@@ -1,11 +1,11 @@
 locals {
   queue_name_suffix = var.fifo_queue ? ".fifo" : ""
-  sqs_queue         = var.kms_key_id == null ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
-  sqs_dlq           = var.kms_key_id == null ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0]
+  sqs_queue         = var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
+  sqs_dlq           = var.encryption_type == "sse" ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0]
 }
 
 resource "aws_sqs_queue" "sqs_queue_with_sse" {
-  count                     = var.kms_key_id == null ? 1 : 0
+  count                     = var.encryption_type == "sse" ? 1 : 0
   name                      = "${var.queue_name}${local.queue_name_suffix}"
   delay_seconds             = var.delay_seconds
   fifo_queue                = var.fifo_queue
@@ -28,7 +28,7 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
 }
 
 resource "aws_sqs_queue" "sqs_queue_with_kms" {
-  count                     = var.kms_key_id == null ? 0 : 1
+  count                     = var.encryption_type == "sse" ? 0 : 1
   name                      = "${var.queue_name}${local.queue_name_suffix}"
   delay_seconds             = var.delay_seconds
   fifo_queue                = var.fifo_queue
@@ -51,14 +51,14 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
 }
 
 resource "aws_sqs_queue" "dlq_with_kms" {
-  count                     = var.kms_key_id == null ? 0 : 1
+  count                     = var.encryption_type == "sse" ? 0 : 1
   name                      = "${var.queue_name}-dlq"
   message_retention_seconds = 1209600
   kms_master_key_id         = var.kms_key_id
 }
 
 resource "aws_sqs_queue" "dlq_with_sse" {
-  count                     = var.kms_key_id == null ? 1 : 0
+  count                     = var.encryption_type == "sse" ? 1 : 0
   name                      = "${var.queue_name}-dlq"
   message_retention_seconds = 1209600
   sqs_managed_sse_enabled   = true
