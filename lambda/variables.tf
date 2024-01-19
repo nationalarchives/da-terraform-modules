@@ -69,9 +69,19 @@ variable "log_group_kms_key_arn" {
 }
 
 variable "lambda_sqs_queue_mappings" {
-  type        = map(string)
-  default     = {}
-  description = "A map of queue name to queue arn to trigger the lambda"
+  type = list(object({
+    sqs_queue_arn         = string
+    sqs_queue_concurrency = optional(number, null)
+    ignore_enabled_status = optional(bool, false)
+  }))
+  default     = []
+  description = <<EOT
+    A list of objects to create SQS queue mappings
+    sqs_queue_arn: The queue arn to map to the lambda
+    sqs_queue_concurrency: The concurrency of the queue mapping
+    ignore_enabled_status: Whether to ignore the status of the mapping. This is useful if you want to disable the mapping
+    manually without terraform overwriting it.
+  EOT
 }
 
 variable "storage_size" {
@@ -106,10 +116,6 @@ variable "sqs_queue_mapping_batch_size" {
 
 variable "sqs_queue_batching_window" {
   default = 0
-}
-
-variable "sqs_queue_concurrency" {
-  default = null
 }
 
 variable "filename" {
