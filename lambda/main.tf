@@ -1,3 +1,7 @@
+locals {
+  sqs_mapping_without_ignore_enabled = { for mapping in var.lambda_sqs_queue_mappings : (mapping.sqs_queue_arn) => mapping.sqs_queue_concurrency if mapping.ignore_enabled_status == false }
+  sqs_mapping_ignore_enabled         = { for mapping in var.lambda_sqs_queue_mappings : (mapping.sqs_queue_arn) => mapping.sqs_queue_concurrency if mapping.ignore_enabled_status == true }
+}
 resource "aws_lambda_function" "lambda_function" {
   function_name = var.function_name
   handler       = var.handler
@@ -55,25 +59,34 @@ resource "aws_kms_ciphertext" "encrypted_environment_variables" {
 }
 
 resource "aws_lambda_event_source_mapping" "sqs_queue_mappings" {
-  for_each                           = var.lambda_sqs_queue_mappings
-  event_source_arn                   = each.value
+  for_each                           = local.sqs_mapping_without_ignore_enabled
+  event_source_arn                   = each.key
   function_name                      = aws_lambda_function.lambda_function.*.arn[0]
   batch_size                         = var.sqs_queue_mapping_batch_size
   maximum_batching_window_in_seconds = var.sqs_queue_batching_window
   dynamic "scaling_config" {
-    for_each = var.sqs_queue_concurrency == null ? [] : [var.sqs_queue_concurrency]
+    for_each = each.value == null ? [] : [each.value]
     content {
       maximum_concurrency = each.value
     }
   }
 }
 
-resource "aws_lambda_permission" "sqs_permissions" {
-  for_each      = var.lambda_sqs_queue_mappings
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.function_name
-  principal     = "sqs.amazonaws.com"
-  source_arn    = each.value
+resource "aws_lambda_event_source_mapping" "sqs_queue_mappings_ignore_enabled" {
+  for_each                           = local.sqs_mapping_ignore_enabled
+  event_source_arn                   = each.key
+  function_name                      = aws_lambda_function.lambda_function.*.arn[0]
+  batch_size                         = var.sqs_queue_mapping_batch_size
+  maximum_batching_window_in_seconds = var.sqs_queue_batching_window
+  dynamic "scaling_config" {
+    for_each = each.value == null ? [] : [each.value]
+    content {
+      maximum_concurrency = each.value
+    }
+  }
+  lifecycle {
+    ignore_changes = [enabled]
+  }
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {
