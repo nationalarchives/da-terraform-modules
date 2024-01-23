@@ -72,14 +72,6 @@ resource "aws_lambda_event_source_mapping" "sqs_queue_mappings" {
   }
 }
 
-resource "aws_lambda_permission" "sqs_permissions" {
-  for_each      = local.sqs_mapping_without_ignore_enabled
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.function_name
-  principal     = "sqs.amazonaws.com"
-  source_arn    = each.key
-}
-
 resource "aws_lambda_event_source_mapping" "sqs_queue_mappings_ignore_enabled" {
   for_each                           = local.sqs_mapping_ignore_enabled
   event_source_arn                   = each.key
@@ -95,14 +87,6 @@ resource "aws_lambda_event_source_mapping" "sqs_queue_mappings_ignore_enabled" {
   lifecycle {
     ignore_changes = [enabled]
   }
-}
-
-resource "aws_lambda_permission" "sqs_permissions_ignore_enabled" {
-  for_each      = local.sqs_mapping_ignore_enabled
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.lambda_function.function_name
-  principal     = "sqs.amazonaws.com"
-  source_arn    = each.key
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {
