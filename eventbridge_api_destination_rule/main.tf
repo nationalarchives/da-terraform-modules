@@ -30,7 +30,25 @@ resource "aws_cloudwatch_event_target" "target" {
   input          = var.input
   input_path     = var.input_path
   dynamic "input_transformer" {
-    for_each = var.input_transformer == null ? [] : [var.input_transformer]
+    for_each = var.api_destination_input_transformer == null ? [] : [var.api_destination_input_transformer]
+    content {
+      input_template = input_transformer.value.input_template
+      input_paths    = input_transformer.value.input_paths
+    }
+  }
+}
+resource "aws_cloudwatch_log_group" "event_target_log_group" {
+  count             = var.log_group_destination_input_transformer == null ? 0 : 1
+  name              = "/aws/events/${var.log_group_destination_input_transformer.log_group_name}"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_event_target" "step_function_failure_cloudwatch_target" {
+  count = var.log_group_destination_input_transformer == null ? 0 : 1
+  arn   = aws_cloudwatch_log_group.event_target_log_group[count.index].arn
+  rule  = aws_cloudwatch_event_rule.rule.name
+  dynamic "input_transformer" {
+    for_each = var.log_group_destination_input_transformer == null ? [] : [var.log_group_destination_input_transformer]
     content {
       input_template = input_transformer.value.input_template
       input_paths    = input_transformer.value.input_paths

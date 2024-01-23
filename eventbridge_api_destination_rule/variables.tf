@@ -6,8 +6,17 @@ variable "description" {
 }
 variable "event_pattern" {}
 
-variable "input_transformer" {
+variable "api_destination_input_transformer" {
   type = object({
+    input_paths    = map(string)
+    input_template = string
+  })
+  default = null
+}
+
+variable "log_group_destination_input_transformer" {
+  type = object({
+    log_group_name = string
     input_paths    = map(string)
     input_template = string
   })
