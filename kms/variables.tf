@@ -35,7 +35,7 @@ variable "default_policy_variables" {
     persistent_resource_roles = []
     ci_roles                  = []
     service_details           = []
-    cloudfront_distributions = []
+    cloudfront_distributions  = []
   }
 }
 

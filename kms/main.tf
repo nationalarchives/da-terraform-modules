@@ -174,8 +174,8 @@ data "aws_iam_policy_document" "key_policy" {
   }
 
   statement {
-    sid       = "CloudfrontDecryptAndEncrypt"
-    effect    = "Allow"
+    sid    = "CloudfrontDecryptAndEncrypt"
+    effect = "Allow"
     principals {
       type        = "Service"
       identifiers = ["cloudfront.amazonaws.com"]
