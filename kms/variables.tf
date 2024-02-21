@@ -28,12 +28,14 @@ variable "default_policy_variables" {
       service_name           = string
       service_source_account = optional(string, null)
     })), [])
+    cloudfront_distributions = optional(list(string), [])
   })
   default = {
     user_roles                = []
     persistent_resource_roles = []
     ci_roles                  = []
     service_details           = []
+    cloudfront_distributions = []
   }
 }
 
