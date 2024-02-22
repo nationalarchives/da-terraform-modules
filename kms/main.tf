@@ -173,7 +173,7 @@ data "aws_iam_policy_document" "key_policy" {
     }
   }
 
-  dynamic statement {
+  dynamic "statement" {
     for_each = length(var.default_policy_variables.cloudfront_distributions) == 0 ? [] : ["cloudfront_distributions"]
 
     content {
