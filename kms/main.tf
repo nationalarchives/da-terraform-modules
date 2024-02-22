@@ -173,23 +173,27 @@ data "aws_iam_policy_document" "key_policy" {
     }
   }
 
-  statement {
-    sid    = "CloudfrontDecryptAndEncrypt"
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKey*",
-    ]
-    resources = ["*"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceArn"
-      values   = var.default_policy_variables.cloudfront_distributions
+  dynamic statement {
+    for_each = length(var.default_policy_variables.cloudfront_distributions) == 0 ? [] : ["cloudfront_distributions"]
+
+    content {
+      sid    = "CloudfrontDecryptAndEncrypt"
+      effect = "Allow"
+      principals {
+        type        = "Service"
+        identifiers = ["cloudfront.amazonaws.com"]
+      }
+      actions = [
+        "kms:Decrypt",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+      ]
+      resources = ["*"]
+      condition {
+        test     = "StringEquals"
+        variable = "aws:SourceArn"
+        values   = var.default_policy_variables.cloudfront_distributions
+      }
     }
   }
 }
