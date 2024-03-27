@@ -25,3 +25,16 @@ resource "aws_api_gateway_rest_api_policy" "api_rest_policy" {
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   policy      = var.api_rest_policy
 }
+
+resource "aws_api_gateway_method_settings" "settings" {
+  for_each    = { for config in var.api_method_settings : config.method_path => config }
+  rest_api_id = aws_api_gateway_rest_api.rest_api.id
+  stage_name  = aws_api_gateway_stage.api_stage.stage_name
+  method_path = each.value.method_path
+
+  settings {
+    metrics_enabled    = each.value.metrics_enabled
+    logging_level      = each.value.logging_level
+    data_trace_enabled = each.value.data_trace_enabled
+  }
+}
