@@ -1,11 +1,12 @@
 locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
-  bucket_name      = var.use_random_suffix ? "${substr(var.bucket_name, 0, 54)}-${random_string.bucket_suffix.result}" : var.bucket_name
+  bucket_name      = var.use_random_suffix ? "${substr(var.bucket_name, 0, 54)}-${random_string.bucket_suffix[0].result}" : var.bucket_name
   log_bucket_name  = "${local.bucket_name}-logs"
 
 }
 
 resource "random_string" "bucket_suffix" {
+  count = var.use_random_suffix ? 1 : 0
   length  = 8
   special = false
   upper   = false
