@@ -1,6 +1,6 @@
 locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
-  bucket_name      = "${substr(var.bucket_name, 0, 54)}-${random_string.bucket_suffix.result}"
+  bucket_name      = var.use_random_suffix ? "${substr(var.bucket_name, 0, 54)}-${random_string.bucket_suffix.result}" : var.bucket_name
   log_bucket_name  = "${local.bucket_name}-logs"
 
 }
