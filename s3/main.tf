@@ -8,6 +8,7 @@ locals {
 resource "random_string" "bucket_suffix" {
   length  = 8
   special = false
+  lower   = true
 }
 
 resource "aws_s3_bucket" "bucket" {
