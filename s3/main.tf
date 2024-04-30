@@ -6,11 +6,10 @@ locals {
 resource "random_string" "bucket_suffix" {
   length  = 8
   special = false
-  numeric = false
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = "${var.bucket_name}-${random_string.bucket_suffix.result}"
+  bucket = "${substr(var.bucket_name, 0, 54)}-${random_string.bucket_suffix.result}"
   tags = merge(
     var.common_tags,
     tomap(
