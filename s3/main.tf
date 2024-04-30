@@ -1,6 +1,8 @@
 locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
-  log_bucket_name  = "${var.bucket_name}-logs"
+  bucket_name      = "${substr(var.bucket_name, 0, 54)}-${random_string.bucket_suffix.result}"
+  log_bucket_name  = "${local.bucket_name}-logs"
+
 }
 
 resource "random_string" "bucket_suffix" {
@@ -9,11 +11,11 @@ resource "random_string" "bucket_suffix" {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = "${substr(var.bucket_name, 0, 54)}-${random_string.bucket_suffix.result}"
+  bucket = local.bucket_name
   tags = merge(
     var.common_tags,
     tomap(
-      { "Name" = var.bucket_name }
+      { "Name" = local.bucket_name }
     )
   )
 }
@@ -58,7 +60,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "delete_incomplete_multipart_up
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.bucket.*.id[0]
   policy = var.bucket_policy == "" ? templatefile("${path.module}/templates/default_bucket_policy.json.tpl", {
-    bucket_name = var.bucket_name
+    bucket_name = local.bucket_name
   }) : var.bucket_policy
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
@@ -69,7 +71,7 @@ resource "aws_s3_bucket" "logging_bucket" {
   tags = merge(
     var.common_tags,
     tomap(
-      { "Name" = "${var.bucket_name}-logs" }
+      { "Name" = "${local.bucket_name}-logs" }
     )
   )
 }
@@ -107,14 +109,14 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
   bucket = aws_s3_bucket.bucket.id
 
   target_bucket = aws_s3_bucket.logging_bucket[count.index].id
-  target_prefix = "${var.bucket_name}/${data.aws_caller_identity.current.account_id}/"
+  target_prefix = "${local.bucket_name}/${data.aws_caller_identity.current.account_id}/"
 }
 
 resource "aws_s3_bucket_policy" "logging_bucket_policy" {
   count  = local.log_bucket_count
   bucket = aws_s3_bucket.logging_bucket[count.index].id
   policy = var.logging_bucket_policy == "" ? templatefile("${path.module}/templates/default_log_bucket_policy.json.tpl", {
-    bucket_name     = var.bucket_name
+    bucket_name     = local.bucket_name
     log_bucket_name = local.log_bucket_name
     account_id      = data.aws_caller_identity.current.account_id
   }) : var.logging_bucket_policy
