@@ -6,7 +6,7 @@ locals {
 }
 
 resource "random_string" "bucket_suffix" {
-  count = var.use_random_suffix ? 1 : 0
+  count   = var.use_random_suffix ? 1 : 0
   length  = 8
   special = false
   upper   = false
