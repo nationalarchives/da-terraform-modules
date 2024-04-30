@@ -2,8 +2,15 @@ locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
   log_bucket_name  = "${var.bucket_name}-logs"
 }
+
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  numeric = false
+}
+
 resource "aws_s3_bucket" "bucket" {
-  bucket = var.bucket_name
+  bucket = "${var.bucket_name}-${random_string.bucket_suffix.result}"
   tags = merge(
     var.common_tags,
     tomap(
