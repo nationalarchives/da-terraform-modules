@@ -8,6 +8,10 @@ There are the following modules:
 ## S3
 Creates an S3 bucket with an optional bucket policy, all public access blocked and an optional logging bucket.
 
+There is a flag variable called `use_random_suffix`
+This defaults to false but when it's set to true, it will add a random suffix to the bucket name.
+The flag is there to allow us to migrate existing buckets but **all** new buckets should have this set to `true`
+
 ## Dynamo
 Creates a Dynamo DB table. 
 
