@@ -2,6 +2,7 @@ locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
   log_bucket_name  = "${var.bucket_name}-logs"
 }
+
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
   tags = merge(
