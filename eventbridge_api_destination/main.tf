@@ -2,8 +2,17 @@ resource "aws_cloudwatch_event_connection" "api_connection" {
   name               = "${var.name}-connection"
   description        = "A connection for ${var.description}"
   authorization_type = "API_KEY"
-
   auth_parameters {
+    dynamic "invocation_http_parameters" {
+      for_each = var.headers
+      iterator = header
+      content {
+        header {
+          key   = header.key
+          value = header.value
+        }
+      }
+    }
     api_key {
       key   = "Authorization"
       value = var.authorisation_header_value

@@ -12,3 +12,8 @@ variable "description" {
 }
 variable "name" {}
 variable "authorisation_header_value" {}
+
+variable "headers" {
+  type    = map(string)
+  default = {}
+}
