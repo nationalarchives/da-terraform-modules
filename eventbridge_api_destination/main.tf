@@ -10,6 +10,7 @@ resource "aws_cloudwatch_event_connection" "api_connection" {
         header {
           key   = header.key
           value = header.value
+          is_value_secret = false
         }
       }
     }
