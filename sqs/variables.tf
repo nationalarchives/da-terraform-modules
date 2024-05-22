@@ -46,8 +46,14 @@ variable "fifo_queue" {
   default = false
 }
 
-variable "create_cloudwatch_alarm" {
-  default = true
+variable "queue_cloudwatch_alarm_visible_messages_threshold" {
+  description = "The alarm will alert if ApproximateNumberOfMessagesVisible is above this threshold for the queue"
+  default     = 10
+}
+
+variable "dlq_cloudwatch_alarm_visible_messages_threshold" {
+  description = "The alarm will alert if ApproximateNumberOfMessagesVisible is above this threshold for the dlq"
+  default     = 0
 }
 
 variable "encryption_type" {

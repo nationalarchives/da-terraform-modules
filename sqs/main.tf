@@ -65,18 +65,33 @@ resource "aws_sqs_queue" "dlq_with_sse" {
 }
 
 module "dlq_cloudwatch_alarm" {
-  count               = var.create_cloudwatch_alarm ? 1 : 0
   source              = "../cloudwatch_alarms"
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
   name                = "${var.queue_name}-dlq-alarm"
-  threshold           = "0"
+  threshold           = var.dlq_cloudwatch_alarm_visible_messages_threshold
   comparison_operator = "GreaterThanThreshold"
   statistic           = "Sum"
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
     QueueName = local.sqs_dlq.name
+  }
+  notification_topic = var.dlq_notification_topic
+}
+
+module "queue_cloudwatch_alarm" {
+  source              = "../cloudwatch_alarms"
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  name                = "${var.queue_name}-alarm"
+  threshold           = var.queue_cloudwatch_alarm_visible_messages_threshold
+  comparison_operator = "GreaterThanThreshold"
+  statistic           = "Sum"
+  treat_missing_data  = "ignore"
+  datapoints_to_alarm = 1
+  dimensions = {
+    QueueName = local.sqs_queue.name
   }
   notification_topic = var.dlq_notification_topic
 }
