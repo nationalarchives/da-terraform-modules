@@ -84,7 +84,7 @@ module "queue_cloudwatch_alarm" {
   source              = "../cloudwatch_alarms"
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
-  name                = "${var.queue_name}-alarm"
+  name                = "${var.queue_name}-messages-visible-alarm"
   threshold           = var.queue_cloudwatch_alarm_visible_messages_threshold
   comparison_operator = "GreaterThanThreshold"
   statistic           = "Sum"
@@ -93,5 +93,5 @@ module "queue_cloudwatch_alarm" {
   dimensions = {
     QueueName = local.sqs_queue.name
   }
-  notification_topic = var.dlq_notification_topic
+  notification_topic = var.queue_visibility_alarm_notification_topic
 }

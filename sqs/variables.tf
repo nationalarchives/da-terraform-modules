@@ -68,3 +68,8 @@ variable "dlq_notification_topic" {
   description = "A topic arn which will be used to send ALARM events if a message is put into the DLQ and OK events when it is removed."
   default     = null
 }
+
+variable "queue_visibility_alarm_notification_topic" {
+  description = "A topic arn which will be used to send ALARM events if the alarm for max number of messages in the queue is triggered."
+  default     = null
+}
