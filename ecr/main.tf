@@ -15,6 +15,13 @@ resource "aws_ecr_repository" "repository" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "ImageSource" = var.image_source_url }
+    )
+  )
 }
 
 resource "aws_ecr_repository_policy" "repository_policy" {
