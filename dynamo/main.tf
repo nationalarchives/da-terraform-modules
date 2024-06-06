@@ -46,3 +46,8 @@ resource "aws_dynamodb_table" "table" {
     )
   )
 }
+
+resource "aws_dynamodb_resource_policy" "require_ssl" {
+  resource_arn = aws_dynamodb_table.table.arn
+  policy       = templatefile("${path.module}/templates/dynamo_require_ssl.json.tpl", { table_arn = aws_dynamodb_table.table.arn })
+}
