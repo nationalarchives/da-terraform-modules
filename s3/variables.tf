@@ -27,5 +27,5 @@ variable "kms_key_arn" {
 
 variable "abort_incomplete_multipart_upload_days" {
   description = "The number of days to keep an incomplete multipart upload before it is deleted"
-  default     = 30
+  default     = 7
 }
