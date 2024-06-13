@@ -67,7 +67,7 @@ resource "aws_sqs_queue" "dlq_with_sse" {
 resource "aws_cloudwatch_metric_alarm" "dlq_metric_alarm" {
   alarm_name          = "${var.queue_name}-messages-visible--dlq-alarm"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 60
+  evaluation_periods  = var.dlq_alarm_evaluation_period
   metric_query {
     id = "m1"
     metric {
@@ -75,7 +75,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_alarm" {
         QueueName = "${var.queue_name}-dlq"
       }
       metric_name = "ApproximateNumberOfMessagesVisible"
-      period      = 60
+      period      = var.dlq_alarm_evaluation_period
       stat        = "Maximum"
       namespace   = "AWS/SQS"
     }
@@ -87,7 +87,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_alarm" {
         QueueName = "${var.queue_name}-dlq"
       }
       metric_name = "ApproximateNumberOfMessagesNotVisible"
-      period      = 60
+      period      = var.dlq_alarm_evaluation_period
       stat        = "Maximum"
       namespace   = "AWS/SQS"
     }
