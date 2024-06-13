@@ -86,7 +86,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_alarm" {
       dimensions = {
         QueueName = "${var.queue_name}-dlq"
       }
-      metric_name = "ApproximateNumberOfMessagesVisible"
+      metric_name = "ApproximateNumberOfMessagesNotVisible"
       period      = 60
       stat        = "Maximum"
       namespace   = "AWS/SQS"
