@@ -1,6 +1,6 @@
 locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
-  log_bucket_name  = "${var.bucket_name}-logs"
+  log_bucket_name  = var.create_log_bucket ? "${var.bucket_name}-logs" : var.log_bucket_name
 }
 
 resource "aws_s3_bucket" "bucket" {
@@ -115,10 +115,9 @@ resource "aws_s3_bucket_versioning" "logging_versioning_example" {
 }
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  count  = local.log_bucket_count
-  bucket = aws_s3_bucket.bucket.id
+  bucket = var.bucket_name
 
-  target_bucket = aws_s3_bucket.logging_bucket[count.index].id
+  target_bucket = local.log_bucket_name
   target_prefix = "${var.bucket_name}/${data.aws_caller_identity.current.account_id}/"
 }
 

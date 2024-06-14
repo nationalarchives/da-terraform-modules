@@ -2,6 +2,10 @@ variable "create_log_bucket" {
   default = true
 }
 
+variable "log_bucket_name" {
+  default = ""
+}
+
 variable "bucket_name" {}
 
 variable "common_tags" {
