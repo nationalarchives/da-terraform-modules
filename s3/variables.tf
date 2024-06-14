@@ -13,7 +13,8 @@ variable "logging_bucket_policy" {
 }
 
 variable "bucket_policy" {
-  default = ""
+  default     = ""
+  description = "Additional bucket policy to be added to a default policy with sid AllowSSLRequestsOnly that denies non SSL requests."
 }
 
 variable "sns_topic_config" {
