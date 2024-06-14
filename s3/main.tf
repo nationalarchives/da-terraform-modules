@@ -50,11 +50,28 @@ resource "aws_s3_bucket_lifecycle_configuration" "delete_incomplete_multipart_up
   }
 }
 
+data "aws_iam_policy_document" "policy_document" {
+  source_policy_documents = var.bucket_policy == "" ? [
+    templatefile(
+      "${path.module}/templates/default_bucket_policy.json.tpl",
+      {
+        bucket_name = var.bucket_name
+      }
+    )
+    ] : [
+    var.bucket_policy,
+    templatefile(
+      "${path.module}/templates/default_bucket_policy.json.tpl",
+      {
+        bucket_name = var.bucket_name
+      }
+    )
+  ]
+}
+
 resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = aws_s3_bucket.bucket.*.id[0]
-  policy = var.bucket_policy == "" ? templatefile("${path.module}/templates/default_bucket_policy.json.tpl", {
-    bucket_name = var.bucket_name
-  }) : var.bucket_policy
+  bucket     = aws_s3_bucket.bucket.*.id[0]
+  policy     = data.aws_iam_policy_document.policy_document.json
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
 
