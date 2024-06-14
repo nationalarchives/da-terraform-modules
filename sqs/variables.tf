@@ -73,3 +73,9 @@ variable "queue_visibility_alarm_notification_topic" {
   description = "A topic arn which will be used to send ALARM events if the alarm for max number of messages in the queue is triggered."
   default     = null
 }
+
+variable "dlq_alarm_evaluation_period" {
+  type        = number
+  description = "The evaluation period for the metrics for the DLQ alarm"
+  default     = 60
+}

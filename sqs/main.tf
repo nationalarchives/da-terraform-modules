@@ -64,20 +64,42 @@ resource "aws_sqs_queue" "dlq_with_sse" {
   sqs_managed_sse_enabled   = true
 }
 
-module "dlq_cloudwatch_alarm" {
-  source              = "../cloudwatch_alarms"
-  metric_name         = "ApproximateNumberOfMessagesVisible"
-  namespace           = "AWS/SQS"
-  name                = "${var.queue_name}-messages-visible--dlq-alarm"
-  threshold           = var.dlq_cloudwatch_alarm_visible_messages_threshold
+resource "aws_cloudwatch_metric_alarm" "dlq_metric_alarm" {
+  alarm_name          = "${var.queue_name}-messages-visible--dlq-alarm"
   comparison_operator = "GreaterThanThreshold"
-  statistic           = "Sum"
-  treat_missing_data  = "ignore"
-  datapoints_to_alarm = 1
-  dimensions = {
-    QueueName = local.sqs_dlq.name
+  evaluation_periods  = var.dlq_alarm_evaluation_period
+  metric_query {
+    id = "m1"
+    metric {
+      dimensions = {
+        QueueName = "${var.queue_name}-dlq"
+      }
+      metric_name = "ApproximateNumberOfMessagesVisible"
+      period      = var.dlq_alarm_evaluation_period
+      stat        = "Maximum"
+      namespace   = "AWS/SQS"
+    }
   }
-  notification_topic = var.dlq_notification_topic
+  metric_query {
+    id = "m2"
+    metric {
+      dimensions = {
+        QueueName = "${var.queue_name}-dlq"
+      }
+      metric_name = "ApproximateNumberOfMessagesNotVisible"
+      period      = var.dlq_alarm_evaluation_period
+      stat        = "Maximum"
+      namespace   = "AWS/SQS"
+    }
+  }
+  metric_query {
+    expression  = "RATE(m1+m2)"
+    id          = "e1"
+    label       = "AllMessagesInQueue"
+    period      = 60
+    return_data = true
+  }
+
 }
 
 module "queue_cloudwatch_alarm" {
