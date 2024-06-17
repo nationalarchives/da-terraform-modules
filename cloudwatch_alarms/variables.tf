@@ -35,7 +35,7 @@ variable "name" {
 }
 
 variable "notification_topic" {
-  default     = ""
+  default     = null
   description = "The SNS topic to send alarm notifications to"
 }
 
