@@ -68,6 +68,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_alarm" {
   alarm_name          = "${var.queue_name}-messages-visible--dlq-alarm"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = var.dlq_alarm_evaluation_period
+  treat_missing_data  = "notBreaching"
   metric_query {
     id = "m1"
     metric {
