@@ -115,6 +115,7 @@ resource "aws_s3_bucket_versioning" "logging_versioning_example" {
 }
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
+  count  = local.log_bucket_count
   bucket = var.bucket_name
 
   target_bucket = local.log_bucket_name
