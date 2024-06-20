@@ -15,5 +15,5 @@ output "dlq_sqs_url" {
 }
 
 output "dlq_cloudwatch_alarm_arn" {
-  value = var.dlq_notification_topic == "" ? "" : module.dlq_cloudwatch_alarm.*.cloudwatch_alarm_arn[0]
+  value = aws_cloudwatch_metric_alarm.dlq_metric_alarm.arn
 }

@@ -2,6 +2,10 @@ variable "create_log_bucket" {
   default = true
 }
 
+variable "log_bucket_name" {
+  default = ""
+}
+
 variable "bucket_name" {}
 
 variable "common_tags" {
@@ -13,7 +17,8 @@ variable "logging_bucket_policy" {
 }
 
 variable "bucket_policy" {
-  default = ""
+  default     = ""
+  description = "Additional bucket policy to be added to a default policy with sid AllowSSLRequestsOnly that denies non SSL requests."
 }
 
 variable "sns_topic_config" {
@@ -27,5 +32,5 @@ variable "kms_key_arn" {
 
 variable "abort_incomplete_multipart_upload_days" {
   description = "The number of days to keep an incomplete multipart upload before it is deleted"
-  default     = 30
+  default     = 7
 }
