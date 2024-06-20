@@ -33,7 +33,7 @@ variable "a_record_name" {
 
 variable "create_hosted_zone" {
   description = "Whether to create the hosted zone or not. Cases where hosted zone already created"
-  default = true
+  default     = true
 }
 
 variable "hosted_zone_id" {
