@@ -16,6 +16,15 @@ resource "aws_dynamodb_table" "table" {
     kms_key_arn = var.kms_key_arn
   }
 
+  dynamic "ttl" {
+    for_each = var.ttl_attribute_name == null ? [] : [var.ttl_attribute_name]
+    iterator = attr_name
+    content {
+      attribute_name = attr_name.value
+      enabled        = true
+    }
+  }
+
   dynamic "attribute" {
     for_each = toset(flatten([var.range_key.name == null ? [] : [var.range_key], var.additional_attributes, [var.hash_key]]))
     iterator = attr
