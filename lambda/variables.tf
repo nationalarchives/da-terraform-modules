@@ -122,3 +122,15 @@ variable "filename" {
   description = "Allows a filename to be passed directly to the module instead of using the generic ones"
   default     = ""
 }
+
+variable "use_image" {
+  description = "Boolean to determine if Lambda function uses an image or a zip file"
+  type        = bool
+  default     = true
+}
+
+variable "image_source_url" {
+  description = "URI of the Lambda function image"
+  type        = string
+  default     = ""
+}

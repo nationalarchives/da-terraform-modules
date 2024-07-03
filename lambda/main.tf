@@ -6,10 +6,11 @@ resource "aws_lambda_function" "lambda_function" {
   function_name = var.function_name
   handler       = var.handler
   role          = aws_iam_role.lambda_iam_role.arn
-  runtime       = var.runtime
-  filename      = var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
+  image_uri     = var.use_image ? null : var.image_source_url
+  runtime       = var.use_image ? null : var.runtime
+  filename      = var.use_image ? null : var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   timeout       = var.timeout_seconds
-  memory_size   = var.memory_size
+  memory_size   = ar.use_image ? null : var.memory_size
 
   ephemeral_storage {
     size = var.storage_size
