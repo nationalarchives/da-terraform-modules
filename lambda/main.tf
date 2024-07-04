@@ -10,7 +10,7 @@ resource "aws_lambda_function" "lambda_function" {
   runtime       = var.use_image ? null : var.runtime
   filename      = var.use_image ? null : var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   timeout       = var.timeout_seconds
-  memory_size   = ar.use_image ? null : var.memory_size
+  memory_size   = var.memory_size
 
   ephemeral_storage {
     size = var.storage_size

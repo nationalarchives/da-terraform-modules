@@ -127,7 +127,7 @@ variable "filename" {
 variable "use_image" {
   description = "Boolean to determine if Lambda function uses an image or a zip file"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "image_url" {
