@@ -6,7 +6,7 @@ resource "aws_lambda_function" "lambda_function" {
   function_name = var.function_name
   handler       = var.handler
   role          = aws_iam_role.lambda_iam_role.arn
-  image_uri     = var.use_image ? null : var.image_source_url
+  image_uri     = var.use_image ? null : var.image_url
   runtime       = var.use_image ? null : var.runtime
   filename      = var.use_image ? null : var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   timeout       = var.timeout_seconds

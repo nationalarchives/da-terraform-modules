@@ -25,6 +25,7 @@ variable "plaintext_env_vars" {
 
 variable "runtime" {
   description = "The lambda runtime, for example java11"
+  default     = ""
 }
 
 variable "timeout_seconds" {
@@ -129,7 +130,7 @@ variable "use_image" {
   default     = true
 }
 
-variable "image_source_url" {
+variable "image_url" {
   description = "URI of the Lambda function image"
   type        = string
   default     = ""
