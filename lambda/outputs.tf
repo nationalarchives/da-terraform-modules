@@ -1,5 +1,5 @@
 output "lambda_arn" {
-  value = aws_lambda_function.lambda_function.arn
+  value = var.use_image ? aws_lambda_function.lambda_function_ecr[0].arn : aws_lambda_function.lambda_function_zip[0].arn
 }
 
 output "lambda_role_arn" {
