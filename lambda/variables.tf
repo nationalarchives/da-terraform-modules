@@ -25,6 +25,7 @@ variable "plaintext_env_vars" {
 
 variable "runtime" {
   description = "The lambda runtime, for example java11"
+  default     = ""
 }
 
 variable "timeout_seconds" {
@@ -120,5 +121,17 @@ variable "sqs_queue_batching_window" {
 
 variable "filename" {
   description = "Allows a filename to be passed directly to the module instead of using the generic ones"
+  default     = ""
+}
+
+variable "use_image" {
+  description = "Boolean to determine if Lambda function uses an image or a zip file"
+  type        = bool
+  default     = false
+}
+
+variable "image_url" {
+  description = "URI of the Lambda function image"
+  type        = string
   default     = ""
 }
