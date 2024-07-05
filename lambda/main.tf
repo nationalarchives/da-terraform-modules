@@ -39,7 +39,7 @@ resource "aws_lambda_function" "lambda_function_zip" {
   }
 }
 
-resource "aws_lambda_function" "lambda_function_ecr" {
+resource "aws_lambda_function" "lambda_function" {
   count         = var.use_image ? 1 : 0
   function_name = var.function_name
   handler       = var.handler
@@ -78,7 +78,7 @@ resource "aws_lambda_function" "lambda_function_ecr" {
 
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
-  name              = var.use_image ? "/aws/lambda/${aws_lambda_function.lambda_function_ecr[0].function_name}" : "/aws/lambda/${aws_lambda_function.lambda_function_zip[0].function_name}"
+  name              = var.use_image ? "/aws/lambda/${aws_lambda_function.lambda_function[0].function_name}" : "/aws/lambda/${aws_lambda_function.lambda_function_zip[0].function_name}"
   retention_in_days = var.log_retention
   kms_key_id        = var.log_group_kms_key_arn
   tags              = var.tags
@@ -100,7 +100,7 @@ resource "aws_kms_ciphertext" "encrypted_environment_variables" {
 resource "aws_lambda_event_source_mapping" "sqs_queue_mappings" {
   for_each                           = local.sqs_mapping_without_ignore_enabled
   event_source_arn                   = each.key
-  function_name                      = var.use_image ? aws_lambda_function.lambda_function_ecr.*.arn[0] : aws_lambda_function.lambda_function_zip.*.arn[0]
+  function_name                      = var.use_image ? aws_lambda_function.lambda_function.*.arn[0] : aws_lambda_function.lambda_function_zip.*.arn[0]
   batch_size                         = var.sqs_queue_mapping_batch_size
   maximum_batching_window_in_seconds = var.sqs_queue_batching_window
   dynamic "scaling_config" {
@@ -114,7 +114,7 @@ resource "aws_lambda_event_source_mapping" "sqs_queue_mappings" {
 resource "aws_lambda_event_source_mapping" "sqs_queue_mappings_ignore_enabled" {
   for_each                           = local.sqs_mapping_ignore_enabled
   event_source_arn                   = each.key
-  function_name                      = var.use_image ? aws_lambda_function.lambda_function_ecr.*.arn[0] : aws_lambda_function.lambda_function_zip.*.arn[0]
+  function_name                      = var.use_image ? aws_lambda_function.lambda_function.*.arn[0] : aws_lambda_function.lambda_function_zip.*.arn[0]
   batch_size                         = var.sqs_queue_mapping_batch_size
   maximum_batching_window_in_seconds = var.sqs_queue_batching_window
   dynamic "scaling_config" {
@@ -132,7 +132,7 @@ resource "aws_lambda_permission" "lambda_permissions" {
   for_each      = var.lambda_invoke_permissions
   statement_id  = "AllowExecutionFrom${title(split(".", each.key)[0])}"
   action        = "lambda:InvokeFunction"
-  function_name = var.use_image ? aws_lambda_function.lambda_function_ecr[0].function_name : aws_lambda_function.lambda_function_zip[0].function_name
+  function_name = var.use_image ? aws_lambda_function.lambda_function[0].function_name : aws_lambda_function.lambda_function_zip[0].function_name
   principal     = each.key
   source_arn    = each.value
 }
