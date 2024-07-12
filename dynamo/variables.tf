@@ -69,6 +69,6 @@ variable "ttl_attribute_name" {
 }
 
 variable "stream_enabled" {
-  type = bool
+  type    = bool
   default = false
 }
