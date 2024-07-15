@@ -72,3 +72,7 @@ variable "stream_enabled" {
   type    = bool
   default = false
 }
+
+variable "stream_view_type" {
+  default = "NEW_IMAGE"
+}
