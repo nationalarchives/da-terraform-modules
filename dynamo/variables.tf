@@ -67,3 +67,12 @@ variable "ttl_attribute_name" {
   description = "This attribute name will be used to enable ttl on the table"
   default     = null
 }
+
+variable "stream_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "stream_view_type" {
+  default = "NEW_IMAGE"
+}
