@@ -131,6 +131,13 @@ resource "aws_lambda_event_source_mapping" "sqs_queue_mappings_ignore_enabled" {
   }
 }
 
+resource "aws_lambda_event_source_mapping" "dynamo_stream_event_source_mapping" {
+  count             = var.dynamo_stream_config == null ? 0 : 1
+  event_source_arn  = var.dynamo_stream_config.stream_arn
+  function_name     = local.lambda_name
+  starting_position = var.dynamo_stream_config.starting_position
+}
+
 resource "aws_lambda_permission" "lambda_permissions" {
   for_each      = var.lambda_invoke_permissions
   statement_id  = "AllowExecutionFrom${title(split(".", each.key)[0])}"
