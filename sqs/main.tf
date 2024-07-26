@@ -64,43 +64,35 @@ resource "aws_sqs_queue" "dlq_with_sse" {
   sqs_managed_sse_enabled   = true
 }
 
-resource "aws_cloudwatch_metric_alarm" "dlq_metric_alarm" {
-  alarm_name          = "${var.queue_name}-messages-visible--dlq-alarm"
+
+resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
+  alarm_name          = "${var.queue_name}" - dlq-messages-visible-alarm
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = var.dlq_alarm_evaluation_period
+  metric_name         = "ApproximateNumberOfMessagesVisible"
+  namespace           = "AWS/SQS"
+  statistic           = "Sum"
   treat_missing_data  = "ignore"
-  metric_query {
-    id = "m1"
-    metric {
-      dimensions = {
-        QueueName = "${var.queue_name}-dlq"
-      }
-      metric_name = "ApproximateNumberOfMessagesVisible"
-      period      = var.dlq_alarm_evaluation_period
-      stat        = "Maximum"
-      namespace   = "AWS/SQS"
-    }
+  datapoints_to_alarm = 1
+  dimensions = {
+    QueueName = "${var.queue_name}" - dlq
   }
-  metric_query {
-    id = "m2"
-    metric {
-      dimensions = {
-        QueueName = "${var.queue_name}-dlq"
-      }
-      metric_name = "ApproximateNumberOfMessagesNotVisible"
-      period      = var.dlq_alarm_evaluation_period
-      stat        = "Maximum"
-      namespace   = "AWS/SQS"
-    }
-  }
-  metric_query {
-    expression  = "RATE(m1+m2)"
-    id          = "e1"
-    label       = "AllMessagesInQueue"
-    period      = 60
-    return_data = true
-  }
+  notification_topic = var.dlq_notification_topic
+}
 
+resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
+  alarm_name          = "${var.queue_name}" - dlq-messages_sent_alarm
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = var.dlq_alarm_evaluation_period
+  metric_name         = "NumberOfMessageSent"
+  namespace           = "AWS/SQS"
+  statistic           = "Sum"
+  treat_missing_data  = "ignore"
+  datapoints_to_alarm = 1
+  dimensions = {
+    QueueName = "${var.queue_name}" - dlq
+  }
+  notification_topic = var.dlq_notification_topic
 }
 
 module "queue_cloudwatch_alarm" {
