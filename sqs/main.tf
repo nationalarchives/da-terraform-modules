@@ -65,10 +65,10 @@ resource "aws_sqs_queue" "dlq_with_sse" {
 }
 
 
-resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
+module "dlq_metric_messages_visible_alarm" {
+  source = "../cloudwatch_alarms"
   alarm_name          = "${var.queue_name}-dlq-messages-visible-alarm"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = var.dlq_alarm_evaluation_period
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
   statistic           = "Sum"
@@ -77,13 +77,14 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
   dimensions = {
     QueueName = "${var.queue_name}-dlq"
   }
-  period = var.dlq_alarm_evaluation_period
+  period = var.dlq_alarm_messages_visible_period
+  threshold = var.dlq_cloudwatch_alarm_visible_messages_threshold
 }
 
-resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
+module "dlq_metric_messages_sent_alarm" {
+  source = "../cloudwatch_alarms"
   alarm_name          = "${var.queue_name}-dlq-messages-sent-alarm"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = var.dlq_alarm_evaluation_period
   metric_name         = "NumberOfMessageSent"
   namespace           = "AWS/SQS"
   statistic           = "Sum"
@@ -92,7 +93,8 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
   dimensions = {
     QueueName = "${var.queue_name}-dlq"
   }
-  period = var.dlq_alarm_evaluation_period
+  period = var.dlq_alarm_messages_sent_period
+  threshold = var.dlq_cloudwatch_alarm_visible_messages_threshold
 }
 
 module "queue_cloudwatch_alarm" {

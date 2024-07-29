@@ -56,6 +56,12 @@ variable "dlq_cloudwatch_alarm_visible_messages_threshold" {
   default     = 0
 }
 
+variable "dlq_cloudwatch_alarm_sent_messages_threshold" {
+  description = "The alarm will alert if ApproximateNumberOfMessagesSent is above this threshold for the dlq"
+  default     = 1
+}
+
+
 variable "encryption_type" {
   default = "kms"
   validation {
@@ -74,8 +80,14 @@ variable "queue_visibility_alarm_notification_topic" {
   default     = null
 }
 
-variable "dlq_alarm_evaluation_period" {
+variable "dlq_alarm_messages_sent_period" {
   type        = number
-  description = "The evaluation period for the metrics for the DLQ alarm"
+  description = "The period for the metrics for the DLQ alarm sent messages"
+  default     = 300
+}
+
+variable "dlq_alarm_messages_visible_period" {
+  type        = number
+  description = "The period for the metrics for the DLQ alarm visible messages"
   default     = 60
 }
