@@ -135,3 +135,12 @@ variable "image_url" {
   type        = string
   default     = ""
 }
+
+variable "dynamo_stream_config" {
+  description = "The configuration of a dynamo stream event source"
+  type = object({
+    stream_arn        = string
+    starting_position = optional(string, "TRIM_HORIZON")
+  })
+  default = null
+}
