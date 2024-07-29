@@ -77,6 +77,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
   dimensions = {
     QueueName = "${var.queue_name}-dlq"
   }
+  period = var.dlq_alarm_evaluation_period
 }
 
 resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
@@ -91,6 +92,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
   dimensions = {
     QueueName = "${var.queue_name}-dlq"
   }
+  period = var.dlq_alarm_evaluation_period
 }
 
 module "queue_cloudwatch_alarm" {
