@@ -77,7 +77,6 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
   dimensions = {
     QueueName = "${var.queue_name}-dlq"
   }
-  notification_topic = var.dlq_notification_topic
 }
 
 resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
@@ -92,7 +91,6 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
   dimensions = {
     QueueName = "${var.queue_name}-dlq"
   }
-  notification_topic = var.dlq_notification_topic
 }
 
 module "queue_cloudwatch_alarm" {
