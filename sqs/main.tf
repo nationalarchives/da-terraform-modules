@@ -81,7 +81,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
-  alarm_name          = "${var.queue_name}-dlq-messages_sent_alarm"
+  alarm_name          = "${var.queue_name}-dlq-messages-sent-alarm"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = var.dlq_alarm_evaluation_period
   metric_name         = "NumberOfMessageSent"
