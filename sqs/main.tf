@@ -66,7 +66,7 @@ resource "aws_sqs_queue" "dlq_with_sse" {
 
 
 resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
-  alarm_name          = "${var.queue_name}"-dlq-messages-visible-alarm
+  alarm_name          = "${var.queue_name}-dlq-messages-visible-alarm"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = var.dlq_alarm_evaluation_period
   metric_name         = "ApproximateNumberOfMessagesVisible"
@@ -75,13 +75,13 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_visible_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = "${var.queue_name}"-dlq
+    QueueName = "${var.queue_name}-dlq"
   }
   notification_topic = var.dlq_notification_topic
 }
 
 resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
-  alarm_name          = "${var.queue_name}"-dlq-messages_sent_alarm
+  alarm_name          = "${var.queue_name}-dlq-messages_sent_alarm"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = var.dlq_alarm_evaluation_period
   metric_name         = "NumberOfMessageSent"
@@ -90,7 +90,7 @@ resource "aws_cloudwatch_metric_alarm" "dlq_metric_messages_sent_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = "${var.queue_name}"-dlq
+    QueueName = "${var.queue_name}-dlq"
   }
   notification_topic = var.dlq_notification_topic
 }
