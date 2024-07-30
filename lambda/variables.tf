@@ -4,6 +4,7 @@ variable "function_name" {
 
 variable "handler" {
   description = "The lambda function handler"
+  default     = null
 }
 
 variable "environment_variables_kms_key_arn" {
