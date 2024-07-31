@@ -45,7 +45,6 @@ resource "aws_lambda_function" "lambda_function" {
 resource "aws_lambda_function" "lambda_function_ecr" {
   count         = var.use_image ? 1 : 0
   function_name = var.function_name
-  handler       = var.handler
   role          = aws_iam_role.lambda_iam_role.arn
   image_uri     = var.image_url
   package_type  = "Image"
