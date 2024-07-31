@@ -85,7 +85,7 @@ module "dlq_metric_messages_sent_alarm" {
   source              = "../cloudwatch_alarms"
   name                = "${var.queue_name}-dlq-messages-sent-alarm"
   comparison_operator = "GreaterThanThreshold"
-  metric_name         = "NumberOfMessagesSent"
+  metric_name         = "NumberOfMessagesReceived"
   namespace           = "AWS/SQS"
   statistic           = "Sum"
   treat_missing_data  = "ignore"
