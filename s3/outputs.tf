@@ -1,3 +1,3 @@
 output "s3_bucket_arn" {
-  value = aws_s3_bucket.bucket.arn
+  value = "arn:aws:s3:::${var.bucket_name}"
 }
