@@ -74,8 +74,8 @@ variable "queue_visibility_alarm_notification_topic" {
   default     = null
 }
 
-variable "dlq_alarm_evaluation_period" {
+variable "dlq_alarm_messages_visible_period" {
   type        = number
-  description = "The evaluation period for the metrics for the DLQ alarm"
+  description = "The period for the metrics for the DLQ alarm visible messages"
   default     = 60
 }
