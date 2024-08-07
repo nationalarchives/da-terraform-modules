@@ -8,3 +8,7 @@ variable "step_function_role_policy_attachments" {
   description = "A list of policy arns to attach to the step function role"
   type        = map(string)
 }
+
+variable "common_tags" {
+  default = {}
+}
