@@ -280,13 +280,15 @@ resource "aws_network_acl_rule" "public_nacl_rule" {
 }
 
 resource "aws_vpc_endpoint" "s3_endpoint" {
-  count        = var.create_s3_gateway_endpoint ? 1 : 0
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.s3"
+  count           = var.create_s3_gateway_endpoint ? 1 : 0
+  vpc_id          = aws_vpc.main.id
+  service_name    = "com.amazonaws.${var.region}.s3"
+  route_table_ids = var.use_nat_gateway ? [aws_route_table.private_nat_gateway[count.index].id] : [aws_route_table.private_nat_instance[count.index].id]
 }
 
 resource "aws_vpc_endpoint" "dynamo_endpoint" {
-  count        = var.create_dynamo_gateway_endpoint ? 1 : 0
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.dynamodb"
+  count           = var.create_dynamo_gateway_endpoint ? 1 : 0
+  vpc_id          = aws_vpc.main.id
+  service_name    = "com.amazonaws.${var.region}.dynamodb"
+  route_table_ids = var.use_nat_gateway ? [aws_route_table.private_nat_gateway[count.index].id] : [aws_route_table.private_nat_instance[count.index].id]
 }
