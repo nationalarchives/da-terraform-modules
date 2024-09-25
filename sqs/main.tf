@@ -52,14 +52,16 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
 
 resource "aws_sqs_queue" "dlq_with_kms" {
   count                     = var.encryption_type == "sse" ? 0 : 1
-  name                      = "${var.queue_name}-dlq"
+  name                      = "${var.queue_name}-dlq${local.queue_name_suffix}"
+  fifo_queue                = var.fifo_queue
   message_retention_seconds = 1209600
   kms_master_key_id         = var.kms_key_id
 }
 
 resource "aws_sqs_queue" "dlq_with_sse" {
   count                     = var.encryption_type == "sse" ? 1 : 0
-  name                      = "${var.queue_name}-dlq"
+  name                      = "${var.queue_name}-dlq${local.queue_name_suffix}"
+  fifo_queue                = var.fifo_queue
   message_retention_seconds = 1209600
   sqs_managed_sse_enabled   = true
 }
