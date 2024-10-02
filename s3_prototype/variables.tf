@@ -1,3 +1,9 @@
+variable "attach_s3_policy" {
+  description = "Whether to attach s3 bucket policy built by the inputted bucket_policy and default policies or not. Only expected to be false if the full bucket policy cannot be passesd in due to a circular dependency"
+  type        = bool
+  default     = true
+}
+
 variable "bucket_name" {}
 
 variable "common_tags" {
