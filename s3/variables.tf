@@ -13,7 +13,8 @@ variable "common_tags" {
 }
 
 variable "logging_bucket_policy" {
-  default = "Additional logging bucket policy to be added to a default policy."
+  default     = ""
+  description = "Additional logging bucket policy to be added to a default policy."
 }
 
 variable "bucket_policy" {
