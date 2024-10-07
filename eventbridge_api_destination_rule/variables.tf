@@ -33,3 +33,8 @@ variable "input_path" {
 variable "event_bus_name" {
   default = "default"
 }
+
+variable "lambda_target_arn" {
+  description = "A lambda arn to be used as an event target"
+  default     = null
+}
