@@ -55,3 +55,9 @@ resource "aws_cloudwatch_event_target" "step_function_failure_cloudwatch_target"
     }
   }
 }
+
+resource "aws_cloudwatch_event_target" "step_function_failure_lambda_target" {
+  count = var.lambda_target_arn == null ? 0 : 1
+  arn   = var.lambda_target_arn
+  rule  = aws_cloudwatch_event_rule.rule.name
+}
