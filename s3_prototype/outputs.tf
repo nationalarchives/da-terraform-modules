@@ -4,6 +4,6 @@ output "s3_bucket_policy_json" {
 }
 
 output "s3_bucket_id" {
-  description = "AWS Id for the created bucket"
+  description = "AWS Id for the created data bucket"
   value       = aws_s3_bucket.bucket.id
 }
