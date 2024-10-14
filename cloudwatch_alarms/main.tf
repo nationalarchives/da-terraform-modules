@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.6.6"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 resource "aws_cloudwatch_metric_alarm" "cloudwatch_metric_alarm" {
   alarm_name          = var.name
   comparison_operator = var.comparison_operator
