@@ -11,6 +11,7 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_metric_alarm" {
   actions_enabled     = var.notification_topic == null ? false : true
   alarm_actions       = var.notification_topic == null ? [] : [var.notification_topic]
   ok_actions          = var.notification_topic == null ? [] : [var.notification_topic]
-  statistic           = var.statistic
+  statistic           = var.extended_statistic == null ? var.statistic : null
+  extended_statistic  = var.extended_statistic
   period              = var.period
 }
