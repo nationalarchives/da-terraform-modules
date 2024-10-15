@@ -108,6 +108,12 @@ variable "policy_attachments" {
   description = "A list of policy arns to attach. These will need to be pre-existing policies"
 }
 
+variable "role_arn" {
+  description = "An existing role to attach to the lambda. If this is provided then policies and policy_attachments will be ignored"
+  default     = null
+  type        = string
+}
+
 variable "log_retention" {
   default = 30
 }

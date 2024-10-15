@@ -9,7 +9,7 @@ resource "aws_lambda_function" "lambda_function" {
   count         = var.use_image ? 0 : 1
   function_name = var.function_name
   handler       = var.handler
-  role          = aws_iam_role.lambda_iam_role.arn
+  role          = var.role_arn == null ? aws_iam_role.lambda_iam_role.arn : var.role_arn
   runtime       = var.runtime
   filename      = var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   timeout       = var.timeout_seconds
@@ -152,7 +152,7 @@ resource "aws_iam_role" "lambda_iam_role" {
 }
 
 resource "aws_iam_policy" "lambda_policies" {
-  for_each = var.policies
+  for_each = var.role_arn == null ? var.policies : {}
   policy   = each.value
   name     = each.key
 }
@@ -164,7 +164,7 @@ resource "aws_iam_role_policy_attachment" "role_policy_attachment" {
 }
 
 resource "aws_iam_role_policy_attachment" "existing_policy_attachment" {
-  for_each   = var.policy_attachments
+  for_each   = var.role_arn == null ? var.policy_attachments : []
   policy_arn = each.value
   role       = aws_iam_role.lambda_iam_role.name
 }
