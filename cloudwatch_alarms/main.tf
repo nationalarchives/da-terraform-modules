@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.6.6"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 resource "aws_cloudwatch_metric_alarm" "cloudwatch_metric_alarm" {
   alarm_name          = var.name
   comparison_operator = var.comparison_operator
@@ -11,6 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "cloudwatch_metric_alarm" {
   actions_enabled     = var.notification_topic == null ? false : true
   alarm_actions       = var.notification_topic == null ? [] : [var.notification_topic]
   ok_actions          = var.notification_topic == null ? [] : [var.notification_topic]
-  statistic           = var.statistic
+  statistic           = var.extended_statistic == null ? var.statistic : null
+  extended_statistic  = var.extended_statistic
   period              = var.period
 }
