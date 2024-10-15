@@ -100,6 +100,7 @@ variable "lambda_invoke_permissions" {
 variable "policies" {
   description = "A map in the form policyName -> policyBodyString"
   type        = map(string)
+  default     = {}
 }
 
 variable "policy_attachments" {
