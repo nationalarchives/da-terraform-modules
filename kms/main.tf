@@ -49,12 +49,16 @@ data "aws_iam_policy_document" "key_policy" {
     }
   }
   statement {
-    sid = "AccountRootDescribeKey"
+    sid = "EnableIamUserPermissionsReadOnly"
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
-    actions   = ["kms:DescribeKey", "kms:GetKeyPolicy"]
+    actions = [
+      "kms:Describe*",
+      "kms:Get*",
+      "kms:List*"
+    ]
     resources = ["*"]
   }
   statement {
