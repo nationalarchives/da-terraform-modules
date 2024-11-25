@@ -1,6 +1,6 @@
 locals {
-  log_bucket_count = var.create_log_bucket ? 1 : 0
   log_bucket_name  = var.create_log_bucket ? "${var.bucket_name}-logs" : var.log_bucket_name
+  log_bucket_count = local.log_bucket_name != "" ? 1 : 0
 }
 
 
@@ -33,7 +33,7 @@ module "log_bucket" {
 
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  count  = local.log_bucket_count
+  count  = var.bucket_logging_count
   bucket = var.bucket_name
 
   target_bucket = local.log_bucket_name
