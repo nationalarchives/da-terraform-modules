@@ -33,7 +33,7 @@ module "log_bucket" {
 
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  count  = var.bucket_logging_count
+  count  = local.log_bucket_count
   bucket = var.bucket_name
 
   target_bucket = local.log_bucket_name
