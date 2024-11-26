@@ -1,8 +1,8 @@
 locals {
+  log_bucket_count = var.create_log_bucket ? 1 : 0
   log_bucket_name  = var.create_log_bucket ? "${var.bucket_name}-logs" : var.log_bucket_name
-  log_bucket_count = local.log_bucket_name != "" ? 1 : 0
+  bucket_logging_count = local.log_bucket_name != "" ? 1 : 0
 }
-
 
 module "data_bucket" {
   source = "../s3_prototype"
@@ -17,9 +17,9 @@ module "data_bucket" {
 }
 
 module "log_bucket" {
-  source = "../s3_logs"
-
   count = local.log_bucket_count
+  
+  source = "../s3_logs"
 
   bucket_name = local.log_bucket_name
   common_tags = var.common_tags
@@ -33,9 +33,9 @@ module "log_bucket" {
 
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
-  count  = local.log_bucket_count
+  count  = local.bucket_logging_count
+  
   bucket = var.bucket_name
-
   target_bucket = local.log_bucket_name
   target_prefix = "${var.bucket_name}/${data.aws_caller_identity.current.account_id}/"
 }
