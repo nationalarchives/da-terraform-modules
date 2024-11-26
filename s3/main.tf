@@ -1,3 +1,13 @@
+terraform {
+  required_version = ">= 1.6.6"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
 locals {
   log_bucket_count = var.create_log_bucket ? 1 : 0
   log_bucket_name  = var.create_log_bucket ? "${var.bucket_name}-logs" : var.log_bucket_name
