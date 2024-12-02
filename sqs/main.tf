@@ -1,12 +1,14 @@
 locals {
   queue_name_suffix = var.fifo_queue ? ".fifo" : ""
+  queue_name        = "${var.queue_name}${local.queue_name_suffix}"
+  dlq_queue_name    = "${var.queue_name}-dlq${local.queue_name_suffix}"
   sqs_queue         = var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
   sqs_dlq           = var.encryption_type == "sse" ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0]
 }
 
 resource "aws_sqs_queue" "sqs_queue_with_sse" {
   count                     = var.encryption_type == "sse" ? 1 : 0
-  name                      = "${var.queue_name}${local.queue_name_suffix}"
+  name                      = local.queue_name
   delay_seconds             = var.delay_seconds
   fifo_queue                = var.fifo_queue
   sqs_managed_sse_enabled   = true
@@ -21,7 +23,7 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
   tags = merge(
     var.tags,
     tomap(
-      { Name = var.queue_name }
+      { Name = local.queue_name }
     )
   )
   visibility_timeout_seconds = var.visibility_timeout
@@ -29,7 +31,7 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
 
 resource "aws_sqs_queue" "sqs_queue_with_kms" {
   count                     = var.encryption_type == "sse" ? 0 : 1
-  name                      = "${var.queue_name}${local.queue_name_suffix}"
+  name                      = local.queue_name
   delay_seconds             = var.delay_seconds
   fifo_queue                = var.fifo_queue
   kms_master_key_id         = var.kms_key_id
@@ -44,7 +46,7 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
   tags = merge(
     var.tags,
     tomap(
-      { Name = var.queue_name }
+      { Name = local.queue_name }
     )
   )
   visibility_timeout_seconds = var.visibility_timeout
@@ -52,7 +54,7 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
 
 resource "aws_sqs_queue" "dlq_with_kms" {
   count                     = var.encryption_type == "sse" ? 0 : 1
-  name                      = "${var.queue_name}-dlq${local.queue_name_suffix}"
+  name                      = local.dlq_queue_name
   fifo_queue                = var.fifo_queue
   message_retention_seconds = 1209600
   kms_master_key_id         = var.kms_key_id
@@ -60,7 +62,7 @@ resource "aws_sqs_queue" "dlq_with_kms" {
 
 resource "aws_sqs_queue" "dlq_with_sse" {
   count                     = var.encryption_type == "sse" ? 1 : 0
-  name                      = "${var.queue_name}-dlq${local.queue_name_suffix}"
+  name                      = local.dlq_queue_name
   fifo_queue                = var.fifo_queue
   message_retention_seconds = 1209600
   sqs_managed_sse_enabled   = true
@@ -69,7 +71,7 @@ resource "aws_sqs_queue" "dlq_with_sse" {
 
 module "dlq_metric_messages_visible_alarm" {
   source              = "../cloudwatch_alarms"
-  name                = "${var.queue_name}-dlq-messages-visible-alarm"
+  name                = "${local.dlq_queue_name}-messages-visible-alarm"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
@@ -77,7 +79,7 @@ module "dlq_metric_messages_visible_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = "${var.queue_name}-dlq"
+    QueueName = "${local.dlq_queue_name}-messages-visible-alarm"
   }
   period    = var.dlq_alarm_messages_visible_period
   threshold = var.dlq_cloudwatch_alarm_visible_messages_threshold
@@ -87,7 +89,7 @@ module "queue_cloudwatch_alarm" {
   source              = "../cloudwatch_alarms"
   metric_name         = "ApproximateNumberOfMessagesVisible"
   namespace           = "AWS/SQS"
-  name                = "${var.queue_name}-messages-visible-alarm"
+  name                = "${local.queue_name}-messages-visible-alarm"
   threshold           = var.queue_cloudwatch_alarm_visible_messages_threshold
   comparison_operator = "GreaterThanThreshold"
   statistic           = "Sum"
@@ -98,3 +100,53 @@ module "queue_cloudwatch_alarm" {
   }
   notification_topic = var.queue_visibility_alarm_notification_topic
 }
+
+resource "aws_cloudwatch_metric_alarm" "daily_alert" {
+  for_each            = var.recurring_notification_hour == null ? [] : toset([local.sqs_dlq.name, local.sqs_queue.name])
+  alarm_name          = "${each.key}-daily-alarm"
+  alarm_description   = "Triggers when DailyAlert > 0 at ${var.recurring_notification_hour}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  datapoints_to_alarm = 1
+
+  metric_query {
+    id = "m1"
+    metric {
+      metric_name = "ApproximateNumberOfMessagesVisible"
+      stat        = "Average"
+      period      = 300
+      namespace   = "AWS/SQS"
+      dimensions = {
+        QueueName = each.key
+      }
+    }
+  }
+
+  metric_query {
+    id = "m2"
+    metric {
+      metric_name = "ApproximateNumberOfMessagesNotVisible"
+      stat        = "Average"
+      period      = 300
+      namespace   = "AWS/SQS"
+      dimensions = {
+        QueueName = each.key
+      }
+    }
+  }
+
+  metric_query {
+    id         = "e1"
+    expression = "SUM([METRICS(\"m1\"), METRICS(\"m2\")])"
+    label      = "TotalMessages"
+  }
+
+  metric_query {
+    id          = "e2"
+    expression  = "IF(HOUR(m1) == ${var.recurring_notification_hour}, e1)"
+    label       = "DailyAlert"
+    return_data = true
+  }
+}
+
