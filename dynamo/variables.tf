@@ -76,3 +76,7 @@ variable "stream_enabled" {
 variable "stream_view_type" {
   default = "NEW_IMAGE"
 }
+
+variable "resource_policy" {
+  default = ""
+}

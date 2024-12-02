@@ -58,7 +58,26 @@ resource "aws_dynamodb_table" "table" {
   )
 }
 
-resource "aws_dynamodb_resource_policy" "require_ssl" {
+data "aws_iam_policy_document" "policy_document" {
+  source_policy_documents = var.resource_policy == "" ? [
+    templatefile(
+      "${path.module}/templates/dynamo_require_ssl.json.tpl",
+      {
+        table_arn = aws_dynamodb_table.table.arn
+      }
+    )
+    ] : [
+    var.resource_policy,
+    templatefile(
+      "${path.module}/templates/dynamo_require_ssl.json.tpl",
+      {
+        table_arn = aws_dynamodb_table.table.arn
+      }
+    )
+  ]
+}
+
+resource "aws_dynamodb_resource_policy" "resource_policy" {
   resource_arn = aws_dynamodb_table.table.arn
-  policy       = templatefile("${path.module}/templates/dynamo_require_ssl.json.tpl", { table_arn = aws_dynamodb_table.table.arn })
+  policy       = data.aws_iam_policy_document.policy_document.json
 }
