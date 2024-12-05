@@ -5,7 +5,6 @@ resource "aws_ssm_parameter" "ssm_parameter" {
   value       = each.value.value
   description = each.value.description
   tier        = each.value.tier
-  overwrite   = each.value.overwrite
   tags        = var.tags
 }
 
@@ -16,7 +15,6 @@ resource "aws_ssm_parameter" "ssm_parameter_ignore_value" {
   value       = each.value.value
   description = each.value.description
   tier        = each.value.tier
-  overwrite   = each.value.overwrite
   tags        = var.tags
   lifecycle {
     ignore_changes = [value]
