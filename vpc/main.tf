@@ -245,6 +245,26 @@ resource "aws_cloudwatch_log_group" "flow_log_log_group" {
   )
 }
 
+resource "aws_route53_resolver_query_log_config" "route53_resolver_log" {
+  name            = "${aws_vpc.main.id}-query-logs"
+  destination_arn = aws_cloudwatch_log_group.route53_resolver_log_group.arn
+}
+
+resource "aws_route53_resolver_query_log_config_association" "route53_resolver_log_association" {
+  resolver_query_log_config_id = aws_route53_resolver_query_log_config.route53_resolver_log.id
+  resource_id                  = aws_vpc.main.id
+}
+
+resource "aws_cloudwatch_log_group" "route53_resolver_log_group" {
+  name = "/vpc/${aws_vpc.main.id}/route53-resolver"
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "/vpc/${aws_vpc.main.id}/route53-resolver" }
+    )
+  )
+}
+
 resource "aws_network_acl" "private_nacl" {
   vpc_id     = aws_vpc.main.id
   subnet_ids = aws_subnet.private.*.id
