@@ -7,7 +7,12 @@
         "ec2:DescribeNetworkInterfaces",
         "ec2:DeleteNetworkInterface"
       ],
-      "Resource": "*"
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceAccount": "${account_id}"
+        }
+      }
     }
   ],
   "Version": "2012-10-17"
