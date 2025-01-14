@@ -13,6 +13,7 @@ jobs:
           message: ":warning: Secrets found in repository da-terraform-modules"
           slack-url: ${{ secrets.SLACK_WEBHOOK }}
       - name: Terraform Format
+        id: fmt
       - uses: nationalarchives/tdr-github-actions/.github/workflows/terraform_check.yml@main
         with:
           use-workspace: false
