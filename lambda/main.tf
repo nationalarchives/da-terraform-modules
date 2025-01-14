@@ -5,6 +5,9 @@ locals {
   lambda_arn                         = local.lambda.arn
   lambda_name                        = local.lambda.function_name
 }
+
+data "aws_caller_identity" "current" {}
+
 resource "aws_lambda_function" "lambda_function" {
   count         = var.use_image ? 0 : 1
   function_name = var.function_name
@@ -171,7 +174,7 @@ resource "aws_iam_role_policy_attachment" "existing_policy_attachment" {
 
 resource "aws_iam_policy" "vpc_access_policy" {
   count       = local.vpc_config_policy_count
-  policy      = templatefile("${path.module}/templates/lambda_vpc_policy.json.tpl", {})
+  policy      = templatefile("${path.module}/templates/lambda_vpc_policy.json.tpl", { account_id = data.aws_caller_identity.current.account_id })
   name        = "${var.function_name}-vpc-policy"
   description = "Allows access to the VPC for function ${var.function_name}"
 }
