@@ -23,7 +23,7 @@ variable "create_archive_rule" {
 variable "archive_rule_name" {
   description = "The name of the archive rule for AWS Access Analyzer."
   type        = string
-  default = null
+  default     = null
 }
 
 variable "criteria" {
