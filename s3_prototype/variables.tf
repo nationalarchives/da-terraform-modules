@@ -27,3 +27,9 @@ variable "abort_incomplete_multipart_upload_days" {
   description = "The number of days to keep an incomplete multipart upload before it is deleted"
   default     = 7
 }
+
+variable "lifecycle_rules" {
+  description = "List of maps describing configuration of object lifecycle management for bucket"
+  type        = any
+  default     = []
+}
