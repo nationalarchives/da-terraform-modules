@@ -13,7 +13,7 @@ resource "aws_accessanalyzer_analyzer" "access_analyzer" {
 }
 
 resource "aws_accessanalyzer_archive_rule" "access_analyzer_archive_rule" {
-  for_each      = var.create_archive_rule ? [1] : []
+  count         = var.create_archive_rule ? 1 : 0
   analyzer_name = aws_accessanalyzer_analyzer.access_analyzer.analyzer_name
   rule_name     = var.archive_rule_name
   dynamic "filter" {
