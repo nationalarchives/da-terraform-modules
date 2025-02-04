@@ -17,7 +17,7 @@ resource "aws_accessanalyzer_archive_rule" "access_analyzer_archive_rule" {
   analyzer_name = aws_accessanalyzer_analyzer.access_analyzer.analyzer_name
   rule_name     = var.archive_rule_name
   dynamic "filter" {
-    for_each = var.criteria
+    for_each = var.create_archive_rule && length(var.criteria) > 0 ? var.criteria : {}
     iterator = "criteria"
     content {
       criteria = criteria.key
