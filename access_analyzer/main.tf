@@ -17,14 +17,13 @@ resource "aws_accessanalyzer_archive_rule" "access_analyzer_archive_rule" {
   analyzer_name = aws_accessanalyzer_analyzer.access_analyzer.analyzer_name
   rule_name     = var.archive_rule_name
   dynamic "filter" {
-    for_each = var.criteria
-    iterator = "criteria"
+    for_each = var.criteria 
     content {
-      criteria = criteria.key
-      contains = lookup(criteria.value, "contains", null)
-      eq       = lookup(criteria.value, "eq", null)
-      exists   = lookup(criteria.value, "exists", null)
-      neq      = lookup(criteria.value, "neq", null)
+      criteria = filter.key
+      contains = lookup(filter.value, "contains", null)
+      eq       = lookup(filter.value, "eq", null)
+      exists   = lookup(filter.value, "exists", null)
+      neq      = lookup(filter.value, "neq", null)
     }
   }
 }
