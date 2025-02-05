@@ -74,6 +74,12 @@ Calling modules can choose whatever set of AWS managed rules are most appropriat
 
 Full list of the available AWS managed rules is available here: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html
 
+## AWS Access Analyzer
+
+This Terraform module provisions an **AWS Access Analyzer** instance and optionally defines an **archive rule** to filter findings. The archive rule supports customizable criteria using comparators such as `contains`, `eq`, `exists`, and `neq`.
+
+For detailed usage and configuration, refer to the [Access Analyzer Module README](./access_analyzer/README.md).
+
 ## Using the modules
 You can either clone this repository into the root of your existing terraform project and reference the modules directly
 ```hcl
