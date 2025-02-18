@@ -18,7 +18,7 @@ resource "aws_accessanalyzer_archive_rule" "access_analyzer_archive_rule" {
   rule_name     = var.archive_rule_name
   dynamic "filter" {
     for_each = var.criteria
-    iterator = "criteria"
+    iterator = criteria
     content {
       criteria = criteria.key
       contains = lookup(criteria.value, "contains", null)
