@@ -105,6 +105,7 @@ resource "aws_lambda_event_source_mapping" "sqs_queue_mappings" {
   function_name                      = local.lambda_arn
   batch_size                         = var.sqs_queue_mapping_batch_size
   maximum_batching_window_in_seconds = var.sqs_queue_batching_window
+  function_response_types            = var.sqs_report_batch_item_failures == true ? ["ReportBatchItemFailures"] : null
   dynamic "scaling_config" {
     for_each = each.value == null ? [] : [each.value]
     content {
@@ -119,6 +120,7 @@ resource "aws_lambda_event_source_mapping" "sqs_queue_mappings_ignore_enabled" {
   function_name                      = local.lambda_arn
   batch_size                         = var.sqs_queue_mapping_batch_size
   maximum_batching_window_in_seconds = var.sqs_queue_batching_window
+  function_response_types            = var.sqs_report_batch_item_failures == true ? ["ReportBatchItemFailures"] : null
   dynamic "scaling_config" {
     for_each = each.value == null ? [] : [each.value]
     content {
@@ -131,10 +133,11 @@ resource "aws_lambda_event_source_mapping" "sqs_queue_mappings_ignore_enabled" {
 }
 
 resource "aws_lambda_event_source_mapping" "dynamo_stream_event_source_mapping" {
-  count             = var.dynamo_stream_config == null ? 0 : 1
-  event_source_arn  = var.dynamo_stream_config.stream_arn
-  function_name     = local.lambda_name
-  starting_position = var.dynamo_stream_config.starting_position
+  count                   = var.dynamo_stream_config == null ? 0 : 1
+  event_source_arn        = var.dynamo_stream_config.stream_arn
+  function_name           = local.lambda_name
+  starting_position       = var.dynamo_stream_config.starting_position
+  function_response_types = var.dynamo_report_batch_item_failures == true ? ["ReportBatchItemFailures"] : null
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {

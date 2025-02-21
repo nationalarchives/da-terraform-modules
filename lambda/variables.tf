@@ -120,6 +120,16 @@ variable "sqs_queue_batching_window" {
   default = 0
 }
 
+variable "sqs_report_batch_item_failures" {
+  description = "Only valid if an SQS event mapping is configured. Sets 'Report batch item failures' on the mapping."
+  default     = false
+}
+
+variable "dynamo_report_batch_item_failures" {
+  description = "Only valid if a Dynamo event mapping is configured. Sets 'Report batch item failures' on the mapping."
+  default     = false
+}
+
 variable "filename" {
   description = "Allows a filename to be passed directly to the module instead of using the generic ones"
   default     = ""
