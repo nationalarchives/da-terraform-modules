@@ -101,24 +101,23 @@ module "queue_cloudwatch_alarm" {
   notification_topic = var.queue_visibility_alarm_notification_topic
 }
 
-resource "aws_cloudwatch_metric_alarm" "daily_alert" {
-  for_each            = var.recurring_notification_hour == null ? [] : toset([local.sqs_dlq.name, local.sqs_queue.name])
-  alarm_name          = "${each.key}-daily-alarm"
-  alarm_description   = "Triggers when DailyAlert > 0 at ${var.recurring_notification_hour}"
-  comparison_operator = "GreaterThanThreshold"
+resource "aws_cloudwatch_metric_alarm" "new_messages_added_alert" {
+  alarm_name          = "${local.sqs_dlq}-new-messages-added-alarm"
+  alarm_description   = "Triggers when number of messages compared to the previous 5 mins has increased"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
-  threshold           = 0
+  threshold           = 1
   datapoints_to_alarm = 1
 
   metric_query {
     id = "m1"
     metric {
       metric_name = "ApproximateNumberOfMessagesVisible"
-      stat        = "Average"
+      stat        = "Maximum"
       period      = 300
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = each.key
+        QueueName = local.sqs_dlq
       }
     }
   }
@@ -127,26 +126,18 @@ resource "aws_cloudwatch_metric_alarm" "daily_alert" {
     id = "m2"
     metric {
       metric_name = "ApproximateNumberOfMessagesNotVisible"
-      stat        = "Average"
+      stat        = "Maximum"
       period      = 300
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = each.key
+        QueueName = local.sqs_dlq
       }
     }
   }
 
   metric_query {
     id         = "e1"
-    expression = "SUM([METRICS(\"m1\"), METRICS(\"m2\")])"
-    label      = "TotalMessages"
-  }
-
-  metric_query {
-    id          = "e2"
-    expression  = "IF(HOUR(m1) == ${var.recurring_notification_hour}, e1)"
-    label       = "DailyAlert"
-    return_data = true
+    expression = "DIFF(\"m1\" + \"m2\")"
+    label      = "NewMessagesInQueue"
   }
 }
-
