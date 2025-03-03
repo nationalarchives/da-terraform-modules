@@ -1,13 +1,5 @@
-output "sqs_arn" {
-  value = local.sqs_queue.arn
-}
-
 output "dlq_sqs_arn" {
   value = local.sqs_dlq.arn
-}
-
-output "sqs_queue_url" {
-  value = local.sqs_queue.url
 }
 
 output "dlq_sqs_url" {
@@ -23,5 +15,5 @@ output "queue_cloudwatch_message_visible_alarm_arn" {
 }
 
 output "recurring_notification_alarm_arns" {
-  value = [for alarm in aws_cloudwatch_metric_alarm.daily_alert : alarm.arn]
+  value = [for alarm in aws_cloudwatch_metric_alarm.new_messages_added_to_dlq_alert : alarm.arn]
 }
