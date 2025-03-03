@@ -101,7 +101,7 @@ module "queue_cloudwatch_alarm" {
   notification_topic = var.queue_visibility_alarm_notification_topic
 }
 
-resource "aws_cloudwatch_metric_alarm" "new_messages_added_alert" {
+resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   alarm_name          = "${local.sqs_dlq}-new-messages-added-alarm"
   alarm_description   = "Triggers when number of messages compared to the previous 5 mins has increased"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -114,7 +114,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_alert" {
     metric {
       metric_name = "ApproximateNumberOfMessagesVisible"
       stat        = "Maximum"
-      period      = 300
+      period      = 60
       namespace   = "AWS/SQS"
       dimensions = {
         QueueName = local.sqs_dlq
@@ -127,7 +127,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_alert" {
     metric {
       metric_name = "ApproximateNumberOfMessagesNotVisible"
       stat        = "Maximum"
-      period      = 300
+      period      = 60
       namespace   = "AWS/SQS"
       dimensions = {
         QueueName = local.sqs_dlq
