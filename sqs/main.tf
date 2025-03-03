@@ -96,7 +96,7 @@ module "queue_cloudwatch_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = local.sqs_queue.name
+    QueueName = "${local.queue_name}-messages-visible-alarm"
   }
   notification_topic = var.queue_visibility_alarm_notification_topic
 }
