@@ -79,7 +79,7 @@ module "dlq_metric_messages_visible_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = "${local.dlq_queue_name}-messages-visible-alarm"
+    QueueName = local.dlq_queue_name
   }
   period    = var.dlq_alarm_messages_visible_period
   threshold = var.dlq_cloudwatch_alarm_visible_messages_threshold
@@ -96,7 +96,7 @@ module "queue_cloudwatch_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = "${local.queue_name}-messages-visible-alarm"
+    QueueName = local.queue_name
   }
   notification_topic = var.queue_visibility_alarm_notification_topic
 }
