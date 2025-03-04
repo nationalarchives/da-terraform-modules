@@ -12,7 +12,7 @@ locals {
   log_bucket_count     = var.create_log_bucket ? 1 : 0
   log_bucket_name      = var.create_log_bucket ? "${var.bucket_name}-logs" : var.log_bucket_name
   bucket_logging_count = local.log_bucket_name != "" ? 1 : 0
-  s3_bucket_tags       = merge(var.common_tags, var.s3_data_bucket_additional_tags)
+  s3_data_bucket_tags  = merge(var.common_tags, var.s3_data_bucket_additional_tags)
   s3_log_bucket_tags   = merge(var.common_tags, var.s3_logs_bucket_additional_tags)
 }
 
@@ -20,7 +20,7 @@ module "data_bucket" {
   source = "../s3_prototype"
 
   bucket_name                            = var.bucket_name
-  common_tags                            = local.s3_bucket_tags
+  common_tags                            = local.s3_data_bucket_tags
   bucket_policy                          = var.bucket_policy
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
 
