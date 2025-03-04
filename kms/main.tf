@@ -94,13 +94,10 @@ data "aws_iam_policy_document" "key_policy" {
         identifiers = var.default_policy_variables.wiz_roles
       }
       actions = [
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey",
+        "kms:Describe*",
         "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:Encrypt",
-        "kms:DescribeKey",
-        "kms:Decrypt"
+        "kms:CreateGrant",
+        "kms:GenerateDataKey"
       ]
       resources = ["*"]
     }
