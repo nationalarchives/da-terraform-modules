@@ -47,8 +47,3 @@ variable "permissions_boundary" {
   type        = string
   default     = null
 }
-
-variable "environment" {
-  default = ""
-}
-
