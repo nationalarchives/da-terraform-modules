@@ -2,6 +2,12 @@ variable "create_log_bucket" {
   default = true
 }
 
+variable "backup" {
+  description = "Whether to attach the backup policy to the bucket policies"
+  type        = bool
+  default     = true
+}
+
 variable "log_bucket_name" {
   default = ""
 }

@@ -23,6 +23,7 @@ module "data_bucket" {
   common_tags                            = local.s3_data_bucket_tags
   bucket_policy                          = var.bucket_policy
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
+  backup                                 = var.backup
 
   kms_key_arn      = var.kms_key_arn
   sns_topic_config = var.sns_topic_config
@@ -40,6 +41,7 @@ module "log_bucket" {
     log_bucket_name = local.log_bucket_name
     account_id      = data.aws_caller_identity.current.account_id
   }) : var.logging_bucket_policy
+  backup                                 = var.backup
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
 }
 

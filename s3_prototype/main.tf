@@ -45,7 +45,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "delete_incomplete_multipart_up
   }
 }
 
-data "aws_iam_policy_document" "policy_document" {
+data "aws_iam_policy_document" "policy_document_without_backup" {
   source_policy_documents = var.bucket_policy == "" ? [
     templatefile(
       "${path.module}/templates/default_bucket_policy.json.tpl",
@@ -63,6 +63,38 @@ data "aws_iam_policy_document" "policy_document" {
     )
   ]
 }
+
+
+data "aws_iam_policy_document" "backup_logs_bucket_policy" {
+  version = "2012-10-17"
+
+  statement {
+    sid = "AllowSourceAWSBackupRoleAccess"
+    principals {
+      type        = "AWS"
+      identifiers = "arn:aws:iam::${local.account_id}:role/org-backup-role"
+    }
+
+    actions = [
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:ListBucket",
+        "s3:ListBucketVersions"
+    ]
+
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}",
+      "arn:aws:s3:::${local.bucket_name}/*",
+    ]
+  }
+}
+
+
+
+data "aws_iam_policy_document" "policy_document" {
+  source_policy_documents = var.backup ? [data.aws_iam_policy_document.backup_logs_bucket_policy, data.aws_iam_policy_document.policy_document_without_backup] : [data.aws_iam_policy_document.policy_document_without_backup]
+}
+
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
   count      = var.attach_s3_policy ? 1 : 0
