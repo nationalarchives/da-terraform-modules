@@ -4,6 +4,13 @@ variable "attach_s3_policy" {
   default     = true
 }
 
+
+variable "backup" {
+  description = "Whether to attach the backup policy to the bucket policy"
+  type        = bool
+  default     = true
+}
+
 variable "bucket_name" {}
 
 variable "common_tags" {
