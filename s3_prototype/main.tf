@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "bucket" {
   tags = merge(
     var.common_tags,
     tomap(
-      { "Name" = var.bucket_name }
+      { "Name" = var.bucket_name, "BackupPolicy" = var.backup_policy_tag }
     )
   )
 }

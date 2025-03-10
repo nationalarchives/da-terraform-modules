@@ -23,6 +23,7 @@ module "data_bucket" {
   common_tags                            = local.s3_data_bucket_tags
   bucket_policy                          = var.bucket_policy
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
+  backup_policy_tag                      = var.backup_policy_tag
 
   kms_key_arn      = var.kms_key_arn
   sns_topic_config = var.sns_topic_config
@@ -42,7 +43,6 @@ module "log_bucket" {
   }) : var.logging_bucket_policy
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
 }
-
 
 resource "aws_s3_bucket_logging" "bucket_logging" {
   count = local.bucket_logging_count
