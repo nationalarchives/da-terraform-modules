@@ -2,6 +2,12 @@ variable "create_log_bucket" {
   default = true
 }
 
+variable "backup_policy_tag" {
+  description = "The tag used by the central backup system to identify the bucket as a backup target. If not set, the bucket will not be backed up."
+  type        = string
+  default     = ""
+}
+
 variable "log_bucket_name" {
   default = ""
 }
