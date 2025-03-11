@@ -15,6 +15,7 @@ resource "aws_lambda_function" "lambda_function" {
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
 
+  layers = lenght(var.lambda_layer_arns) > 0 ? var.lambda_layer_arns : null
   ephemeral_storage {
     size = var.storage_size
   }
