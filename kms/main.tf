@@ -86,6 +86,23 @@ data "aws_iam_policy_document" "key_policy" {
     resources = ["*"]
   }
   dynamic "statement" {
+    for_each = length(var.default_policy_variables.wiz_roles) == 0 ? [] : ["wiz_role"]
+    content {
+      sid = "WizAccessRole"
+      principals {
+        type        = "AWS"
+        identifiers = var.default_policy_variables.wiz_roles
+      }
+      actions = [
+        "kms:Describe*",
+        "kms:Decrypt",
+        "kms:CreateGrant",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+    }
+  }
+  dynamic "statement" {
     for_each = length(var.default_policy_variables.ci_roles) == 0 ? [] : ["ci_roles"]
     content {
       sid = "CIRolesAdministerWithoutDelete"

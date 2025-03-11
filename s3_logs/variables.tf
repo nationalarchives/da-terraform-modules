@@ -4,6 +4,12 @@ variable "attach_s3_policy" {
   default     = true
 }
 
+variable "backup_policy_tag" {
+  description = "The tag used by the central backup system to identify the bucket as a backup target. If not set, the bucket will not be backed up."
+  type        = string
+  default     = ""
+}
+
 variable "bucket_name" {}
 
 variable "common_tags" {
@@ -12,6 +18,10 @@ variable "common_tags" {
 
 variable "bucket_policy" {
   default = ""
+}
+
+variable "kms_key_arn" {
+  default = null
 }
 
 variable "abort_incomplete_multipart_upload_days" {
