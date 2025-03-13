@@ -51,3 +51,9 @@ variable "s3_logs_bucket_additional_tags" {
   description = "Set of tags to be applied to the S3 logs bucket only"
   default     = null
 }
+
+variable "lifecycle_rules" {
+  description = "List of maps describing configuration of object lifecycle management for bucket"
+  type        = any
+  default     = []
+}
