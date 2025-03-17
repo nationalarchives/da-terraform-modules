@@ -86,12 +86,12 @@ data "aws_iam_policy_document" "key_policy" {
     resources = ["*"]
   }
   dynamic "statement" {
-    for_each = length(var.default_policy_variables.wiz_roles) == 0 ? [] : ["wiz_role"]
+    for_each = length(var.default_policy_variables.security_roles) == 0 ? [] : ["security_roles"]
     content {
-      sid = "WizAccessRole"
+      sid = "AllowSecurityRolesAccess"
       principals {
         type        = "AWS"
-        identifiers = var.default_policy_variables.wiz_roles
+        identifiers = var.default_policy_variables.security_roles
       }
       actions = [
         "kms:Describe*",

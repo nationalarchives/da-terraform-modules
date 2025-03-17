@@ -19,7 +19,7 @@ variable "default_policy_variables" {
   ci_roles - Roles to be run by terraform. They have access to administer the key but not decrypt or delete.
   persistent_resource_roles - A list of roles which will allow those roles to grant access to AWS services. See   https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html#key-policy-service-integration for more information.
   service_details - A list of service_detail objects, with a service name and a source account to add to the policy condition. This will allow decryption from AWS services.
-  wiz_roles - A list of wiz access roles to allow for full scanning of AWS resources for issues.
+  security_roles - A list of security_roles roles to allow accessing and managing encrypted resources.
   EOT
   type = object({
     user_roles                = optional(list(string), [])
@@ -30,7 +30,7 @@ variable "default_policy_variables" {
       service_source_account = optional(string, null)
     })), [])
     cloudfront_distributions = optional(list(string), [])
-    wiz_roles                = optional(list(string), [])
+    security_roles           = optional(list(string), [])
   })
   default = {
     user_roles                = []
@@ -38,7 +38,7 @@ variable "default_policy_variables" {
     ci_roles                  = []
     service_details           = []
     cloudfront_distributions  = []
-    wiz_roles                 = []
+    security_roles            = []
   }
 }
 
