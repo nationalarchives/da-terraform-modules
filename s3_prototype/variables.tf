@@ -4,6 +4,12 @@ variable "attach_s3_policy" {
   default     = true
 }
 
+variable "backup_policy_tag" {
+  description = "The tag used by the central backup system to identify the bucket as a backup target. If not set, the bucket will not be backed up."
+  type        = string
+  default     = ""
+}
+
 variable "bucket_name" {}
 
 variable "common_tags" {
@@ -26,4 +32,10 @@ variable "kms_key_arn" {
 variable "abort_incomplete_multipart_upload_days" {
   description = "The number of days to keep an incomplete multipart upload before it is deleted"
   default     = 7
+}
+
+variable "lifecycle_rules" {
+  description = "List of maps describing configuration of object lifecycle management for bucket"
+  type        = any
+  default     = []
 }

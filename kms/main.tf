@@ -86,6 +86,23 @@ data "aws_iam_policy_document" "key_policy" {
     resources = ["*"]
   }
   dynamic "statement" {
+    for_each = length(var.default_policy_variables.wiz_roles) == 0 ? [] : ["wiz_role"]
+    content {
+      sid = "WizAccessRole"
+      principals {
+        type        = "AWS"
+        identifiers = var.default_policy_variables.wiz_roles
+      }
+      actions = [
+        "kms:Describe*",
+        "kms:Decrypt",
+        "kms:CreateGrant",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+    }
+  }
+  dynamic "statement" {
     for_each = length(var.default_policy_variables.ci_roles) == 0 ? [] : ["ci_roles"]
     content {
       sid = "CIRolesAdministerWithoutDelete"
@@ -151,7 +168,7 @@ data "aws_iam_policy_document" "key_policy" {
   dynamic "statement" {
     for_each = var.default_policy_variables.service_details
     content {
-      sid = "AllowSameAccountServiceAccess${title(statement.value["service_name"])}${index(var.default_policy_variables.service_details, statement.value)}"
+      sid = "AllowSameAccountServiceAccess${title(replace(statement.value["service_name"], ".", ""))}${index(var.default_policy_variables.service_details, statement.value)}"
       principals {
         type        = "Service"
         identifiers = ["${statement.value["service_name"]}.amazonaws.com"]

@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "bucket" {
   tags = merge(
     var.common_tags,
     tomap(
-      { "Name" = var.bucket_name }
+      { "Name" = var.bucket_name, "BackupPolicy" = var.backup_policy_tag }
     )
   )
 }
@@ -41,6 +41,48 @@ resource "aws_s3_bucket_lifecycle_configuration" "delete_incomplete_multipart_up
     status = "Enabled"
     abort_incomplete_multipart_upload {
       days_after_initiation = var.abort_incomplete_multipart_upload_days
+    }
+  }
+
+  dynamic "rule" {
+    for_each = var.lifecycle_rules
+    iterator = rule
+    content {
+      id     = rule.value.id
+      status = rule.value.status
+
+      dynamic "expiration" {
+        for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [rule.value.expiration]
+        content {
+          date                         = lookup(expiration.value, "date", null)
+          days                         = lookup(expiration.value, "days", null)
+          expired_object_delete_marker = lookup(expiration.value, "expired_object_delete_marker", null)
+        }
+      }
+
+      dynamic "noncurrent_version_expiration" {
+        for_each = length(keys(lookup(rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [rule.value.noncurrent_version_expiration]
+        content {
+          noncurrent_days           = lookup(noncurrent_version_expiration.value, "noncurrent_days", null)
+          newer_noncurrent_versions = lookup(noncurrent_version_expiration.value, "newer_noncurrent_versions", null)
+        }
+      }
+
+      dynamic "filter" {
+        for_each = length(keys(lookup(rule.value, "filter", {}))) == 0 ? [] : [rule.value.filter]
+        content {
+          prefix                   = lookup(filter.value, "prefix", null)
+          object_size_greater_than = lookup(filter.value, "object_size_greater_than", null)
+          object_size_less_than    = lookup(filter.value, "object_size_less_than", null)
+          dynamic "tag" {
+            for_each = length(keys(lookup(filter.value, "tag", {}))) == 0 ? [] : [filter.value.tag]
+            content {
+              key   = lookup(tag.value, "key")
+              value = lookup(tag.value, "value")
+            }
+          }
+        }
+      }
     }
   }
 }
