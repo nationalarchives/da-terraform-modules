@@ -102,7 +102,7 @@ module "queue_cloudwatch_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
-  alarm_name          = "${local.sqs_dlq}-new-messages-added-alarm"
+  alarm_name          = "${local.sqs_dlq.name}-new-messages-added-alarm"
   alarm_description   = "Triggers when number of messages compared to the previous N mins has increased"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
@@ -117,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
       period      = 60
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = local.sqs_dlq
+        QueueName = local.sqs_dlq.name
       }
     }
   }
@@ -130,7 +130,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
       period      = 60
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = local.sqs_dlq
+        QueueName = local.sqs_dlq.name
       }
     }
   }
