@@ -22,6 +22,10 @@ output "queue_cloudwatch_message_visible_alarm_arn" {
   value = module.queue_cloudwatch_alarm.cloudwatch_alarm_arn
 }
 
-output "recurring_notification_alarm_arns" {
-  value = [for alarm in aws_cloudwatch_metric_alarm.new_messages_added_to_dlq_alert : alarm.arn]
+output "alarms" {
+  value = [module.queue_cloudwatch_alarm.cloudwatch_alarm_arn, module.dlq_metric_messages_visible_alarm.cloudwatch_alarm_arn]
+}
+
+output "event_alarms" {
+  value = [aws_cloudwatch_metric_alarm.new_messages_added_to_dlq_alert.arn]
 }
