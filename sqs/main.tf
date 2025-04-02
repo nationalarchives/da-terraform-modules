@@ -136,8 +136,9 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   }
 
   metric_query {
-    id         = "e1"
-    expression = "DIFF(\"m1\" + \"m2\")"
-    label      = "NewMessagesInQueue"
+    id          = "e1"
+    expression  = "DIFF(m1 + m2)"
+    label       = "NewMessagesInQueue"
+    return_data = true
   }
 }
