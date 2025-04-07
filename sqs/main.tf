@@ -106,7 +106,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   alarm_description   = "Triggers when number of messages compared to the previous N mins has increased"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
-  threshold           = 1
+  threshold           = 0
   datapoints_to_alarm = 1
 
   metric_query {
