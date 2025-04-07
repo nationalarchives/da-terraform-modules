@@ -104,7 +104,7 @@ module "queue_cloudwatch_alarm" {
 resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   alarm_name          = "${local.sqs_dlq.name}-new-messages-added-alarm"
   alarm_description   = "Triggers when number of messages compared to the previous N mins has increased"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
   datapoints_to_alarm = 1
