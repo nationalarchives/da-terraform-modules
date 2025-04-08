@@ -84,3 +84,9 @@ variable "recurring_notification_hour" {
   type    = number
   default = null
 }
+
+variable "messages_visible_alarm_period" {
+  type        = number
+  description = "The period for the metrics for the alarm visible messages"
+  default     = 900
+}
