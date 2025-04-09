@@ -79,7 +79,7 @@ module "dlq_metric_messages_visible_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = "${local.dlq_queue_name}-messages-visible-alarm"
+    QueueName = local.dlq_queue_name
   }
   period    = var.dlq_alarm_messages_visible_period
   threshold = var.dlq_cloudwatch_alarm_visible_messages_threshold
@@ -96,15 +96,14 @@ module "queue_cloudwatch_alarm" {
   treat_missing_data  = "ignore"
   datapoints_to_alarm = 1
   dimensions = {
-    QueueName = local.sqs_queue.name
+    QueueName = local.queue_name
   }
   notification_topic = var.queue_visibility_alarm_notification_topic
 }
 
-resource "aws_cloudwatch_metric_alarm" "daily_alert" {
-  for_each            = var.recurring_notification_hour == null ? [] : toset([local.sqs_dlq.name, local.sqs_queue.name])
-  alarm_name          = "${each.key}-daily-alarm"
-  alarm_description   = "Triggers when DailyAlert > 0 at ${var.recurring_notification_hour}"
+resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
+  alarm_name          = "${local.sqs_dlq.name}-new-messages-added-alarm"
+  alarm_description   = "Triggers when number of messages compared to the previous N mins has increased"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
@@ -114,11 +113,11 @@ resource "aws_cloudwatch_metric_alarm" "daily_alert" {
     id = "m1"
     metric {
       metric_name = "ApproximateNumberOfMessagesVisible"
-      stat        = "Average"
-      period      = 300
+      stat        = "Maximum"
+      period      = 60
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = each.key
+        QueueName = local.sqs_dlq.name
       }
     }
   }
@@ -127,25 +126,19 @@ resource "aws_cloudwatch_metric_alarm" "daily_alert" {
     id = "m2"
     metric {
       metric_name = "ApproximateNumberOfMessagesNotVisible"
-      stat        = "Average"
-      period      = 300
+      stat        = "Maximum"
+      period      = 60
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = each.key
+        QueueName = local.sqs_dlq.name
       }
     }
   }
 
   metric_query {
-    id         = "e1"
-    expression = "SUM([METRICS(\"m1\"), METRICS(\"m2\")])"
-    label      = "TotalMessages"
-  }
-
-  metric_query {
-    id          = "e2"
-    expression  = "IF(HOUR(m1) == ${var.recurring_notification_hour}, e1)"
-    label       = "DailyAlert"
+    id          = "e1"
+    expression  = "DIFF(m1 + m2)"
+    label       = "NewMessagesInQueue"
     return_data = true
   }
 }
