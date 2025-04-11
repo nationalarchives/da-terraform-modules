@@ -157,7 +157,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
     metric {
       metric_name = "ApproximateNumberOfMessagesVisible"
       stat        = "Sum"
-      period      = 900
+      period      = var.messages_visible_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
         QueueName = each.key
@@ -170,7 +170,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
     metric {
       metric_name = "NumberOfMessagesReceived"
       stat        = "Sum"
-      period      = 900
+      period      = var.messages_visible_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
         QueueName = each.key
