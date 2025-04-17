@@ -155,3 +155,9 @@ variable "dynamo_stream_config" {
   })
   default = null
 }
+
+variable "lambda_layer_arns" {
+  description = "A list of Lambda Layer ARNs to be associated with the function"
+  type        = list(string)
+  default     = []
+}
