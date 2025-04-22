@@ -7,7 +7,7 @@ resource "aws_api_gateway_rest_api" "rest_api" {
 resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.rest_api.id
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.rest_api.body))
+    redeployment = sha1(jsonencode(concat([aws_api_gateway_rest_api.rest_api.body], local.deployment_triggers)))
   }
   lifecycle {
     create_before_destroy = true

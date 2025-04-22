@@ -74,6 +74,12 @@ Calling modules can choose whatever set of AWS managed rules are most appropriat
 
 Full list of the available AWS managed rules is available here: https://docs.aws.amazon.com/waf/latest/developerguide/aws-managed-rule-groups-list.html
 
+## AWS Access Analyzer
+
+This Terraform module provisions an **AWS Access Analyzer** instance and optionally defines an **archive rule** to filter findings. The archive rule supports customizable criteria using comparators such as `contains`, `eq`, `exists`, and `neq`.
+
+For detailed usage and configuration, refer to the [Access Analyzer Module README](./access_analyzer/README.md).
+
 ## Using the modules
 You can either clone this repository into the root of your existing terraform project and reference the modules directly
 ```hcl
@@ -88,5 +94,16 @@ module "example_module" {
 ```
 
 ## Development
-The test job which runs against a pull request runs `terraform fmt --check` which fails if the terraform is not formatted correctly.
+The test job which runs against a pull request, runs `terraform fmt --check` which fails if the terraform is not formatted correctly.
 Run `terraform fmt --recursive` to avoid this.
+
+## Testing
+
+It might be best to test your changes before merging into the main, if you would like to do so:
+
+1. create a GitHub branch and push it
+2. in a local `terraform-environments` repo of your choosing, find a relevant module, e.g. if your change is an SQS change, find an SQS module
+3. you should see that the `source` field ends with `\\[AWS service]"`
+4. at the end of the AWS service, add `?ref=[Remote branch name]`
+5. run `terraform init` to get the changes
+6. now in your local `terraform-environments` repo, you can run `terraform plan` and/or `terraform apply` to see what affect it will have

@@ -79,3 +79,9 @@ variable "dlq_alarm_messages_visible_period" {
   description = "The period for the metrics for the DLQ alarm visible messages"
   default     = 60
 }
+
+variable "messages_visible_alarm_period" {
+  type        = number
+  description = "The period for the metrics for the alarm visible messages"
+  default     = 900
+}
