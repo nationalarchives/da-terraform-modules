@@ -160,8 +160,8 @@ data "aws_iam_policy_document" "key_policy" {
       resources = ["*"]
       condition {
         test     = "Bool"
-        values   = ["kms:GrantIsForAWSResource"]
-        variable = "true"
+        values   = ["true"]
+        variable = "kms:GrantIsForAWSResource"
       }
     }
   }
