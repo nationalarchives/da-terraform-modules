@@ -16,10 +16,10 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
   max_message_size          = var.max_message_size
   policy                    = var.sqs_policy
   receive_wait_time_seconds = var.receive_wait_time_seconds
-  redrive_policy = jsonencode({
+  redrive_policy = var.create_dlq ? jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dlq_with_sse[count.index].arn
     maxReceiveCount     = var.redrive_maximum_receives
-  })
+  }) : null
   tags = merge(
     var.tags,
     tomap(
@@ -39,10 +39,10 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
   max_message_size          = var.max_message_size
   policy                    = var.sqs_policy
   receive_wait_time_seconds = var.receive_wait_time_seconds
-  redrive_policy = jsonencode({
+  redrive_policy = var.create_dlq ? jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dlq_with_kms[count.index].arn
     maxReceiveCount     = var.redrive_maximum_receives
-  })
+  }) : null
   tags = merge(
     var.tags,
     tomap(
@@ -53,7 +53,7 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
 }
 
 resource "aws_sqs_queue" "dlq_with_kms" {
-  count                     = var.encryption_type == "sse" ? 0 : 1
+  count                     = var.create_dlq && var.encryption_type == "kms" ? 1 : 0
   name                      = local.dlq_queue_name
   fifo_queue                = var.fifo_queue
   message_retention_seconds = 1209600
@@ -61,7 +61,7 @@ resource "aws_sqs_queue" "dlq_with_kms" {
 }
 
 resource "aws_sqs_queue" "dlq_with_sse" {
-  count                     = var.encryption_type == "sse" ? 1 : 0
+  count                     = var.create_dlq && var.encryption_type == "sse" ? 1 : 0
   name                      = local.dlq_queue_name
   fifo_queue                = var.fifo_queue
   message_retention_seconds = 1209600
@@ -71,6 +71,7 @@ resource "aws_sqs_queue" "dlq_with_sse" {
 
 module "dlq_metric_messages_visible_alarm" {
   source              = "../cloudwatch_alarms"
+  count               = var.create_dlq ? 1 : 0
   name                = "${local.dlq_queue_name}-messages-visible-alarm"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "ApproximateNumberOfMessagesVisible"
@@ -102,6 +103,7 @@ module "queue_cloudwatch_alarm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
+  count               = var.create_dlq ? 1 : 0
   alarm_name          = "${local.sqs_dlq.name}-new-messages-added-alarm"
   alarm_description   = "Triggers when number of messages compared to the previous N mins has increased"
   comparison_operator = "GreaterThanThreshold"
@@ -144,7 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
-  for_each            = toset([local.sqs_dlq.name, local.sqs_queue.name])
+  for_each            = var.create_dlq ? toset([local.sqs_dlq.name, local.sqs_queue.name]) : toset([local.sqs_queue.name])
   alarm_name          = "${each.key}-unprocessed-messages-alert"
   alarm_description   = "Triggers when there are messages in the queue but no messages have been recieved for specified period"
   comparison_operator = "GreaterThanThreshold"
