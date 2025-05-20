@@ -2,7 +2,7 @@ locals {
   queue_name_suffix = var.fifo_queue ? ".fifo" : ""
   queue_name        = "${var.queue_name}${local.queue_name_suffix}"
   dlq_queue_name    = "${var.queue_name}-dlq${local.queue_name_suffix}"
-  sqs_queue         = var.create_dlq ? var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0] : null
+  sqs_queue         = var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
   sqs_dlq           = var.create_dlq ? var.encryption_type == "sse" ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0] : null
 }
 
