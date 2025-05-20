@@ -66,7 +66,7 @@ variable "encryption_type" {
 
 variable "create_dlq" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "dlq_notification_topic" {
