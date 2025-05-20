@@ -7,11 +7,11 @@ output "sqs_queue_url" {
 }
 
 output "dlq_sqs_arn" {
-  value = var.create_dlq ? local.sqs_dlq[0].arn : null
+  value = var.create_dlq ? local.sqs_dlq.arn : null
 }
 
 output "dlq_sqs_url" {
-  value = var.create_dlq ? local.sqs_dlq[0].url : null
+  value = var.create_dlq ? local.sqs_dlq.url : null
 }
 
 output "alarms" {
