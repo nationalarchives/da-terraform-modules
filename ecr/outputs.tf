@@ -5,5 +5,5 @@ output "repository_url" {
 
 output "repository_arn" {
   description = "ARN of the ECR repository"
-  value = aws_ecr_repository.repository.arn
+  value       = aws_ecr_repository.repository.arn
 }
