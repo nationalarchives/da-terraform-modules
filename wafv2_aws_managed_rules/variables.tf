@@ -4,8 +4,28 @@ variable "log_destinations" {
   default     = []
 }
 
+variable "scope" {
+  default = "REGIONAL"
+}
+
+variable "default_action" {
+  default = "block"
+}
+
 variable "arn_associations" {
   description = "List of AWS resource ARNs for WAF rule association"
+  default     = []
+}
+
+variable "ip_restrictions_configuration" {
+  type = object({
+    ip_list                    = optional(list(string), [])
+    action                     = optional(string, "block")
+    cloudwatch_metrics_enabled = optional(bool, false)
+    sampled_requests_enabled   = optional(bool, false)
+
+  })
+  default = {}
 }
 
 variable "aws_managed_rules" {
@@ -44,4 +64,5 @@ variable "aws_managed_rules" {
 
 variable "tags" {
   description = "tags used across the project"
+  default     = {}
 }
