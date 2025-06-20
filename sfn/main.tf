@@ -7,8 +7,35 @@ resource "aws_sfn_state_machine" "step_function" {
 
 module "step_function_role" {
   source             = "../iam_role"
-  assume_role_policy = templatefile("${path.module}/templates/sfn_assume_role.json.tpl", {})
+  assume_role_policy = data.aws_iam_policy_document.step_function_iam_trust_policy.json
   name               = "${var.step_function_name}-role"
   tags               = var.common_tags
   policy_attachments = var.step_function_role_policy_attachments
+}
+
+// See https://docs.aws.amazon.com/step-functions/latest/dg/procedure-create-iam-role.html
+// Note using aws_sfn_state_machine.step_funcion.arn creates a cyclic dependancy so cannot be used
+data "aws_iam_policy_document" "step_function_iam_trust_policy" {
+  statement {
+
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["states.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = ["arn:${data.aws_partition.current.id}:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:stateMachine:${var.step_function_name}"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = ["${data.aws_caller_identity.current.id}"]
+    }
+  }
 }
