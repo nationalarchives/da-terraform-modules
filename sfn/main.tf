@@ -14,6 +14,7 @@ module "step_function_role" {
 }
 
 // See https://docs.aws.amazon.com/step-functions/latest/dg/procedure-create-iam-role.html
+// Using a map run does not seem to be compatible with the aws:SourceArn
 // Note using aws_sfn_state_machine.step_funcion.arn creates a cyclic dependancy so cannot be used
 data "aws_iam_policy_document" "step_function_iam_trust_policy" {
   statement {
@@ -24,12 +25,6 @@ data "aws_iam_policy_document" "step_function_iam_trust_policy" {
     principals {
       type        = "Service"
       identifiers = ["states.amazonaws.com"]
-    }
-
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values   = ["arn:${data.aws_partition.current.id}:states:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:stateMachine:${var.step_function_name}"]
     }
 
     condition {
