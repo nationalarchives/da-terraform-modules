@@ -1,4 +1,4 @@
-output "lambda" {
+output "lambda_function" {
   value = local.lambda
 }
 
