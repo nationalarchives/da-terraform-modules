@@ -1,5 +1,26 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_organizations_organization" "current" {
+  count = length(flatten([var.default_policy_variables.user_roles_decoupled, var.default_policy_variables.persistent_resource_roles_decoupled])) > 0 ? 1 : 0
+}
+
+locals {
+  org_id = try(data.aws_organizations_organization.current[0].id, null)
+
+  user_roles_actions = [
+    "kms:Encrypt",
+    "kms:Decrypt",
+    "kms:ReEncrypt*",
+    "kms:GenerateDataKey*",
+    "kms:DescribeKey"
+  ]
+  persistent_resource_roles_actions = [
+    "kms:CreateGrant",
+    "kms:ListGrants",
+    "kms:RevokeGrant"
+  ]
+}
+
 resource "aws_kms_key" "encryption" {
   description         = var.key_description
   enable_key_rotation = true
@@ -134,14 +155,30 @@ data "aws_iam_policy_document" "key_policy" {
         type        = "AWS"
         identifiers = var.default_policy_variables.user_roles
       }
-      actions = [
-        "kms:Encrypt",
-        "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:DescribeKey"
-      ]
+      actions   = local.user_roles_actions
       resources = ["*"]
+    }
+  }
+  dynamic "statement" {
+    for_each = length(var.default_policy_variables.user_roles_decoupled) == 0 ? [] : ["user_roles_decoupled"]
+    content {
+      sid = "UserRolesEncryptAndDecryptDecoupled"
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+      actions   = local.user_roles_actions
+      resources = ["*"]
+      condition {
+        test     = "ArnEquals"
+        variable = "aws:PrincipalArn"
+        values   = var.default_policy_variables.user_roles_decoupled
+      }
+      condition {
+        test     = "StringEquals"
+        variable = "aws:PrincipalOrgID"
+        values   = [local.org_id]
+      }
     }
   }
   dynamic "statement" {
@@ -152,16 +189,39 @@ data "aws_iam_policy_document" "key_policy" {
         type        = "AWS"
         identifiers = var.default_policy_variables.persistent_resource_roles
       }
-      actions = [
-        "kms:CreateGrant",
-        "kms:ListGrants",
-        "kms:RevokeGrant"
-      ]
+      actions   = local.persistent_resource_roles_actions
       resources = ["*"]
       condition {
         test     = "Bool"
         values   = ["true"]
         variable = "kms:GrantIsForAWSResource"
+      }
+    }
+  }
+  dynamic "statement" {
+    for_each = length(var.default_policy_variables.persistent_resource_roles_decoupled) == 0 ? [] : ["persistent_resource_roles_decoupled"]
+    content {
+      sid = "ResourceRolesGrantsDecoupled"
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+      actions   = local.persistent_resource_roles_actions
+      resources = ["*"]
+      condition {
+        test     = "ArnEquals"
+        variable = "aws:PrincipalArn"
+        values   = var.default_policy_variables.persistent_resource_roles_decoupled
+      }
+      condition {
+        test     = "StringEquals"
+        variable = "aws:PrincipalOrgID"
+        values   = [local.org_id]
+      }
+      condition {
+        test     = "Bool"
+        variable = "kms:GrantIsForAWSResource"
+        values   = ["true"]
       }
     }
   }
