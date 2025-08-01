@@ -5,7 +5,7 @@ data "aws_organizations_organization" "current" {
 }
 
 locals {
-  org_id = try(data.aws_organizations_organization.current[0].id, null)
+  org_id = try(data.aws_organizations_organization.current[0].id, "")
 
   user_roles_actions = [
     "kms:Encrypt",
