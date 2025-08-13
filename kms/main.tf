@@ -1,12 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_organizations_organization" "current" {
-  count = length(flatten([var.default_policy_variables.user_roles_decoupled, var.default_policy_variables.persistent_resource_roles_decoupled])) > 0 ? 1 : 0
-}
-
 locals {
-  org_id = try(data.aws_organizations_organization.current[0].id, "")
-
   user_roles_actions = [
     "kms:Encrypt",
     "kms:Decrypt",
@@ -177,7 +171,7 @@ data "aws_iam_policy_document" "key_policy" {
       condition {
         test     = "StringEquals"
         variable = "aws:PrincipalOrgID"
-        values   = [local.org_id]
+        values   = ["$${aws:ResourceOrgID}"]
       }
     }
   }
@@ -216,7 +210,7 @@ data "aws_iam_policy_document" "key_policy" {
       condition {
         test     = "StringEquals"
         variable = "aws:PrincipalOrgID"
-        values   = [local.org_id]
+        values   = ["$${aws:ResourceOrgID}"]
       }
       condition {
         test     = "Bool"
