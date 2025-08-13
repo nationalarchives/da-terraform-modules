@@ -28,3 +28,9 @@ variable "api_method_settings" {
   default     = []
   description = "A list of method setting for the API. See here for details logging level settings: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method_settings"
 }
+
+variable "api_is_private" {
+  description = "Make the API Gateway private when true"
+  type        = bool
+  default     = false
+}

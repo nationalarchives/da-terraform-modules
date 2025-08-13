@@ -2,6 +2,13 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   name = var.api_name
   body = var.api_definition
   tags = var.common_tags
+
+  dynamic "endpoint_configuration" {
+    for_each = var.api_is_private ? ["do_it"] : []
+    content {
+      types = ["PRIVATE"]
+    }
+  }
 }
 
 resource "aws_api_gateway_deployment" "api_deployment" {
