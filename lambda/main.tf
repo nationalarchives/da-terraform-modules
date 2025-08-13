@@ -141,12 +141,12 @@ resource "aws_lambda_event_source_mapping" "dynamo_stream_event_source_mapping" 
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {
-  for_each      = merge([for k2, v2 in { for k1, v1 in var.lambda_invoke_permissions : k1 => flatten([v1]) } : { for v3_idx, v3 in v2 : v3_idx == 0 ? k2 : "${k2}:::${v3}" => { id : join("", ["AllowExecutionFrom", title(split(".", k2)[0]), v3_idx > 0 ? "-${v3_idx}" : ""]), principal : k2, source_arn : v3 } }]...)
-  statement_id  = each.value.id
-  action        = "lambda:InvokeFunction"
-  function_name = local.lambda_name
-  principal     = each.value.principal
-  source_arn    = each.value.source_arn
+  for_each            = merge([for k2, v2 in { for k1, v1 in var.lambda_invoke_permissions : k1 => flatten([v1]) } : { for v3_idx, v3 in v2 : v3_idx == 0 ? k2 : "${k2}_${v3_idx}" => { principal : k2, source_arn : v3 } }]...)
+  statement_id_prefix = "AllowExecutionFrom${title(split(".", each.value.principal)[0])}"
+  action              = "lambda:InvokeFunction"
+  function_name       = local.lambda_name
+  principal           = each.value.principal
+  source_arn          = each.value.source_arn
 }
 
 resource "aws_iam_role" "lambda_iam_role" {
