@@ -29,8 +29,14 @@ variable "api_method_settings" {
   description = "A list of method setting for the API. See here for details logging level settings: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_method_settings"
 }
 
-variable "api_is_private" {
-  description = "Make the API Gateway private when true"
-  type        = bool
-  default     = false
+variable "endpoint_configuration" {
+  type = object({
+    ip_address_type  = optional(string)
+    types            = list(string)
+    vpc_endpoint_ids = optional(list(string))
+  })
+  description = "An endpoint configuration block"
+  default = {
+    types = []
+  }
 }

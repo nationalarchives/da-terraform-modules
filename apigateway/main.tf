@@ -4,9 +4,11 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   tags = var.common_tags
 
   dynamic "endpoint_configuration" {
-    for_each = var.api_is_private ? ["do_it"] : []
+    for_each = length(var.endpoint_configuration.types) == 0 ? [] : ["do_it"]
     content {
-      types = ["PRIVATE"]
+      ip_address_type  = var.endpoint_configuration.ip_address_type
+      types            = var.endpoint_configuration.types
+      vpc_endpoint_ids = var.endpoint_configuration.vpc_endpoint_ids
     }
   }
 }
