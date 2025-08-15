@@ -2,6 +2,15 @@ resource "aws_api_gateway_rest_api" "rest_api" {
   name = var.api_name
   body = var.api_definition
   tags = var.common_tags
+
+  dynamic "endpoint_configuration" {
+    for_each = length(var.endpoint_configuration.types) == 0 ? [] : ["do_it"]
+    content {
+      ip_address_type  = var.endpoint_configuration.ip_address_type
+      types            = var.endpoint_configuration.types
+      vpc_endpoint_ids = var.endpoint_configuration.vpc_endpoint_ids
+    }
+  }
 }
 
 resource "aws_api_gateway_deployment" "api_deployment" {
