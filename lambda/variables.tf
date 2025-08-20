@@ -92,8 +92,8 @@ variable "storage_size" {
 }
 
 variable "lambda_invoke_permissions" {
-  description = "A list of principals and source arns to be allowed to call lambda:InvokeFunction"
-  type        = map(string)
+  description = "An object of principals and source arns to be allowed to call lambda:InvokeFunction, values can be string or list(string)."
+  type        = any
   default     = {}
 }
 
