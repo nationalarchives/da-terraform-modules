@@ -42,8 +42,11 @@ resource "aws_lambda_function" "lambda_function" {
     ignore_changes = [filename]
   }
 
-  dead_letter_config {
-    target_arn = var.dead_letter_target_arn
+  dynamic "dead_letter_config" {
+    for_each = var.dead_letter_target_arn != null ? [var.dead_letter_target_arn] : []
+    content {
+      target_arn = dead_letter_config.value
+    }
   }
 }
 

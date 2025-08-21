@@ -159,5 +159,5 @@ variable "dynamo_stream_config" {
 variable "dead_letter_target_arn" {
   type = string
   description = "ARN of an SQS queue to use as the lambda DLQ"
-  default = ""
+  default = null
 }
