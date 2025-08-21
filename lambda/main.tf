@@ -5,6 +5,7 @@ locals {
   lambda_arn                         = local.lambda.arn
   lambda_name                        = local.lambda.function_name
 }
+
 resource "aws_lambda_function" "lambda_function" {
   count         = var.use_image ? 0 : 1
   function_name = var.function_name
@@ -39,6 +40,10 @@ resource "aws_lambda_function" "lambda_function" {
 
   lifecycle {
     ignore_changes = [filename]
+  }
+
+  dead_letter_config {
+    target_arn = var.dead_letter_target_arn
   }
 }
 
