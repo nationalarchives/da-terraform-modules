@@ -155,3 +155,8 @@ variable "dynamo_stream_config" {
   })
   default = null
 }
+
+variable "description" {
+  description = "The lambda description"
+  default     = null
+}

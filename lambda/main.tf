@@ -6,6 +6,7 @@ locals {
   lambda_name                        = local.lambda.function_name
 }
 resource "aws_lambda_function" "lambda_function" {
+  description   = var.description
   count         = var.use_image ? 0 : 1
   function_name = var.function_name
   handler       = var.handler
@@ -43,6 +44,7 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 resource "aws_lambda_function" "lambda_function_ecr" {
+  description   = var.description
   count         = var.use_image ? 1 : 0
   function_name = var.function_name
   role          = aws_iam_role.lambda_iam_role.arn
