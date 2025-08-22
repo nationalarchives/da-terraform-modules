@@ -146,15 +146,16 @@ resource "aws_lambda_event_source_mapping" "dynamo_stream_event_source_mapping" 
   function_name           = local.lambda_name
   starting_position       = var.dynamo_stream_config.starting_position
   function_response_types = var.dynamo_report_batch_item_failures == true ? ["ReportBatchItemFailures"] : null
+  batch_size              = var.dynamo_stream_config.batch_size
 
   dynamic "destination_config" {
-      for_each = var.dynamo_stream_config.dead_letter_target_arn != null ? [var.dynamo_stream_config.dead_letter_target_arn] : []
-        content {
-          on_failure {
-            destination_arn = destination_config.value
-          }
-        }
+    for_each = var.dynamo_stream_config.dead_letter_target_arn != null ? [var.dynamo_stream_config.dead_letter_target_arn] : []
+    content {
+      on_failure {
+        destination_arn = destination_config.value
+      }
     }
+  }
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {

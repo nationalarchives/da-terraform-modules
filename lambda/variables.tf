@@ -150,9 +150,10 @@ variable "image_url" {
 variable "dynamo_stream_config" {
   description = "The configuration of a dynamo stream event source"
   type = object({
-    stream_arn        = string
-    starting_position = optional(string, "TRIM_HORIZON")
+    stream_arn             = string
+    starting_position      = optional(string, "TRIM_HORIZON")
     dead_letter_target_arn = optional(string, null)
+    batch_size             = optional(number, 100)
   })
   default = null
 }
