@@ -41,13 +41,6 @@ resource "aws_lambda_function" "lambda_function" {
   lifecycle {
     ignore_changes = [filename]
   }
-
-  # dynamic "dead_letter_config" {
-  #   for_each = var.dead_letter_target_arn != null ? [var.dead_letter_target_arn] : []
-  #   content {
-  #     target_arn = dead_letter_config.value
-  #   }
-  # }
 }
 
 resource "aws_lambda_function" "lambda_function_ecr" {
