@@ -152,12 +152,7 @@ variable "dynamo_stream_config" {
   type = object({
     stream_arn        = string
     starting_position = optional(string, "TRIM_HORIZON")
+    dead_letter_target_arn = optional(string, null)
   })
-  default = null
-}
-
-variable "dead_letter_target_arn" {
-  type = string
-  description = "ARN of an SQS queue to use as the lambda DLQ"
   default = null
 }

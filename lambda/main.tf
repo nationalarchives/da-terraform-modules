@@ -42,12 +42,12 @@ resource "aws_lambda_function" "lambda_function" {
     ignore_changes = [filename]
   }
 
-  dynamic "dead_letter_config" {
-    for_each = var.dead_letter_target_arn != null ? [var.dead_letter_target_arn] : []
-    content {
-      target_arn = dead_letter_config.value
-    }
-  }
+  # dynamic "dead_letter_config" {
+  #   for_each = var.dead_letter_target_arn != null ? [var.dead_letter_target_arn] : []
+  #   content {
+  #     target_arn = dead_letter_config.value
+  #   }
+  # }
 }
 
 resource "aws_lambda_function" "lambda_function_ecr" {
@@ -146,6 +146,15 @@ resource "aws_lambda_event_source_mapping" "dynamo_stream_event_source_mapping" 
   function_name           = local.lambda_name
   starting_position       = var.dynamo_stream_config.starting_position
   function_response_types = var.dynamo_report_batch_item_failures == true ? ["ReportBatchItemFailures"] : null
+
+  dynamic "destination_config" {
+      for_each = var.dynamo_stream_config.dead_letter_target_arn != null ? [var.dynamo_stream_config.dead_letter_target_arn] : []
+        content {
+          on_failure {
+            destination_arn = destination_config.value
+          }
+        }
+    }
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {
