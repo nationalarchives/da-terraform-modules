@@ -7,6 +7,7 @@ locals {
 }
 
 resource "aws_lambda_function" "lambda_function" {
+  description   = var.description
   count         = var.use_image ? 0 : 1
   function_name = var.function_name
   handler       = var.handler
@@ -44,6 +45,7 @@ resource "aws_lambda_function" "lambda_function" {
 }
 
 resource "aws_lambda_function" "lambda_function_ecr" {
+  description   = var.description
   count         = var.use_image ? 1 : 0
   function_name = var.function_name
   role          = aws_iam_role.lambda_iam_role.arn
@@ -152,12 +154,12 @@ resource "aws_lambda_event_source_mapping" "dynamo_stream_event_source_mapping" 
 }
 
 resource "aws_lambda_permission" "lambda_permissions" {
-  for_each      = var.lambda_invoke_permissions
-  statement_id  = "AllowExecutionFrom${title(split(".", each.key)[0])}"
-  action        = "lambda:InvokeFunction"
-  function_name = local.lambda_name
-  principal     = each.key
-  source_arn    = each.value
+  for_each            = merge([for k2, v2 in { for k1, v1 in var.lambda_invoke_permissions : k1 => flatten([v1]) } : { for v3_idx, v3 in v2 : v3_idx == 0 ? k2 : "${k2}_${v3_idx}" => { principal : k2, source_arn : v3 } }]...)
+  statement_id_prefix = "AllowExecutionFrom${title(split(".", each.value.principal)[0])}"
+  action              = "lambda:InvokeFunction"
+  function_name       = local.lambda_name
+  principal           = each.value.principal
+  source_arn          = each.value.source_arn
 }
 
 resource "aws_iam_role" "lambda_iam_role" {
