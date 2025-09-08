@@ -9,6 +9,11 @@ variable "sqs_policy" {
   description = "A string containing the SQS policy"
 }
 
+variable "lambda_function_name" {
+  description = "The name of the lambda function which will process messages from the queue"
+  default     = ""
+}
+
 variable "redrive_maximum_receives" {
   default = 10
 }

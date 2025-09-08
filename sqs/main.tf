@@ -187,3 +187,9 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
     return_data = true
   }
 }
+
+resource "aws_lambda_event_source_mapping" "sqs_lambda_trigger" {
+  count            = var.lambda_function_name == "" ? 0 : 1
+  event_source_arn = local.sqs_queue.arn
+  function_name    = var.lambda_function_name
+}
