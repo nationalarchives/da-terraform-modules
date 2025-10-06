@@ -42,4 +42,23 @@ variable "egress_security_group_rules" {
   default = []
 }
 
+variable "ingress_prefix_list_rules" {
+  type = set(object({
+    port         = number
+    description  = string
+    prefix_lists = list(string)
+  }))
+  default = []
+}
+
+variable "egress_prefix_list_rules" {
+  type = set(object({
+    port            = number
+    description     = string
+    prefix_list_ids = list(string)
+    protocol        = string
+  }))
+  default = []
+}
+
 variable "common_tags" {}
