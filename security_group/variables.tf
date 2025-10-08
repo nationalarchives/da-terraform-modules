@@ -4,7 +4,6 @@ variable "name" {}
 
 variable "description" {}
 
-
 variable "rules" {
   type = object({
     ingress = optional(list(object({
@@ -27,3 +26,5 @@ variable "rules" {
     })), [])
   })
 }
+
+variable "common_tags" {}
