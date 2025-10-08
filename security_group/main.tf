@@ -10,62 +10,27 @@ resource "aws_security_group" "security_group" {
   )
 }
 
-resource "aws_security_group_rule" "ingress_cidr_rule" {
-  for_each          = { for rule in var.ingress_cidr_rules : rule.description => rule }
-  protocol          = "tcp"
-  security_group_id = aws_security_group.security_group.id
-  cidr_blocks       = each.value.cidr_blocks
-  to_port           = each.value.port
-  from_port         = each.value.port
-  type              = "ingress"
+resource "aws_vpc_security_group_egress_rule" "egress_rules" {
+  count                        = length(var.rules.egress)
+  ip_protocol                  = var.rules.egress[count.index].ip_protocol
+  cidr_ipv4                    = var.rules.egress[count.index].cidr_ip_v4
+  cidr_ipv6                    = var.rules.egress[count.index].cidr_ip_v6
+  security_group_id            = aws_security_group.security_group.id
+  referenced_security_group_id = var.rules.egress[count.index].security_group_id
+  prefix_list_id               = var.rules.egress[count.index].prefix_list_id
+  from_port                    = var.rules.egress[count.index].port
+  to_port                      = var.rules.egress[count.index].port
 }
 
-resource "aws_security_group_rule" "ingress_security_group_rule" {
-  for_each                 = { for rule in var.ingress_security_group_rules : rule.description => rule }
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.security_group.id
-  source_security_group_id = each.value.security_group_id
-  to_port                  = each.value.port
-  from_port                = each.value.port
-  type                     = "ingress"
+resource "aws_vpc_security_group_ingress_rule" "ingress_rules" {
+  count                        = length(var.rules.ingress)
+  ip_protocol                  = var.rules.ingress[count.index].ip_protocol
+  cidr_ipv4                    = var.rules.ingress[count.index].cidr_ip_v4
+  cidr_ipv6                    = var.rules.ingress[count.index].cidr_ip_v6
+  security_group_id            = aws_security_group.security_group.id
+  referenced_security_group_id = var.rules.ingress[count.index].security_group_id
+  prefix_list_id               = var.rules.ingress[count.index].prefix_list_id
+  from_port                    = var.rules.ingress[count.index].port
+  to_port                      = var.rules.ingress[count.index].port
 }
 
-resource "aws_security_group_rule" "egress_cidr_rule" {
-  for_each          = { for rule in var.egress_cidr_rules : rule.description => rule }
-  protocol          = each.value.protocol
-  security_group_id = aws_security_group.security_group.id
-  cidr_blocks       = each.value.cidr_blocks
-  to_port           = each.value.port
-  from_port         = each.value.port
-  type              = "egress"
-}
-
-resource "aws_security_group_rule" "egress_security_group_rule" {
-  for_each                 = { for rule in var.egress_security_group_rules : rule.description => rule }
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.security_group.id
-  source_security_group_id = each.value.security_group_id
-  to_port                  = each.value.port
-  from_port                = each.value.port
-  type                     = "egress"
-}
-
-resource "aws_security_group_rule" "ingress_prefix_list_rule" {
-  for_each          = { for rule in var.ingress_prefix_list_rules : rule.description => rule }
-  protocol          = "tcp"
-  security_group_id = aws_security_group.security_group.id
-  prefix_list_ids   = each.value.prefix_lists
-  to_port           = each.value.port
-  from_port         = each.value.port
-  type              = "ingress"
-}
-
-resource "aws_security_group_rule" "egress_prefix_list_rule" {
-  for_each          = { for rule in var.egress_prefix_list_rules : rule.description => rule }
-  protocol          = each.value.protocol
-  security_group_id = aws_security_group.security_group.id
-  prefix_list_ids   = each.value.prefix_list_ids
-  to_port           = each.value.port
-  from_port         = each.value.port
-  type              = "egress"
-}
