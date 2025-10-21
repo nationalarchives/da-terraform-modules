@@ -164,7 +164,7 @@ data "aws_iam_policy_document" "key_policy" {
       actions   = local.user_roles_actions
       resources = ["*"]
       condition {
-        test     = "ArnEquals"
+        test     = "ArnLike"
         variable = "aws:PrincipalArn"
         values   = var.default_policy_variables.user_roles_decoupled
       }
