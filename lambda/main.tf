@@ -32,6 +32,7 @@ resource "aws_lambda_function" "lambda_function" {
   s3_bucket         = var.s3_bucket
   s3_key            = var.s3_key
   s3_object_version = local.deploy_from_s3 ? data.aws_s3_object.deploy_zip[0].version_id : null
+  source_code_hash = local.deploy_from_s3 ? data.aws_s3_object.deploy_zip[0].checksum_sha256 : null
   timeout           = var.timeout_seconds
   memory_size       = var.memory_size
 
