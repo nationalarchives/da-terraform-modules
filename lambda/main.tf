@@ -31,7 +31,7 @@ resource "aws_lambda_function" "lambda_function" {
   filename          = local.deploy_from_s3 ? null : var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   s3_bucket         = var.s3_bucket
   s3_key            = var.s3_key
-  s3_object_version = data.aws_s3_object.deploy_zip.version_id
+  s3_object_version = data.aws_s3_object.deploy_zip[0].version_id
   timeout           = var.timeout_seconds
   memory_size       = var.memory_size
 
