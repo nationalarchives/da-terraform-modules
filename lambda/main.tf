@@ -13,7 +13,7 @@ resource "aws_lambda_function" "lambda_function" {
   handler       = var.handler
   role          = aws_iam_role.lambda_iam_role.arn
   runtime       = var.runtime
-  filename      = var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
+  filename      = var.s3_key == null ? var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename : null
   s3_bucket     = var.s3_bucket
   s3_key        = var.s3_key
   timeout       = var.timeout_seconds
