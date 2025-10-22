@@ -162,3 +162,11 @@ variable "description" {
   description = "The lambda description"
   default     = null
 }
+
+variable "s3_bucket" {
+  default = null
+}
+
+variable "s3_key" {
+  default = null
+}
