@@ -95,7 +95,7 @@ resource "aws_lambda_function" "lambda_function_ecr" {
   }
 
   lifecycle {
-    ignore_changes = [filename]
+    ignore_changes = [filename, last_modified]
   }
 }
 
