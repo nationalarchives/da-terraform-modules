@@ -1,23 +1,39 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.99.1"
+    }
+  }
+}
 locals {
   sqs_mapping_without_ignore_enabled = { for mapping in var.lambda_sqs_queue_mappings : (mapping.sqs_queue_arn) => mapping.sqs_queue_concurrency if mapping.ignore_enabled_status == false }
   sqs_mapping_ignore_enabled         = { for mapping in var.lambda_sqs_queue_mappings : (mapping.sqs_queue_arn) => mapping.sqs_queue_concurrency if mapping.ignore_enabled_status == true }
   lambda                             = var.use_image ? aws_lambda_function.lambda_function_ecr[0] : aws_lambda_function.lambda_function[0]
   lambda_arn                         = local.lambda.arn
   lambda_name                        = local.lambda.function_name
+  deploy_from_s3                     = var.s3_bucket != null && var.s3_key != null
+}
+
+data "aws_s3_object" "deploy_zip" {
+  count  = local.deploy_from_s3 ? 1 : 0
+  bucket = var.s3_bucket
+  key    = var.s3_key
 }
 
 resource "aws_lambda_function" "lambda_function" {
-  description   = var.description
-  count         = var.use_image ? 0 : 1
-  function_name = var.function_name
-  handler       = var.handler
-  role          = aws_iam_role.lambda_iam_role.arn
-  runtime       = var.runtime
-  filename      = var.s3_key == null ? var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename : null
-  s3_bucket     = var.s3_bucket
-  s3_key        = var.s3_key
-  timeout       = var.timeout_seconds
-  memory_size   = var.memory_size
+  description       = var.description
+  count             = var.use_image ? 0 : 1
+  function_name     = var.function_name
+  handler           = var.handler
+  role              = aws_iam_role.lambda_iam_role.arn
+  runtime           = var.runtime
+  filename          = local.deploy_from_s3 ? null : var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
+  s3_bucket         = var.s3_bucket
+  s3_key            = var.s3_key
+  s3_object_version = data.aws_s3_object.deploy_zip.version_id
+  timeout           = var.timeout_seconds
+  memory_size       = var.memory_size
 
   ephemeral_storage {
     size = var.storage_size
