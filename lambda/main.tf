@@ -38,10 +38,6 @@ resource "aws_lambda_function" "lambda_function" {
     security_group_ids = var.vpc_config.security_group_ids
     subnet_ids         = var.vpc_config.subnet_ids
   }
-
-  lifecycle {
-    ignore_changes = [filename]
-  }
 }
 
 resource "aws_lambda_function" "lambda_function_ecr" {
