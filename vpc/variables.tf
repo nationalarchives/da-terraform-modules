@@ -73,11 +73,11 @@ variable "create_s3_gateway_endpoint" {
   default = true
 }
 
-variable "s3_endpoint_policy" {
+variable "s3_gateway_endpoint_policy" {
   default = null
 }
 
-variable "dynamo_endpoint_policy" {
+variable "dynamo_gateway_endpoint_policy" {
   default = null
 }
 
