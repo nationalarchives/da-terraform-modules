@@ -3,6 +3,7 @@ resource "aws_cloudwatch_event_rule" "rule" {
   description    = var.description
   event_pattern  = var.event_pattern
   event_bus_name = var.event_bus_name
+  state          = var.rule_state
 }
 
 module "api_destination_policy" {
