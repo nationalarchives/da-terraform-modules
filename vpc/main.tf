@@ -303,7 +303,7 @@ resource "aws_vpc_endpoint" "s3_endpoint" {
   count           = var.create_s3_gateway_endpoint ? 1 : 0
   vpc_id          = aws_vpc.main.id
   service_name    = "com.amazonaws.${var.region}.s3"
-  route_table_ids = var.use_nat_gateway ? [aws_route_table.private_nat_gateway[count.index].id] : [aws_route_table.private_nat_instance[count.index].id]
+  route_table_ids = var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : aws_route_table.private_nat_instance.*.id
   policy          = var.s3_gateway_endpoint_policy == null ? templatefile("${path.module}/templates/default_gateway_endpoint_policy.json.tpl", {}) : var.s3_gateway_endpoint_policy
 }
 
@@ -311,6 +311,6 @@ resource "aws_vpc_endpoint" "dynamo_endpoint" {
   count           = var.create_dynamo_gateway_endpoint ? 1 : 0
   vpc_id          = aws_vpc.main.id
   service_name    = "com.amazonaws.${var.region}.dynamodb"
-  route_table_ids = var.use_nat_gateway ? [aws_route_table.private_nat_gateway[count.index].id] : [aws_route_table.private_nat_instance[count.index].id]
+  route_table_ids = var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : aws_route_table.private_nat_instance.*.id
   policy          = var.dynamo_gateway_endpoint_policy == null ? templatefile("${path.module}/templates/default_gateway_endpoint_policy.json.tpl", {}) : var.dynamo_gateway_endpoint_policy
 }
