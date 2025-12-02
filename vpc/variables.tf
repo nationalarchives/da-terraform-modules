@@ -103,5 +103,7 @@ variable "interface_endpoints" {
     name = string
     policy = string
     security_group_ids = set(string)
+    subnet_ids = set(string)
+    enable_private_dns = bool
   }))
 }

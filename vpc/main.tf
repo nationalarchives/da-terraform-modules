@@ -28,6 +28,8 @@ resource "aws_vpc_endpoint" "endpoints" {
   policy = each.value.policy
   vpc_endpoint_type = "Interface"
   security_group_ids = each.value.security_group_ids
+  subnet_ids = each.value.subnet_ids
+  private_dns_enabled = each.value.enable_private_dns
 }
 
 resource "aws_vpc" "main" {
