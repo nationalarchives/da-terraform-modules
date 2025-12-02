@@ -28,7 +28,7 @@ resource "aws_vpc_endpoint" "endpoints" {
   policy = each.value.policy
   vpc_endpoint_type = "Interface"
   security_group_ids = each.value.security_group_ids
-  subnet_ids = each.value.subnet_ids
+  subnet_ids = aws_subnet.private.*.id
   private_dns_enabled = each.value.enable_private_dns
 }
 
