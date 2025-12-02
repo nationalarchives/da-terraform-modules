@@ -149,7 +149,7 @@ resource "aws_instance" "nat_instance" {
   root_block_device {
     encrypted = true
   }
-  iam_instance_profile        = aws_iam_instance_profile.instance_profile.id
+  iam_instance_profile        = aws_iam_instance_profile.instance_profile[0].id
   user_data_replace_on_change = true
   subnet_id                   = aws_subnet.public[count.index].id
   vpc_security_group_ids      = var.nat_instance_security_groups
