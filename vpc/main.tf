@@ -21,6 +21,15 @@ resource "aws_eip" "eip" {
 data "aws_availability_zones" "available" {
 }
 
+resource "aws_vpc_endpoint" "endpoints" {
+  for_each = var.interface_endpoints
+  vpc_id = aws_vpc.main.id
+  service_name = each.value.name
+  policy = each.value.policy
+  vpc_endpoint_type = "Interface"
+  security_group_ids = each.value.security_group_ids
+}
+
 resource "aws_vpc" "main" {
   cidr_block           = var.cidr_block
   enable_dns_hostnames = var.enable_dns_hostnames

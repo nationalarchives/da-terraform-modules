@@ -97,3 +97,11 @@ variable "enable_dns_support" {
 variable "region" {
   default = "eu-west-2"
 }
+
+variable "interface_endpoints" {
+  type = map(object({
+    name = string
+    policy = string
+    security_group_ids = set(string)
+  }))
+}
