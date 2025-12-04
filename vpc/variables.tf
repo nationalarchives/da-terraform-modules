@@ -100,8 +100,8 @@ variable "region" {
 
 variable "interface_endpoints" {
   type = map(object({
-    name = string
-    policy = string
+    name               = string
+    policy             = string
     security_group_ids = set(string)
     enable_private_dns = bool
   }))
