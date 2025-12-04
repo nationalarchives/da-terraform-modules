@@ -160,7 +160,7 @@ resource "aws_instance" "nat_instance" {
   root_block_device {
     encrypted = true
   }
-  iam_instance_profile        = aws_iam_instance_profile.instance_profile.id
+  iam_instance_profile        = aws_iam_instance_profile.instance_profile[0].id
   user_data_replace_on_change = true
   subnet_id                   = aws_subnet.public[count.index].id
   vpc_security_group_ids      = var.nat_instance_security_groups
@@ -179,6 +179,7 @@ resource "aws_eip_association" "eip_assoc" {
 }
 
 resource "aws_iam_role" "instance_role" {
+  count              = var.use_nat_gateway ? 0 : 1
   assume_role_policy = templatefile("${path.module}/templates/service_assume_role.json.tpl", { service = "ec2" })
   name               = "${var.vpc_name}-iam-role"
   tags = merge(
@@ -190,13 +191,15 @@ resource "aws_iam_role" "instance_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_role_policy_attach" {
+  count      = var.use_nat_gateway ? 0 : 1
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  role       = aws_iam_role.instance_role.name
+  role       = aws_iam_role.instance_role[count.index].name
 }
 
 resource "aws_iam_instance_profile" "instance_profile" {
-  role = aws_iam_role.instance_role.name
-  name = "${var.vpc_name}-instance-profile"
+  count = var.use_nat_gateway ? 0 : 1
+  role  = aws_iam_role.instance_role[count.index].name
+  name  = "${var.vpc_name}-instance-profile"
   tags = merge(
     var.tags,
     tomap(
