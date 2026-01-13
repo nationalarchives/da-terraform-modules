@@ -73,6 +73,14 @@ variable "create_s3_gateway_endpoint" {
   default = true
 }
 
+variable "s3_gateway_endpoint_policy" {
+  default = null
+}
+
+variable "dynamo_gateway_endpoint_policy" {
+  default = null
+}
+
 variable "create_dynamo_gateway_endpoint" {
   type    = bool
   default = true
@@ -88,4 +96,13 @@ variable "enable_dns_support" {
 
 variable "region" {
   default = "eu-west-2"
+}
+
+variable "interface_endpoints" {
+  type = map(object({
+    name               = string
+    policy             = string
+    security_group_ids = set(string)
+    enable_private_dns = bool
+  }))
 }

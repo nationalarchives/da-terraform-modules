@@ -19,3 +19,9 @@ variable "permissions_boundary" {
   type        = string
   default     = null
 }
+
+variable "max_session_duration" {
+  description = "The maximum session duration for the role. Defaults to 1 hour"
+  default     = 3600
+  type        = number
+}

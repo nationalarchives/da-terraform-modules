@@ -4,42 +4,27 @@ variable "name" {}
 
 variable "description" {}
 
-variable "ingress_cidr_rules" {
-  type = set(object({
-    port        = number
-    description = string
-    cidr_blocks = list(string)
-  }))
-  default = []
-}
-
-variable "ingress_security_group_rules" {
-  type = set(object({
-    port              = number
-    description       = string
-    security_group_id = string
-  }))
-  default = []
-}
-
-variable "egress_cidr_rules" {
-  type = set(object({
-    port        = number
-    description = string
-    cidr_blocks = list(string)
-    protocol    = string
-  }))
-  default = []
-}
-
-variable "egress_security_group_rules" {
-  type = set(object({
-    port              = number
-    description       = string
-    security_group_id = string
-    protocol          = string
-  }))
-  default = []
+variable "rules" {
+  type = object({
+    ingress = optional(list(object({
+      ip_protocol       = optional(string, "tcp")
+      port              = number
+      description       = string
+      cidr_ip_v4        = optional(string)
+      cidr_ip_v6        = optional(string)
+      security_group_id = optional(string)
+      prefix_list_id    = optional(string)
+    })), [])
+    egress = optional(list(object({
+      ip_protocol       = optional(string, "tcp")
+      port              = number
+      description       = string
+      cidr_ip_v4        = optional(string)
+      cidr_ip_v6        = optional(string)
+      security_group_id = optional(string)
+      prefix_list_id    = optional(string)
+    })), [])
+  })
 }
 
 variable "common_tags" {}

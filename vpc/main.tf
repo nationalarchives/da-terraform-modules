@@ -4,6 +4,10 @@ locals {
   count_nat_gateway  = var.use_nat_gateway ? local.ip_count : 0
   count_nat_instance = var.use_nat_gateway ? 0 : local.ip_count
   allocation_ids     = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
+  route_table_ids    = concat([aws_vpc.main.default_route_table_id], var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : aws_route_table.private_nat_instance.*.id)
+  private_cidr_blocks = [
+    for idx in range(var.az_count) : cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, idx)
+  ]
 }
 
 resource "aws_eip" "eip" {
@@ -18,6 +22,17 @@ resource "aws_eip" "eip" {
 }
 
 data "aws_availability_zones" "available" {
+}
+
+resource "aws_vpc_endpoint" "endpoints" {
+  for_each            = var.interface_endpoints
+  vpc_id              = aws_vpc.main.id
+  service_name        = each.value.name
+  policy              = each.value.policy
+  vpc_endpoint_type   = "Interface"
+  security_group_ids  = each.value.security_group_ids
+  subnet_ids          = aws_subnet.private.*.id
+  private_dns_enabled = each.value.enable_private_dns
 }
 
 resource "aws_vpc" "main" {
@@ -38,7 +53,7 @@ resource "aws_default_security_group" "default" {
 
 resource "aws_subnet" "private" {
   count             = var.az_count
-  cidr_block        = cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, count.index)
+  cidr_block        = local.private_cidr_blocks[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
   vpc_id            = aws_vpc.main.id
 
@@ -148,7 +163,7 @@ resource "aws_instance" "nat_instance" {
   root_block_device {
     encrypted = true
   }
-  iam_instance_profile        = aws_iam_instance_profile.instance_profile.id
+  iam_instance_profile        = aws_iam_instance_profile.instance_profile[0].id
   user_data_replace_on_change = true
   subnet_id                   = aws_subnet.public[count.index].id
   vpc_security_group_ids      = var.nat_instance_security_groups
@@ -167,6 +182,7 @@ resource "aws_eip_association" "eip_assoc" {
 }
 
 resource "aws_iam_role" "instance_role" {
+  count              = var.use_nat_gateway ? 0 : 1
   assume_role_policy = templatefile("${path.module}/templates/service_assume_role.json.tpl", { service = "ec2" })
   name               = "${var.vpc_name}-iam-role"
   tags = merge(
@@ -178,13 +194,15 @@ resource "aws_iam_role" "instance_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "instance_role_policy_attach" {
+  count      = var.use_nat_gateway ? 0 : 1
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  role       = aws_iam_role.instance_role.name
+  role       = aws_iam_role.instance_role[count.index].name
 }
 
 resource "aws_iam_instance_profile" "instance_profile" {
-  role = aws_iam_role.instance_role.name
-  name = "${var.vpc_name}-instance-profile"
+  count = var.use_nat_gateway ? 0 : 1
+  role  = aws_iam_role.instance_role[count.index].name
+  name  = "${var.vpc_name}-instance-profile"
   tags = merge(
     var.tags,
     tomap(
@@ -245,6 +263,26 @@ resource "aws_cloudwatch_log_group" "flow_log_log_group" {
   )
 }
 
+resource "aws_route53_resolver_query_log_config" "route53_resolver_log" {
+  name            = "${aws_vpc.main.id}-query-logs"
+  destination_arn = aws_cloudwatch_log_group.route53_resolver_log_group.arn
+}
+
+resource "aws_route53_resolver_query_log_config_association" "route53_resolver_log_association" {
+  resolver_query_log_config_id = aws_route53_resolver_query_log_config.route53_resolver_log.id
+  resource_id                  = aws_vpc.main.id
+}
+
+resource "aws_cloudwatch_log_group" "route53_resolver_log_group" {
+  name = "/vpc/${aws_vpc.main.id}/route53-resolver"
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "/vpc/${aws_vpc.main.id}/route53-resolver" }
+    )
+  )
+}
+
 resource "aws_network_acl" "private_nacl" {
   vpc_id     = aws_vpc.main.id
   subnet_ids = aws_subnet.private.*.id
@@ -280,13 +318,17 @@ resource "aws_network_acl_rule" "public_nacl_rule" {
 }
 
 resource "aws_vpc_endpoint" "s3_endpoint" {
-  count        = var.create_s3_gateway_endpoint ? 1 : 0
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.s3"
+  count           = var.create_s3_gateway_endpoint ? 1 : 0
+  vpc_id          = aws_vpc.main.id
+  service_name    = "com.amazonaws.${var.region}.s3"
+  route_table_ids = local.route_table_ids
+  policy          = var.s3_gateway_endpoint_policy == null ? templatefile("${path.module}/templates/default_gateway_endpoint_policy.json.tpl", {}) : var.s3_gateway_endpoint_policy
 }
 
 resource "aws_vpc_endpoint" "dynamo_endpoint" {
-  count        = var.create_dynamo_gateway_endpoint ? 1 : 0
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.dynamodb"
+  count           = var.create_dynamo_gateway_endpoint ? 1 : 0
+  vpc_id          = aws_vpc.main.id
+  service_name    = "com.amazonaws.${var.region}.dynamodb"
+  route_table_ids = local.route_table_ids
+  policy          = var.dynamo_gateway_endpoint_policy == null ? templatefile("${path.module}/templates/default_gateway_endpoint_policy.json.tpl", {}) : var.dynamo_gateway_endpoint_policy
 }

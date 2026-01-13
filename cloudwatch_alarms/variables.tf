@@ -49,6 +49,11 @@ variable "statistic" {
   description = "Can be SampleCount, Average, Sum, Minimum, Maximum"
 }
 
+variable "extended_statistic" {
+  default     = null
+  description = "A value between p0.0 and p100. If set statistic will be overriden to null"
+}
+
 variable "comparison_operator" {
   default     = "GreaterThanThreshold"
   description = "Can be GreaterThanOrEqualToThreshold, GreaterThanThreshold, LessThanThreshold, LessThanOrEqualToThreshold"

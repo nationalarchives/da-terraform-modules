@@ -28,3 +28,8 @@ variable "schedule" {
   description = "The schedule for the event rule. Cannot be used with event pattern"
   default     = ""
 }
+
+variable "input" {
+  description = "Static json input to pass to the event target"
+  default     = ""
+}
