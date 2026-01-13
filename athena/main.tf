@@ -1,6 +1,11 @@
 resource "aws_athena_database" "database" {
   name   = var.name
   bucket = var.result_bucket_name
+
+  encryption_configuration {
+    encryption_option = "SSE_KMS"
+    kms_key_arn       = var.kms_key_arn
+  }
 }
 
 resource "aws_athena_workgroup" "workgroup" {
