@@ -20,7 +20,7 @@ variable "common_tags" {
 }
 
 variable "kms_key_arn" {
-  description = "The ARN of the KMS key to use for encryption. If not provided, SSE-S3 will be used."
+  description = "The ARN of the KMS key to use for encryption."
   type        = string
   default     = null
 }
