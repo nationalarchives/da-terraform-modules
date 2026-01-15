@@ -9,9 +9,7 @@ resource "aws_athena_database" "database" {
 
   tags = merge(
     var.common_tags,
-    tomap(
-      { "Name" = var.name }
-    )
+    { "Name" = var.name }
   )
 }
 
@@ -36,9 +34,7 @@ resource "aws_athena_workgroup" "workgroup" {
 
   tags = merge(
     var.common_tags,
-    tomap(
-      { "Name" = var.name }
-    )
+    { "Name" = var.name }
   )
 }
 
