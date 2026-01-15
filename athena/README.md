@@ -68,7 +68,7 @@ LOCATION 's3://${bucket_name}/${data_path}/';
 |------|-------------|------|---------|:--------:|
 | name | The name to use for the Athena database and workgroup | `string` | n/a | yes |
 | result_bucket_name | The name of the S3 bucket to store query results | `string` | n/a | yes |
-| create_table_queries | A map of SQL queries to create the tables. Key is the query name, value is the SQL. | `map(string)` | n/a | yes |
+| create_table_queries | A map of SQL queries to create the tables. Key is the query name, value is the SQL. | `map(string)` | `{}` | no |
 | common_tags | Common tags to apply to resources | `map(string)` | `{}` | no |
 | kms_key_arn | The ARN of the KMS key to use for encryption. | `string` | n/a | yes |
 
@@ -78,4 +78,4 @@ LOCATION 's3://${bucket_name}/${data_path}/';
 |------|-----------------------------------|
 | workgroup_arn | The ARN of the Athena workgroup  |
 | database_name | The name of the Athena database  |
-| named_query_ids | Map of named query IDs created |
+| named_query_ids | Map of Athena named query names to their corresponding query IDs. |

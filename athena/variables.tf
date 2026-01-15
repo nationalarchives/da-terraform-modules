@@ -11,6 +11,7 @@ variable "result_bucket_name" {
 variable "create_table_queries" {
   description = "A map of SQL queries to create the tables. Key is the query name, value is the SQL."
   type        = map(string)
+  default     = {}
 }
 
 variable "common_tags" {
