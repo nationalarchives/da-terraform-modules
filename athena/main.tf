@@ -6,6 +6,13 @@ resource "aws_athena_database" "database" {
     encryption_option = "SSE_KMS"
     kms_key_arn       = var.kms_key_arn
   }
+
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "Name" = var.name }
+    )
+  )
 }
 
 resource "aws_athena_workgroup" "workgroup" {
@@ -27,7 +34,12 @@ resource "aws_athena_workgroup" "workgroup" {
 
   force_destroy = true
 
-  tags = var.common_tags
+  tags = merge(
+    var.common_tags,
+    tomap(
+      { "Name" = var.name }
+    )
+  )
 }
 
 resource "aws_athena_named_query" "create_table" {
