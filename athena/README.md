@@ -25,7 +25,7 @@ module "athena" {
   }
 
   # Optional
-  # kms_key_arn = Kms arn"
+  # kms_key_arn = "KMS ARN"
   # common_tags = {
   #   Environment = "test"
   # }
