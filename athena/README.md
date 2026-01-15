@@ -24,8 +24,9 @@ module "athena" {
     })
   }
 
+  kms_key_arn = "arn:aws:kms:eu-west-2:account:key/..."
+
   # Optional
-  # kms_key_arn = Kms arn"
   # common_tags = {
   #   Environment = "test"
   # }
@@ -68,7 +69,7 @@ LOCATION 's3://${bucket_name}/${data_path}/';
 | result_bucket_name | The name of the S3 bucket to store query results | `string` | n/a | yes |
 | create_table_queries | A map of SQL queries to create the tables. Key is the query name, value is the SQL. | `map(string)` | n/a | yes |
 | common_tags | Common tags to apply to resources | `map(string)` | `{}` | no |
-| kms_key_arn | The ARN of the KMS key to use for encryption. If not provided, SSE-S3 will be used. | `string` | `null` | no |
+| kms_key_arn | The ARN of the KMS key to use for encryption. | `string` | n/a | yes |
 
 ## Outputs
 
