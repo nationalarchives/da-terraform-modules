@@ -1,6 +1,7 @@
 resource "aws_athena_database" "database" {
   name   = var.name
   bucket = var.result_bucket_name
+  force_destroy = true
 
   encryption_configuration {
     encryption_option = "SSE_KMS"
