@@ -22,6 +22,7 @@ resource "aws_cloudwatch_event_target" "lambda_event_target" {
   count = local.count_lambda_event_target
   rule  = local.event_rule_name
   arn   = var.lambda_event_target_arn
+  input = var.input
 }
 
 resource "aws_cloudwatch_event_target" "sns_topic_event_target" {

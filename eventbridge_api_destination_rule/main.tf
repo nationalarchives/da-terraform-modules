@@ -3,6 +3,7 @@ resource "aws_cloudwatch_event_rule" "rule" {
   description    = var.description
   event_pattern  = var.event_pattern
   event_bus_name = var.event_bus_name
+  state          = var.rule_state
 }
 
 module "api_destination_policy" {
@@ -54,4 +55,10 @@ resource "aws_cloudwatch_event_target" "step_function_failure_cloudwatch_target"
       input_paths    = input_transformer.value.input_paths
     }
   }
+}
+
+resource "aws_cloudwatch_event_target" "step_function_failure_lambda_target" {
+  count = var.lambda_target_arn == null ? 0 : 1
+  arn   = var.lambda_target_arn
+  rule  = aws_cloudwatch_event_rule.rule.name
 }

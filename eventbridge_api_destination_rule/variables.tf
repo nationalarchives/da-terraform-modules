@@ -33,3 +33,13 @@ variable "input_path" {
 variable "event_bus_name" {
   default = "default"
 }
+
+variable "lambda_target_arn" {
+  description = "A lambda arn to be used as an event target"
+  default     = null
+}
+
+variable "rule_state" {
+  description = "The rule state. Defaults to ENABLED which allows terraform to detect changes made manually to the state. Set to null to ignore manual state changes"
+  default     = "ENABLED"
+}

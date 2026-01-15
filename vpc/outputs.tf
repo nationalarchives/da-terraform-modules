@@ -9,3 +9,15 @@ output "public_subnets" {
 output "vpc_id" {
   value = aws_vpc.main.id
 }
+
+output "private_nacl_arn" {
+  value = aws_network_acl.private_nacl.arn
+}
+
+output "public_nacl_arn" {
+  value = aws_network_acl.public_nacl.arn
+}
+
+output "private_cidr_blocks" {
+  value = local.private_cidr_blocks
+}

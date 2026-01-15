@@ -64,6 +64,11 @@ variable "encryption_type" {
   }
 }
 
+variable "create_dlq" {
+  type    = bool
+  default = true
+}
+
 variable "dlq_notification_topic" {
   description = "A topic arn which will be used to send ALARM events if a message is put into the DLQ and OK events when it is removed."
   default     = null
@@ -74,8 +79,14 @@ variable "queue_visibility_alarm_notification_topic" {
   default     = null
 }
 
-variable "dlq_alarm_evaluation_period" {
+variable "dlq_alarm_messages_visible_period" {
   type        = number
-  description = "The evaluation period for the metrics for the DLQ alarm"
+  description = "The period for the metrics for the DLQ alarm visible messages"
   default     = 60
+}
+
+variable "messages_visible_alarm_period" {
+  type        = number
+  description = "The period for the metrics for the alarm visible messages"
+  default     = 900
 }

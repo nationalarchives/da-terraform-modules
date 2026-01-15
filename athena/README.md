@@ -38,6 +38,7 @@ module "athena" {
 ```sql
 CREATE EXTERNAL TABLE IF NOT EXISTS ${table_name} (
   consignmentId string,
+  s3VersionId string,
   fileError string,
   `date` string,
   validationErrors ARRAY<STRUCT<
