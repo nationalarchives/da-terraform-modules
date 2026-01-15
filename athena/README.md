@@ -74,9 +74,8 @@ LOCATION 's3://${bucket_name}/${data_path}/';
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| workgroup_arn | The ARN of the Athena workgroup |
-| database_name | The name of the Athena database |
+| Name | Description                       |
+|------|-----------------------------------|
+| workgroup_arn | The ARN of the Athena workgroup  |
+| database_name | The name of the Athena database  |
 | named_query_ids | Map of named query IDs created |
-
