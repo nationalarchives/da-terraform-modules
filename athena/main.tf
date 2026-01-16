@@ -5,13 +5,8 @@ resource "aws_athena_database" "database" {
 
   encryption_configuration {
     encryption_option = "SSE_KMS"
-    kms_key_arn       = var.kms_key_arn
+    kms_key           = var.kms_key_arn
   }
-
-  tags = merge(
-    var.common_tags,
-    { "Name" = var.name }
-  )
 }
 
 resource "aws_athena_workgroup" "workgroup" {
