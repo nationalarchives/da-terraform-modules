@@ -4,8 +4,7 @@ resource "aws_athena_database" "database" {
   force_destroy = true
 
   encryption_configuration {
-    encryption_option = "SSE_KMS"
-    kms_key           = var.kms_key_arn
+    encryption_option = "SSE_S3"
   }
 }
 
