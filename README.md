@@ -5,6 +5,9 @@ This is a repository of terraform modules which can be used to create resources 
 ## Modules
 There are the following modules:
 
+## Athena
+Creates an Athena database, workgroup and named queries.
+
 ## S3
 Creates an S3 bucket with an optional bucket policy, all public access blocked and an optional logging bucket.
 
