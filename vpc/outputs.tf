@@ -17,3 +17,7 @@ output "private_nacl_arn" {
 output "public_nacl_arn" {
   value = aws_network_acl.public_nacl.arn
 }
+
+output "private_cidr_blocks" {
+  value = local.private_cidr_blocks
+}
