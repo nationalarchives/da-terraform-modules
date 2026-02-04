@@ -40,6 +40,6 @@ variable "input" {
 
 variable "event_target_arns" {
   description = "Name to arn map for the event target resources"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }

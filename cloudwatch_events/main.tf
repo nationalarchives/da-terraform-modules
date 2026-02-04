@@ -33,6 +33,6 @@ resource "aws_cloudwatch_event_target" "sns_topic_event_target" {
 
 resource "aws_cloudwatch_event_target" "event_target" {
   for_each = var.event_target_arns
-  rule  = local.event_rule_name
-  arn   = each.value
+  rule     = local.event_rule_name
+  arn      = each.value
 }
