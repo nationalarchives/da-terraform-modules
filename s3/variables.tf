@@ -57,3 +57,13 @@ variable "lifecycle_rules" {
   type        = any
   default     = []
 }
+
+variable "enable_request_metrics" {
+  description = "Enable the additional request metrics for this bucket"
+  default     = false
+}
+
+variable "request_metrics_filter" {
+  description = "Filter object for aws_s3_bucket_metric"
+  default     = null
+}
