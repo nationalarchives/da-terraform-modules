@@ -43,17 +43,20 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
   target_prefix = "${var.bucket_name}/${data.aws_caller_identity.current.account_id}/"
 }
 
-resource "aws_s3_bucket_metric" "bucket_request_metrics" {
-  count  = var.enable_request_metrics == true ? 1 : 0
+resource "aws_s3_bucket_metric" "bucket_request_metrics_all" {
+  count  = var.enable_request_metrics_all == true ? 1 : 0
   bucket = module.data_bucket.s3_bucket_id
-  name   = var.request_metrics_filter == null ? "EntireBucket" : "LimitScope"
+  name   = "EntireBucket"
+}
 
-  dynamic "filter" {
-    for_each = var.request_metrics_filter != null ? ["do_it"] : []
-    content {
-      access_point = var.request_metrics_filter["access_point"]
-      prefix       = var.request_metrics_filter["prefix"]
-      tags         = var.request_metrics_filter["tags"]
-    }
+resource "aws_s3_bucket_metric" "bucket_request_metrics_filter" {
+  for_each = var.request_metrics_filters
+  bucket   = module.data_bucket.s3_bucket_id
+  name     = each.key
+
+  filter {
+    access_point = each.value.access_point
+    prefix       = each.value.prefix
+    tags         = each.value.tags
   }
 }
