@@ -42,3 +42,21 @@ resource "aws_s3_bucket_logging" "bucket_logging" {
   target_bucket = local.log_bucket_name
   target_prefix = "${var.bucket_name}/${data.aws_caller_identity.current.account_id}/"
 }
+
+resource "aws_s3_bucket_metric" "bucket_request_metrics_all" {
+  count  = var.enable_request_metrics_all == true ? 1 : 0
+  bucket = module.data_bucket.s3_bucket_id
+  name   = "EntireBucket"
+}
+
+resource "aws_s3_bucket_metric" "bucket_request_metrics_filter" {
+  for_each = var.request_metrics_filters
+  bucket   = module.data_bucket.s3_bucket_id
+  name     = each.key
+
+  filter {
+    access_point = each.value.access_point
+    prefix       = each.value.prefix
+    tags         = each.value.tags
+  }
+}

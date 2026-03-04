@@ -57,3 +57,18 @@ variable "lifecycle_rules" {
   type        = any
   default     = []
 }
+
+variable "enable_request_metrics_all" {
+  description = "Enable the additional request metrics for all objects in this bucket"
+  default     = false
+}
+
+variable "request_metrics_filters" {
+  description = "Enable the additional request metrics with filters.  Expects a map of Filter objects as documented in aws_s3_bucket_metric. Key is the filter name"
+  type = map(object({
+    access_point = optional(string)
+    prefix       = optional(string)
+    tags         = optional(map(any))
+  }))
+  default = {}
+}
