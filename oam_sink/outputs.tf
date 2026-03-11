@@ -1,3 +1,3 @@
-output "aws_oam_sink_arn" {
-  value = aws_oam_sink.oam_sink.arn
+output "aws_oam_sink" {
+  value = aws_oam_sink.oam_sink
 }

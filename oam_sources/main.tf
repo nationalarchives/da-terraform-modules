@@ -20,8 +20,10 @@ variable "aws_account_id_sink" {
   description = "The ID of the sink account"
 }
 
-locals {
-  managed_policies_to_attach = ["arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess", "arn:aws:iam::aws:policy/CloudWatchAutomaticDashboardsAccess", "arn:aws:iam::aws:policy/AWSXrayReadOnlyAccess"]
+variable "service_role_managed_policies" {
+  type        = list(string)
+  description = "Managed policies to attach to the service role"
+  default     = ["arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess", "arn:aws:iam::aws:policy/CloudWatchAutomaticDashboardsAccess", "arn:aws:iam::aws:policy/AWSXrayReadOnlyAccess"]
 }
 
 resource "aws_oam_link" "aws_oam_link_source_account" {
@@ -49,7 +51,7 @@ resource "aws_iam_role" "iam_role_service_account_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "iam_role_service_account_role_attach" {
-  for_each = toset(local.managed_policies_to_attach)
+  for_each = toset(var.service_role_managed_policies)
 
   policy_arn = each.key
   role       = aws_iam_role.iam_role_service_account_role.name
