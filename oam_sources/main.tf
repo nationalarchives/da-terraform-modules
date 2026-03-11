@@ -17,7 +17,7 @@ variable "aws_oam_sink_arn" {
 
 variable "aws_account_id_monitoring" {
   type        = string
-  description = "The ID af the monitoring account"
+  description = "The ID of the monitoring account"
 }
 
 locals {
