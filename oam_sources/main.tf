@@ -15,9 +15,9 @@ variable "aws_oam_sink_arn" {
   description = "The arn of the OAM sink to use in the OAM link"
 }
 
-variable "aws_account_id_monitoring" {
+variable "aws_account_id_sink" {
   type        = string
-  description = "The ID of the monitoring account"
+  description = "The ID of the sink account"
 }
 
 locals {
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "iam_oam_service_account_trust_policy_document" {
 
     principals {
       type        = "AWS"
-      identifiers = [var.aws_account_id_monitoring]
+      identifiers = [var.aws_account_id_sink]
     }
   }
 }

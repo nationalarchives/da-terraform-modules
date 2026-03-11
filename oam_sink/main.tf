@@ -5,11 +5,11 @@ variable "source_oam_account_ids" {
   description = "List of source accounts to use in the OAM sink policy"
 }
 
-resource "aws_oam_sink" "oam_sink_management" {
-  name = "ManagementAccountSink"
+resource "aws_oam_sink" "oam_sink" {
+  name = "AccountSink"
 }
 
-data "aws_iam_policy_document" "oam_sink_management_policy" {
+data "aws_iam_policy_document" "oam_sink_policy" {
   statement {
     sid       = "OamSinkPolicy"
     effect    = "Allow"
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "oam_sink_management_policy" {
   }
 }
 
-resource "aws_oam_sink_policy" "oam_sink_management_policy" {
-  sink_identifier = aws_oam_sink.oam_sink_management.id
-  policy          = data.aws_iam_policy_document.oam_sink_management_policy.json
+resource "aws_oam_sink_policy" "oam_sink_policy" {
+  sink_identifier = aws_oam_sink.oam_sink.id
+  policy          = data.aws_iam_policy_document.oam_sink_policy.json
 }
