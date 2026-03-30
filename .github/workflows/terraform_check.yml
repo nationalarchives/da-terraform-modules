@@ -7,8 +7,8 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
-      - uses: nationalarchives/tdr-github-actions/.github/actions/run-git-secrets@4cce7fa069b9dbecddbdacd9350f66adc50ac815
-      - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@4cce7fa069b9dbecddbdacd9350f66adc50ac815
+      - uses: nationalarchives/tdr-github-actions/.github/actions/run-git-secrets@b6c9c07143225e2473579be26914683efd719ef6
+      - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@b6c9c07143225e2473579be26914683efd719ef6
         if: failure()
         with:
           message: ":warning: Secrets found in repository da-terraform-modules"
