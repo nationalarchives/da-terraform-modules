@@ -7,7 +7,8 @@ variable "trust_anchor_arn" {
 variable "x509_cert_location" {
   type        = string
   description = "http(s) location of certificate bundle to use for trust anchor.  Ignored if trust_anchor_arn specified"
-  default     = "https://certs.nationalarchives.gov.uk/serverless-ca-bundle.pem"
+  # if your terraform plan is constantly bringing up the pem as a change, make sure it has a trailing newline at the end
+  default = "https://certs.nationalarchives.gov.uk/serverless-ca-bundle.pem"
 }
 
 variable "roles" {
