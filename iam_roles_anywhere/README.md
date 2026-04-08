@@ -27,6 +27,6 @@ It's recommended to output the following from your code using this module.  Then
 
 ```
 output "aws_signin_helper_command" {
-  value = module.backup_AT_uat_profile.aws_signin_helper_command
+  value = module.my_local_system_profile.aws_signin_helper_command
 }
 ```
