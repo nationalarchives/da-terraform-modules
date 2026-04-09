@@ -1,31 +1,31 @@
-data "http" "ca-cert-bundle" {
+data "http" "ca_cert_bundle" {
   count = var.trust_anchor_arn == null ? 1 : 0
   url   = var.x509_cert_location
 }
 
-resource "aws_rolesanywhere_trust_anchor" "ds-ca-prod" {
+resource "aws_rolesanywhere_trust_anchor" "trust_anchor" {
   count = var.trust_anchor_arn == null ? 1 : 0
-  name  = "ds-ca-prod"
+  name  = var.trust_anchor_name
   source {
     source_type = "CERTIFICATE_BUNDLE"
     source_data {
-      x509_certificate_data = data.http.ca-cert-bundle[0].response_body
+      x509_certificate_data = data.http.ca_cert_bundle[0].response_body
     }
   }
   enabled = true
 }
 
 locals {
-  trust_anchor_arn = coalesce(var.trust_anchor_arn, aws_rolesanywhere_trust_anchor.ds-ca-prod[0].arn)
+  trust_anchor_arn = var.trust_anchor_arn != null ? var.trust_anchor_arn : aws_rolesanywhere_trust_anchor.trust_anchor[0].arn
 }
 
 # best practice is one certificate per role
 module "iam_role" {
   for_each = var.roles
-  source   = "git::https://github.com/nationalarchives/da-terraform-modules//iam_role?ref=main"
+  source   = "../iam_role"
   name     = each.key
   assume_role_policy = templatefile("${path.module}/templates/ra_role_policy.json.tpl", {
-    anchor_arn      = coalesce(var.trust_anchor_arn, aws_rolesanywhere_trust_anchor.ds-ca-prod[0].arn)
+    anchor_arn      = local.trust_anchor_arn
     x509_subject_cn = each.value.x509_subject_cn
     x509_subject_ou = each.value.x509_subject_ou
   })
