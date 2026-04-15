@@ -8,9 +8,16 @@
         "IpAddress": {
           "aws:SourceIp": ${jsonencode(allowed_subnets)
           }
-        },
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "*",
+      "Condition": {
         "Bool": {
-          "aws:ViaAWSService": "false"
+          "aws:ViaAWSService": "true"
         }
       }
     }
