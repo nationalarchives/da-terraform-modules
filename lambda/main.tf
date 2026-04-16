@@ -1,14 +1,15 @@
 locals {
   sqs_mapping_without_ignore_enabled = { for mapping in var.lambda_sqs_queue_mappings : (mapping.sqs_queue_arn) => mapping.sqs_queue_concurrency if mapping.ignore_enabled_status == false }
   sqs_mapping_ignore_enabled         = { for mapping in var.lambda_sqs_queue_mappings : (mapping.sqs_queue_arn) => mapping.sqs_queue_concurrency if mapping.ignore_enabled_status == true }
-  lambda                             = var.use_image ? aws_lambda_function.lambda_function_ecr[0] : aws_lambda_function.lambda_function[0]
+  use_s3                             = var.s3_bucket != null && var.s3_key != null
+  lambda                             = var.use_image ? aws_lambda_function.lambda_function_ecr[0] : local.use_s3 ? aws_lambda_function.lambda_function_s3[0] : aws_lambda_function.lambda_function[0]
   lambda_arn                         = local.lambda.arn
   lambda_name                        = local.lambda.function_name
 }
 
 resource "aws_lambda_function" "lambda_function" {
   description   = var.description
-  count         = var.use_image ? 0 : 1
+  count         = var.use_image || local.use_s3 ? 0 : 1
   function_name = var.function_name
   handler       = var.handler
   role          = aws_iam_role.lambda_iam_role.arn
@@ -16,6 +17,14 @@ resource "aws_lambda_function" "lambda_function" {
   filename      = var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
+  publish       = var.publish_version
+
+  dynamic "snap_start" {
+    for_each = var.snap_start == true ? ["snap_start"] : []
+    content {
+      apply_on = "PublishedVersions"
+    }
+  }
 
   ephemeral_storage {
     size = var.storage_size
@@ -44,6 +53,65 @@ resource "aws_lambda_function" "lambda_function" {
   }
 }
 
+data "aws_s3_object" "lambda_code_object" {
+  count         = local.use_s3 ? 1 : 0
+  bucket        = var.s3_bucket
+  key           = var.s3_key
+  checksum_mode = "ENABLED"
+}
+
+resource "aws_lambda_function" "lambda_function_s3" {
+  description      = var.description
+  count            = local.use_s3 ? 1 : 0
+  function_name    = var.function_name
+  handler          = var.handler
+  role             = aws_iam_role.lambda_iam_role.arn
+  runtime          = var.runtime
+  timeout          = var.timeout_seconds
+  memory_size      = var.memory_size
+  publish          = var.publish_version
+  s3_bucket        = var.s3_bucket
+  s3_key           = var.s3_key
+  source_code_hash = data.aws_s3_object.lambda_code_object[count.index].checksum_sha256
+
+  dynamic "snap_start" {
+    for_each = var.snap_start == true ? ["snap_start"] : []
+    content {
+      apply_on = "PublishedVersions"
+    }
+  }
+
+  ephemeral_storage {
+    size = var.storage_size
+  }
+
+  reserved_concurrent_executions = var.reserved_concurrency
+  tags                           = var.tags
+
+  dynamic "environment" {
+    for_each = length(local.all_env_vars) == 0 ? [] : [1]
+    content {
+      variables = local.all_env_vars
+    }
+  }
+
+  dynamic "file_system_config" {
+    for_each = var.efs_access_points
+    content {
+      arn              = file_system_config.value.access_point_arn
+      local_mount_path = file_system_config.value.mount_path
+    }
+  }
+  vpc_config {
+    security_group_ids = var.vpc_config.security_group_ids
+    subnet_ids         = var.vpc_config.subnet_ids
+  }
+
+  lifecycle {
+    ignore_changes = [filename]
+  }
+}
+
 resource "aws_lambda_function" "lambda_function_ecr" {
   description   = var.description
   count         = var.use_image ? 1 : 0
@@ -53,9 +121,17 @@ resource "aws_lambda_function" "lambda_function_ecr" {
   package_type  = "Image"
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
+  publish       = var.publish_version
 
   ephemeral_storage {
     size = var.storage_size
+  }
+
+  dynamic "snap_start" {
+    for_each = var.snap_start == true ? ["snap_start"] : []
+    content {
+      apply_on = "PublishedVersions"
+    }
   }
 
   reserved_concurrent_executions = var.reserved_concurrency
