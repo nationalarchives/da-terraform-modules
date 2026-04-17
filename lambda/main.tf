@@ -61,18 +61,18 @@ data "aws_s3_object" "lambda_code_object" {
 }
 
 resource "aws_lambda_function" "lambda_function_s3" {
-  description      = var.description
-  count            = local.use_s3 ? 1 : 0
-  function_name    = var.function_name
-  handler          = var.handler
-  role             = aws_iam_role.lambda_iam_role.arn
-  runtime          = var.runtime
-  timeout          = var.timeout_seconds
-  memory_size      = var.memory_size
-  publish          = var.publish_version
-  s3_bucket        = var.s3_bucket
-  s3_key           = var.s3_key
-  source_code_hash = data.aws_s3_object.lambda_code_object[count.index].checksum_sha256
+  description   = var.description
+  count         = local.use_s3 ? 1 : 0
+  function_name = var.function_name
+  handler       = var.handler
+  role          = aws_iam_role.lambda_iam_role.arn
+  runtime       = var.runtime
+  timeout       = var.timeout_seconds
+  memory_size   = var.memory_size
+  publish       = var.publish_version
+  s3_bucket     = var.s3_bucket
+  s3_key        = var.s3_key
+  code_sha256   = data.aws_s3_object.lambda_code_object[count.index].checksum_sha256
 
   dynamic "snap_start" {
     for_each = var.snap_start == true ? ["snap_start"] : []
