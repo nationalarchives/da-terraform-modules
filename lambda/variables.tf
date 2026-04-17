@@ -162,3 +162,25 @@ variable "description" {
   description = "The lambda description"
   default     = null
 }
+
+variable "publish_version" {
+  default = false
+  type    = bool
+}
+
+variable "s3_bucket" {
+  description = "The s3 bucket which hosts the code for the lambda"
+  default     = null
+  type        = string
+}
+
+variable "s3_key" {
+  description = "The s3 key for the code for the lambda"
+  default     = null
+  type        = string
+}
+
+variable "snap_start" {
+  default = false
+  type    = bool
+}
