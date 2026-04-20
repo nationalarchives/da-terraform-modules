@@ -72,7 +72,7 @@ resource "aws_lambda_function" "lambda_function_s3" {
   publish       = var.publish_version
   s3_bucket     = var.s3_bucket
   s3_key        = var.s3_key
-  code_sha256   = data.aws_s3_object.lambda_code_object[count.index].checksum_sha256
+  source_code_hash  = data.aws_s3_object.lambda_code_object[count.index].etag
 
   dynamic "snap_start" {
     for_each = var.snap_start == true ? ["snap_start"] : []
