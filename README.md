@@ -105,8 +105,8 @@ Run `terraform fmt --recursive` to avoid this.
 It might be best to test your changes before merging into the main, if you would like to do so:
 
 1. create a GitHub branch and push it
-2. in a local `terraform-environments` repo of your choosing, find a relevant module, e.g. if your change is an SQS change, find an SQS module
-3. you should see that the `source` field ends with `\\[AWS service]"`
-4. at the end of the AWS service, add `?ref=[Remote branch name]`
+2. in a local repo of your choosing, find a relevant module, e.g. if your change is an SQS change, find an SQS module
+3. you should see that the `source` field ends with `...da-terraform-modules//[AWS service]"`
+4. at the end of the `[AWS service]`, add `?ref=[Remote branch name]`
 5. run `terraform init` to get the changes
-6. now in your local `terraform-environments` repo, you can run `terraform plan` and/or `terraform apply` to see what affect it will have
+6. now in your local repo, you can run `terraform plan` and/or `terraform apply` to see what affect it will have

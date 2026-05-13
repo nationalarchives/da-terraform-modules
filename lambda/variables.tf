@@ -184,3 +184,13 @@ variable "snap_start" {
   default = false
   type    = bool
 }
+
+variable "layers" {
+  default = []
+  type    = list(string)
+
+  validation {
+    condition     = length(var.layers) <= 5
+    error_message = "The layers variable cannot contain more than 5 items."
+  }
+}
