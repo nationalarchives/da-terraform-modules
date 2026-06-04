@@ -1,17 +1,19 @@
 locals {
-  new_bits           = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
-  ip_count           = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
-  count_nat_gateway  = var.use_nat_gateway ? local.ip_count : 0
-  count_nat_instance = var.use_nat_gateway ? 0 : local.ip_count
-  allocation_ids     = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
-  route_table_ids    = concat([aws_vpc.main.default_route_table_id], var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : aws_route_table.private_nat_instance.*.id)
+  new_bits                  = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
+  ip_count                  = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
+  count_nat_gateway         = var.use_nat_gateway && !var.use_nat_instance ? local.ip_count : 0
+  count_nat_instance        = !var.use_nat_gateway && var.use_nat_instance ? local.ip_count : 0
+  allocation_ids            = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
+  nat_gateway_route_tables  = var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : []
+  nat_instance_route_tables = var.use_nat_instance ? aws_route_table.private_nat_gateway.*.id : []
+  route_table_ids           = concat([aws_vpc.main.default_route_table_id], local.nat_gateway_route_tables, local.nat_instance_route_tables, var.gateway_endpoint_route_table_ids)
   private_cidr_blocks = [
     for idx in range(var.az_count) : cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, idx)
   ]
 }
 
 resource "aws_eip" "eip" {
-  count  = length(var.elastic_ip_allocation_ids) > 0 ? 0 : var.az_count
+  count  = length(var.elastic_ip_allocation_ids) > 0 ? 0 : var.create_elastic_ips ? var.az_count : 0
   domain = "vpc"
   tags = merge(
     var.tags,
@@ -66,7 +68,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_subnet" "public" {
-  count                   = var.az_count
+  count                   = var.create_public_subnet ? var.az_count : 0
   cidr_block              = cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, var.az_count + count.index)
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   vpc_id                  = aws_vpc.main.id
@@ -289,6 +291,7 @@ resource "aws_network_acl" "private_nacl" {
 }
 
 resource "aws_network_acl" "public_nacl" {
+  count      = var.create_public_subnet ? 1 : 0
   vpc_id     = aws_vpc.main.id
   subnet_ids = aws_subnet.public.*.id
 }
@@ -307,7 +310,7 @@ resource "aws_network_acl_rule" "private_nacl_rule" {
 
 resource "aws_network_acl_rule" "public_nacl_rule" {
   for_each       = { for rule in var.public_nacl_rules : "rule${rule.rule_no}_${rule.egress}" => rule }
-  network_acl_id = aws_network_acl.public_nacl.id
+  network_acl_id = one(aws_network_acl.public_nacl.*.id)
   protocol       = "tcp"
   rule_action    = each.value.action
   rule_number    = each.value.rule_no

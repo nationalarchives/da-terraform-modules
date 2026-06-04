@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "bucket" {
-  bucket = var.bucket_name
+  bucket           = var.bucket_name
+  bucket_namespace = var.bucket_namespace
   tags = merge(
     var.common_tags,
     tomap(

@@ -27,6 +27,11 @@ variable "elastic_ip_allocation_ids" {
   default     = []
 }
 
+variable "create_elastic_ips" {
+  type    = bool
+  default = true
+}
+
 variable "nat_instance_security_groups" {
   description = "A list of security groups for the NAT instance"
   type        = list(string)
@@ -39,7 +44,7 @@ variable "nat_instance_type" {
 }
 
 variable "use_nat_gateway" {
-  description = "Will create a nat gateway if set to true and a nat instance otherwise"
+  description = "Will create a nat gateway if set to true"
   default     = false
 }
 
@@ -105,4 +110,19 @@ variable "interface_endpoints" {
     security_group_ids = set(string)
     enable_private_dns = bool
   }))
+}
+
+variable "create_public_subnet" {
+  type    = bool
+  default = true
+}
+
+variable "use_nat_instance" {
+  type    = bool
+  default = false
+}
+
+variable "gateway_endpoint_route_table_ids" {
+  type    = list(string)
+  default = []
 }

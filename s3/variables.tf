@@ -72,3 +72,7 @@ variable "request_metrics_filters" {
   }))
   default = {}
 }
+
+variable "bucket_namespace" {
+  default = "global"
+}

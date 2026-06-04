@@ -135,6 +135,10 @@ variable "filename" {
   default     = ""
 }
 
+variable "code_sha256" {
+  default = null
+}
+
 variable "use_image" {
   description = "Boolean to determine if Lambda function uses an image or a zip file"
   type        = bool

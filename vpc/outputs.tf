@@ -19,11 +19,13 @@ output "private_nacl_arn" {
 }
 
 output "public_nacl_arn" {
-  value = aws_network_acl.public_nacl.arn
+  value = one(aws_network_acl.public_nacl.*.arn)
 }
 
 output "private_cidr_blocks" {
   value = local.private_cidr_blocks
 }
 
-
+output "interface_endpoints" {
+  value = merge(aws_vpc_endpoint.endpoints)
+}

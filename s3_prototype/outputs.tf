@@ -7,3 +7,8 @@ output "s3_bucket_id" {
   description = "AWS Id for the created data bucket"
   value       = aws_s3_bucket.bucket.id
 }
+
+output "s3_bucket_regional_domain_name" {
+  description = "The domain name for the bucket"
+  value       = aws_s3_bucket.bucket.bucket_regional_domain_name
+}

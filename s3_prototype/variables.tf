@@ -39,3 +39,7 @@ variable "lifecycle_rules" {
   type        = any
   default     = []
 }
+
+variable "bucket_namespace" {
+  default = "global"
+}

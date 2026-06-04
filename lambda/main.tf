@@ -18,6 +18,8 @@ resource "aws_lambda_function" "lambda_function" {
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
   publish       = var.publish_version
+  code_sha256   = var.code_sha256
+
 
   dynamic "snap_start" {
     for_each = var.snap_start == true ? ["snap_start"] : []
@@ -122,6 +124,7 @@ resource "aws_lambda_function" "lambda_function_ecr" {
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
   publish       = var.publish_version
+  code_sha256   = var.code_sha256
 
   ephemeral_storage {
     size = var.storage_size

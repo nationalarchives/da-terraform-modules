@@ -18,6 +18,7 @@ module "data_bucket" {
   kms_key_arn      = var.kms_key_arn
   sns_topic_config = var.sns_topic_config
   lifecycle_rules  = var.lifecycle_rules
+  bucket_namespace = var.bucket_namespace
 }
 
 module "log_bucket" {
