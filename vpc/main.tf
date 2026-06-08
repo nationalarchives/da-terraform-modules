@@ -3,6 +3,7 @@ locals {
   ip_count                  = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
   count_nat_gateway         = var.use_nat_gateway && !var.use_nat_instance ? local.ip_count : 0
   count_nat_instance        = !var.use_nat_gateway && var.use_nat_instance ? local.ip_count : 0
+  count_no_nat              = !var.use_nat_instance && !var.use_nat_gateway ? local.ip_count : 0
   allocation_ids            = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
   nat_gateway_route_tables  = var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : []
   nat_instance_route_tables = var.use_nat_instance ? aws_route_table.private_nat_gateway.*.id : []
@@ -58,7 +59,6 @@ resource "aws_subnet" "private" {
   cidr_block        = local.private_cidr_blocks[count.index]
   availability_zone = data.aws_availability_zones.available.names[count.index]
   vpc_id            = aws_vpc.main.id
-
   tags = merge(
     var.tags,
     tomap(
@@ -129,7 +129,7 @@ resource "aws_route_table" "private_nat_gateway" {
 }
 
 resource "aws_route_table" "private_no_nat" {
-  count  = !var.use_nat_instance && !var.use_nat_gateway ? 1 : 0
+  count  = local.count_no_nat
   vpc_id = aws_vpc.main.id
   tags = merge(
     var.tags,
@@ -236,6 +236,13 @@ resource "aws_route_table_association" "private_nat_gateway" {
   subnet_id = aws_subnet.private.*.id[count.index]
   // If AZ count is higher than the number of elastic IPs provided, assign all remaining subnets to the last NAT gateway
   route_table_id = count.index > local.count_nat_gateway - 1 ? aws_route_table.private_nat_gateway.*.id[local.count_nat_gateway - 1] : aws_route_table.private_nat_gateway.*.id[count.index]
+}
+
+resource "aws_route_table_association" "private_no_nat" {
+  count     = local.count_no_nat
+  subnet_id = aws_subnet.private.*.id[count.index]
+  // If AZ count is higher than the number of elastic IPs provided, assign all remaining subnets to the last route table
+  route_table_id = count.index > local.count_no_nat - 1 ? aws_route_table.private_no_nat.*.id[local.count_no_nat - 1] : aws_route_table.private_no_nat.*.id[count.index]
 }
 
 resource "aws_flow_log" "flow_log" {
