@@ -26,6 +26,12 @@ variable "service_role_managed_policies" {
   default     = ["arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess", "arn:aws:iam::aws:policy/CloudWatchAutomaticDashboardsAccess", "arn:aws:iam::aws:policy/AWSXrayReadOnlyAccess"]
 }
 
+variable "skip_role_creation" {
+  description = "Don't create the CloudWatch-CrossAccountSharingRole - Useful if using this multi region where the OAM sink/sources needs to be in each region but the IAM role created by default is of course global"
+  default     = true
+  type        = bool
+}
+
 resource "aws_oam_link" "aws_oam_link_source_account" {
   label_template  = "$AccountName"
   resource_types  = ["AWS::CloudWatch::Metric", "AWS::Logs::LogGroup", "AWS::ApplicationInsights::Application"]
@@ -46,13 +52,13 @@ data "aws_iam_policy_document" "iam_oam_service_account_trust_policy_document" {
 }
 
 resource "aws_iam_role" "iam_role_service_account_role" {
+  count              = length(var.service_role_managed_policies) > 0 ? 1 : 0
   name               = "CloudWatch-CrossAccountSharingRole"
   assume_role_policy = data.aws_iam_policy_document.iam_oam_service_account_trust_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "iam_role_service_account_role_attach" {
-  for_each = toset(var.service_role_managed_policies)
-
+  for_each   = toset(var.service_role_managed_policies)
   policy_arn = each.key
-  role       = aws_iam_role.iam_role_service_account_role.name
+  role       = aws_iam_role.iam_role_service_account_role[0].name
 }

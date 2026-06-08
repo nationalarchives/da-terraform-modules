@@ -1,5 +1,13 @@
 # Create a Observability Access Manager Sink
 # Creating a sink effectively makes the account a "monitoring" account
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
+
 variable "source_oam_account_ids" {
   type        = list(string)
   description = "List of source accounts to use in the OAM sink policy"
