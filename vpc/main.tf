@@ -1,3 +1,11 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "6.17.0"
+    }
+  }
+}
 locals {
   new_bits                  = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
   ip_count                  = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
@@ -6,7 +14,7 @@ locals {
   allocation_ids            = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
   nat_gateway_route_tables  = var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : []
   nat_instance_route_tables = var.use_nat_instance ? aws_route_table.private_nat_gateway.*.id : []
-  route_table_ids           = concat([aws_vpc.main.default_route_table_id], local.nat_gateway_route_tables, local.nat_instance_route_tables, var.gateway_endpoint_route_table_ids)
+  route_table_ids           = concat([aws_vpc.main.default_route_table_id], local.nat_gateway_route_tables, local.nat_instance_route_tables, var.gateway_endpoint_route_table_ids, one(aws_route_table.private_no_nat.id))
   private_cidr_blocks = [
     for idx in range(var.az_count) : cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, idx)
   ]
@@ -124,6 +132,17 @@ resource "aws_route_table" "private_nat_gateway" {
     var.tags,
     tomap(
       { "Name" = "${var.vpc_name}-nat-gateway-route-table-${data.aws_availability_zones.available.names[count.index]}" }
+    )
+  )
+}
+
+resource "aws_route_table" "private_no_nat" {
+  count  = !var.use_nat_instance && !var.use_nat_gateway ? 1 : 0
+  vpc_id = aws_vpc.main.id
+  tags = merge(
+    var.tags,
+    tomap(
+      { "Name" = "${var.vpc_name}-no-nat-route-table-${data.aws_availability_zones.available.names[count.index]}" }
     )
   )
 }
