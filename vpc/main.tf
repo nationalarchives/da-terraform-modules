@@ -6,7 +6,7 @@ locals {
   allocation_ids            = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
   nat_gateway_route_tables  = var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : []
   nat_instance_route_tables = var.use_nat_instance ? aws_route_table.private_nat_gateway.*.id : []
-  route_table_ids           = concat([aws_vpc.main.default_route_table_id], local.nat_gateway_route_tables, local.nat_instance_route_tables, var.gateway_endpoint_route_table_ids, one(aws_route_table.private_no_nat.id))
+  route_table_ids           = concat([aws_vpc.main.default_route_table_id], local.nat_gateway_route_tables, local.nat_instance_route_tables, var.gateway_endpoint_route_table_ids, one(aws_route_table.private_no_nat).id)
   private_cidr_blocks = [
     for idx in range(var.az_count) : cidrsubnet(aws_vpc.main.cidr_block, local.new_bits, idx)
   ]
