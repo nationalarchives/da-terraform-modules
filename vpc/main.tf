@@ -1,11 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "6.17.0"
-    }
-  }
-}
 locals {
   new_bits                  = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
   ip_count                  = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
