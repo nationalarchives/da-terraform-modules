@@ -15,6 +15,11 @@ terraform {
   }
 }
 
+variable "region" {
+  type        = string
+  description = "AWS Region to create resource in"
+}
+
 variable "aws_oam_sink_arn" {
   type        = string
   description = "The arn of the OAM sink to use in the OAM link"
@@ -35,6 +40,7 @@ resource "aws_oam_link" "aws_oam_link_source_account" {
   label_template  = "$AccountName"
   resource_types  = ["AWS::CloudWatch::Metric", "AWS::Logs::LogGroup", "AWS::ApplicationInsights::Application"]
   sink_identifier = var.aws_oam_sink_arn
+  region          = var.region
 }
 
 data "aws_iam_policy_document" "iam_oam_service_account_trust_policy_document" {

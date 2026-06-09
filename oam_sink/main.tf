@@ -8,13 +8,19 @@ terraform {
   }
 }
 
+variable "region" {
+  type        = string
+  description = "AWS Region to create resource in"
+}
+
 variable "source_oam_account_ids" {
   type        = list(string)
   description = "List of source accounts to use in the OAM sink policy"
 }
 
 resource "aws_oam_sink" "oam_sink" {
-  name = "AccountSink"
+  name   = "AccountSink"
+  region = var.region
 }
 
 data "aws_iam_policy_document" "oam_sink_policy" {
@@ -40,4 +46,5 @@ data "aws_iam_policy_document" "oam_sink_policy" {
 resource "aws_oam_sink_policy" "oam_sink_policy" {
   sink_identifier = aws_oam_sink.oam_sink.id
   policy          = data.aws_iam_policy_document.oam_sink_policy.json
+  region          = var.region
 }
