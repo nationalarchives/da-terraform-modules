@@ -5,7 +5,7 @@
 #
 # If you are using this multi-region, use this module in subsequent regions with
 # service_role_managed_policies = []
-# Which will stop the attempt to create iam role (global) twice
+# Which will stop the attempt to create the iam role (global) twice
 
 terraform {
   required_providers {
