@@ -2,6 +2,11 @@
 # Create a policy for the CloudWatch-CrossAccountSharingRole which is created by AWS
 # See https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Cross-Account-Cross-Region.html
 # Inspired by https://gds.blog.gov.uk/2023/07/26/enabling-aws-cross-account-monitoring-using-terraform/
+#
+# If you are using this multi-region, use this module in subsequent regions with
+# service_role_managed_policies = []
+# Which will stop the attempt to create iam role (global) twice
+
 terraform {
   required_providers {
     aws = {
@@ -24,12 +29,6 @@ variable "service_role_managed_policies" {
   type        = list(string)
   description = "Managed policies to attach to the service role"
   default     = ["arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess", "arn:aws:iam::aws:policy/CloudWatchAutomaticDashboardsAccess", "arn:aws:iam::aws:policy/AWSXrayReadOnlyAccess"]
-}
-
-variable "skip_role_creation" {
-  description = "Don't create the CloudWatch-CrossAccountSharingRole - Useful if using this multi region where the OAM sink/sources needs to be in each region but the IAM role created by default is of course global"
-  default     = true
-  type        = bool
 }
 
 resource "aws_oam_link" "aws_oam_link_source_account" {
