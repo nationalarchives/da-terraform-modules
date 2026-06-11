@@ -167,9 +167,12 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 }
 
 locals {
-  encrypted_env_vars      = { for k, v in var.encrypted_env_vars : k => aws_kms_ciphertext.encrypted_environment_variables[k].ciphertext_blob }
-  all_env_vars            = merge(local.encrypted_env_vars, var.plaintext_env_vars)
-  vpc_config_policy_count = var.vpc_config.subnet_ids == [] ? 0 : 1
+  encrypted_env_vars = { for k, v in var.encrypted_env_vars : k => aws_kms_ciphertext.encrypted_environment_variables[k].ciphertext_blob }
+  all_env_vars       = merge(local.encrypted_env_vars, var.plaintext_env_vars)
+  vpc_config_policy_count = (
+    length(var.vpc_config.subnet_ids) > 0 &&
+    length(var.vpc_config.security_group_ids) > 0
+  ) ? 1 : 0
 }
 
 resource "aws_kms_ciphertext" "encrypted_environment_variables" {
