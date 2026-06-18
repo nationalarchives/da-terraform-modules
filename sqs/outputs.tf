@@ -21,3 +21,7 @@ output "alarms" {
 output "event_alarms" {
   value = aws_cloudwatch_metric_alarm.new_messages_added_to_dlq_alert.*.arn
 }
+
+output "queue_name" {
+  value = local.queue_name
+}
