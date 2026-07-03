@@ -39,3 +39,13 @@ variable "lifecycle_rules" {
   type        = any
   default     = []
 }
+
+variable "bucket_versioning_status" {
+  type    = string
+  default = "Enabled"
+
+  validation {
+    condition     = contains(["Enabled", "Suspended", "Disabled"], var.bucket_versioning_status)
+    error_message = "The versioning status must be one of these: Enabled, Suspended, Disabled."
+  }
+}

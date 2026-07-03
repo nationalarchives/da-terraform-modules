@@ -30,7 +30,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "encryption_config
 resource "aws_s3_bucket_versioning" "versioning" {
   bucket = aws_s3_bucket.bucket.id
   versioning_configuration {
-    status = "Enabled"
+    status = var.bucket_versioning_status
   }
 }
 

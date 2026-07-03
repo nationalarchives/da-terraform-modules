@@ -14,6 +14,7 @@ module "data_bucket" {
   bucket_policy                          = var.bucket_policy
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
   backup_policy_tag                      = var.backup_policy_tag
+  bucket_versioning_status               = var.bucket_versioning_status
 
   kms_key_arn      = var.kms_key_arn
   sns_topic_config = var.sns_topic_config
