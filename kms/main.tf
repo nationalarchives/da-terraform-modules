@@ -125,19 +125,26 @@ data "aws_iam_policy_document" "key_policy" {
         type        = "AWS"
         identifiers = var.default_policy_variables.ci_roles
       }
-      actions = [
-        "kms:Create*",
-        "kms:Describe*",
-        "kms:Enable*",
-        "kms:List*",
-        "kms:Put*",
-        "kms:Update*",
-        "kms:Revoke*",
-        "kms:Disable*",
-        "kms:Get*",
-        "kms:TagResource",
-        "kms:UntagResource"
-      ]
+      actions = concat(
+        [
+          "kms:CancelKeyDeletion",
+          "kms:Create*",
+          "kms:DeleteAlias",
+          "kms:Describe*",
+          "kms:Disable*",
+          "kms:Enable*",
+          "kms:Get*",
+          "kms:List*",
+          "kms:Put*",
+          "kms:Revoke*",
+          "kms:TagResource",
+          "kms:UntagResource",
+          "kms:Update*",
+        ],
+        !var.default_policy_variables.allow_ci_roles_to_delete ? [] : [
+          "kms:ScheduleKeyDeletion"
+        ]
+      )
       resources = ["*"]
     }
   }
