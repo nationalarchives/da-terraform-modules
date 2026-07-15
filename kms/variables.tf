@@ -15,6 +15,7 @@ variable "key_description" {
 variable "default_policy_variables" {
   description = <<EOT
   Policy variables for the default KMS policy
+  allow_ci_roles_to_delete - Whether to allow CI roles to delete the key/alias
   user_roles - A list of roles which will have access to encrypt and decrypt with the key
   user_roles_decoupled - A list of roles which will have access to encrypt and decrypt with the key. Unlike user_roles these will be added as a condition instead of a principal to the statement, meaning that KMS will not resolve these ARNs to unique role IDs within AWS - they will be treated as strings. These principals MUST be within the same AWS Organization as the key.
   ci_roles - Roles to be run by terraform. They have access to administer the key but not decrypt or delete.
@@ -24,6 +25,7 @@ variable "default_policy_variables" {
   wiz_roles - A list of wiz access roles to allow for full scanning of AWS resources for issues. DEPRECATED: Use user_roles_decoupled and persistent_resource_roles_decoupled instead
   EOT
   type = object({
+    allow_ci_roles_to_delete            = optional(bool, false)
     user_roles                          = optional(list(string), [])
     user_roles_decoupled                = optional(list(string), []) # Prefer user_roles where possible, this is for specific cross-account access where the principal may not exist when deploying. Review use with Technical Architects.
     ci_roles                            = optional(list(string), [])
@@ -37,6 +39,7 @@ variable "default_policy_variables" {
     wiz_roles                = optional(list(string), []) # DEPRECATED: Use user_roles_decoupled and persistent_resource_roles_decoupled instead
   })
   default = {
+    allow_ci_roles_to_delete            = false
     user_roles                          = []
     user_roles_decoupled                = []
     persistent_resource_roles           = []
