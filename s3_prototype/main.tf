@@ -109,7 +109,7 @@ data "aws_iam_policy_document" "policy_document" {
 resource "aws_s3_bucket_policy" "bucket_policy" {
   count      = var.attach_s3_policy ? 1 : 0
   bucket     = aws_s3_bucket.bucket.id
-  policy     = data.aws_iam_policy_document.policy_document.json
+  policy     = replace(data.aws_iam_policy_document.policy_document.json, "<<BUCKET_NAME>>", aws_s3_bucket.bucket.id)
   depends_on = [aws_s3_bucket_public_access_block.bucket_public_access]
 }
 

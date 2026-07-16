@@ -14,6 +14,12 @@ variable "log_bucket_name" {
 
 variable "bucket_name" {}
 
+variable "bucket_namespace" {
+  description = "The namespace of the S3 bucket."
+  type        = string
+  default     = "global"
+}
+
 variable "common_tags" {
   default = {}
 }
@@ -25,7 +31,7 @@ variable "logging_bucket_policy" {
 
 variable "bucket_policy" {
   default     = ""
-  description = "Additional bucket policy to be added to a default policy with sid AllowSSLRequestsOnly that denies non SSL requests."
+  description = "Additional bucket policy to be added to a default policy with sid AllowSSLRequestsOnly that denies non SSL requests. \"<<BUCKET_NAME>>\" will be replaced with the bucket name by this module."
 }
 
 variable "sns_topic_config" {
