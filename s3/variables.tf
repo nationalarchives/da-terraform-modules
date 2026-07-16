@@ -14,12 +14,6 @@ variable "log_bucket_name" {
 
 variable "bucket_name" {}
 
-variable "bucket_namespace" {
-  description = "The namespace of the S3 bucket."
-  type        = string
-  default     = "global"
-}
-
 variable "common_tags" {
   default = {}
 }
