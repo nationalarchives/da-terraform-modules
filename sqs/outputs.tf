@@ -22,8 +22,8 @@ output "event_alarms" {
   value = aws_cloudwatch_metric_alarm.new_messages_added_to_dlq_alert.*.arn
 }
 
-output "unprocessed_message_alarms" {
-  value = aws_cloudwatch_metric_alarm.unprocessed_messages_alert.*.arn
+output "unprocessed_message_alarm" {
+  value = aws_cloudwatch_metric_alarm.unprocessed_messages_alert.arn
 }
 
 output "sqs_queue" {

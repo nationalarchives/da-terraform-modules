@@ -146,8 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
-  for_each            = toset([local.sqs_queue.name])
-  alarm_name          = "${each.key}-unprocessed-messages-alert"
+  alarm_name          = "${local.sqs_queue.name}-unprocessed-messages-alert"
   alarm_description   = "Triggers when there are messages in the queue but no messages have been recieved for specified period"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -162,7 +161,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
       period      = var.messages_visible_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = each.key
+        QueueName = local.sqs_queue.name
       }
     }
   }
@@ -175,7 +174,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
       period      = var.messages_visible_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
-        QueueName = each.key
+        QueueName = local.sqs_queue.name
       }
     }
   }
