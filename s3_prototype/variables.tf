@@ -17,7 +17,8 @@ variable "common_tags" {
 }
 
 variable "bucket_policy" {
-  default = ""
+  default     = ""
+  description = "Policy to apply to the bucket. \"<<BUCKET_NAME>>\" will be replaced with the bucket name by this module."
 }
 
 variable "sns_topic_config" {
