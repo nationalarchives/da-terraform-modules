@@ -17,7 +17,6 @@ resource "aws_lambda_function" "lambda_function" {
   filename      = var.filename == "" ? startswith(var.runtime, "java") ? "${path.module}/functions/generic.jar" : "${path.module}/functions/generic.zip" : var.filename
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
-  architectures = [var.architecture]
   layers        = var.layers
   publish       = var.publish_version
 
@@ -71,6 +70,7 @@ resource "aws_lambda_function" "lambda_function_s3" {
   runtime       = var.runtime
   timeout       = var.timeout_seconds
   memory_size   = var.memory_size
+  architectures = [var.architecture]
   publish       = var.publish_version
   s3_bucket     = var.s3_bucket
   s3_key        = var.s3_key
