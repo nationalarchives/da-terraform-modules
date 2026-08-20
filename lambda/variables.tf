@@ -194,3 +194,13 @@ variable "layers" {
     error_message = "The layers variable cannot contain more than 5 items."
   }
 }
+
+variable "architecture" {
+  description = "The architecture of the Lambda function"
+  type        = string
+  default     = "x86_64"
+  validation {
+    condition     = contains(["x86_64", "arm64"], var.architecture)
+    error_message = "The architecture variable should be one of 'x86_64' or 'arm64'."
+  }
+}
