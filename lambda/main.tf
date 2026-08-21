@@ -5,7 +5,7 @@ locals {
   lambda                             = var.use_image ? aws_lambda_function.lambda_function_ecr[0] : local.use_s3 ? aws_lambda_function.lambda_function_s3[0] : aws_lambda_function.lambda_function[0]
   lambda_arn                         = local.lambda.arn
   lambda_name                        = local.lambda.function_name
-  tags                               = merge(var.tags, { Name = var.function_name })
+  tags                               = merge(var.tags, { Name = local.lambda.function_name })
 }
 
 resource "aws_lambda_function" "lambda_function" {
