@@ -5,6 +5,7 @@ locals {
   lambda                             = var.use_image ? aws_lambda_function.lambda_function_ecr[0] : local.use_s3 ? aws_lambda_function.lambda_function_s3[0] : aws_lambda_function.lambda_function[0]
   lambda_arn                         = local.lambda.arn
   lambda_name                        = local.lambda.function_name
+  tags                               = merge(var.tags, { Name = local.lambda.function_name })
 }
 
 resource "aws_lambda_function" "lambda_function" {
@@ -33,7 +34,7 @@ resource "aws_lambda_function" "lambda_function" {
   }
 
   reserved_concurrent_executions = var.reserved_concurrency
-  tags                           = var.tags
+  tags                           = local.tags
   environment {
     variables = local.all_env_vars
   }
@@ -89,7 +90,7 @@ resource "aws_lambda_function" "lambda_function_s3" {
   }
 
   reserved_concurrent_executions = var.reserved_concurrency
-  tags                           = var.tags
+  tags                           = local.tags
 
   dynamic "environment" {
     for_each = length(local.all_env_vars) == 0 ? [] : [1]
@@ -139,7 +140,7 @@ resource "aws_lambda_function" "lambda_function_ecr" {
   }
 
   reserved_concurrent_executions = var.reserved_concurrency
-  tags                           = var.tags
+  tags                           = local.tags
   environment {
     variables = local.all_env_vars
   }
@@ -166,7 +167,7 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${local.lambda_name}"
   retention_in_days = var.log_retention
   kms_key_id        = var.log_group_kms_key_arn
-  tags              = var.tags
+  tags              = local.tags
 }
 
 locals {
