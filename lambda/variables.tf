@@ -43,6 +43,9 @@ variable "reserved_concurrency" {
 
 variable "tags" {
   type = map(string)
+  default = {
+    Name = var.function_name
+  }
 }
 
 variable "efs_access_points" {
