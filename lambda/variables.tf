@@ -62,6 +62,11 @@ variable "s3_files_access_points" {
   }))
   default     = []
   description = "A list of S3 Files access point arns and mount paths. This can be omitted if S3 Files is not needed"
+
+  validation {
+    condition     = length(var.efs_access_points) + length(var.s3_files_access_points) <= 1
+    error_message = "A lambda can only mount one file system, so set at most one of efs_access_points or s3_files_access_points."
+  }
 }
 
 variable "vpc_config" {
