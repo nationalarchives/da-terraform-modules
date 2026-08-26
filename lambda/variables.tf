@@ -55,6 +55,15 @@ variable "efs_access_points" {
   description = "A list of access point arns and mount paths. This can be omitted if EFS is not needed"
 }
 
+variable "s3_files_access_points" {
+  type = list(object({
+    access_point_arn = string,
+    mount_path       = string
+  }))
+  default     = []
+  description = "A list of S3 Files access point arns and mount paths. This can be omitted if S3 Files is not needed"
+}
+
 variable "vpc_config" {
   type = object({
     subnet_ids         = list(string)
