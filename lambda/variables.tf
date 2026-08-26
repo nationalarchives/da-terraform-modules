@@ -55,6 +55,20 @@ variable "efs_access_points" {
   description = "A list of access point arns and mount paths. This can be omitted if EFS is not needed"
 }
 
+variable "s3_files_access_points" {
+  type = list(object({
+    access_point_arn = string,
+    mount_path       = string
+  }))
+  default     = []
+  description = "A list of S3 Files access point arns and mount paths. This can be omitted if S3 Files is not needed"
+
+  validation {
+    condition     = length(var.efs_access_points) + length(var.s3_files_access_points) <= 1
+    error_message = "A lambda can only mount one file system, so set at most one of efs_access_points or s3_files_access_points."
+  }
+}
+
 variable "vpc_config" {
   type = object({
     subnet_ids         = list(string)

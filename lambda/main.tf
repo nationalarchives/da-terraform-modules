@@ -6,6 +6,8 @@ locals {
   lambda_arn                         = local.lambda.arn
   lambda_name                        = local.lambda.function_name
   tags                               = merge(var.tags, { Name = var.function_name })
+  # A lambda can only mount one file system, so EFS and S3 Files access points share the same file_system_config block.
+  file_system_access_points = concat(var.efs_access_points, var.s3_files_access_points)
 }
 
 resource "aws_lambda_function" "lambda_function" {
@@ -40,7 +42,7 @@ resource "aws_lambda_function" "lambda_function" {
   }
 
   dynamic "file_system_config" {
-    for_each = var.efs_access_points
+    for_each = local.file_system_access_points
     content {
       arn              = file_system_config.value.access_point_arn
       local_mount_path = file_system_config.value.mount_path
@@ -100,7 +102,7 @@ resource "aws_lambda_function" "lambda_function_s3" {
   }
 
   dynamic "file_system_config" {
-    for_each = var.efs_access_points
+    for_each = local.file_system_access_points
     content {
       arn              = file_system_config.value.access_point_arn
       local_mount_path = file_system_config.value.mount_path
@@ -146,7 +148,7 @@ resource "aws_lambda_function" "lambda_function_ecr" {
   }
 
   dynamic "file_system_config" {
-    for_each = var.efs_access_points
+    for_each = local.file_system_access_points
     content {
       arn              = file_system_config.value.access_point_arn
       local_mount_path = file_system_config.value.mount_path
