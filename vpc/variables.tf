@@ -106,3 +106,10 @@ variable "interface_endpoints" {
     enable_private_dns = bool
   }))
 }
+
+# DR2-2503
+variable "nat_gateway_enabled" {
+  description = "Turning off the NAT gateways in intg and staging overnight"
+  type = bool
+  default = true
+}
