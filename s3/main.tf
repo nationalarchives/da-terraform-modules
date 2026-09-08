@@ -34,6 +34,7 @@ module "log_bucket" {
     account_id      = data.aws_caller_identity.current.account_id
   }) : var.logging_bucket_policy
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
+  lifecycle_rules                        = var.log_bucket_lifecycle_rules
 }
 
 resource "aws_s3_bucket_logging" "bucket_logging" {

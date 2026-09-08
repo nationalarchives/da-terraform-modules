@@ -8,4 +8,5 @@ module "log_bucket" {
   bucket_policy                          = var.bucket_policy
   abort_incomplete_multipart_upload_days = var.abort_incomplete_multipart_upload_days
   backup_policy_tag                      = var.backup_policy_tag
+  lifecycle_rules                        = var.lifecycle_rules
 }

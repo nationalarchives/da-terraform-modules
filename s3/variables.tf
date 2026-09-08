@@ -53,7 +53,13 @@ variable "s3_logs_bucket_additional_tags" {
 }
 
 variable "lifecycle_rules" {
-  description = "List of maps describing configuration of object lifecycle management for bucket"
+  description = "List of maps describing configuration of object lifecycle management for the data bucket"
+  type        = any
+  default     = []
+}
+
+variable "log_bucket_lifecycle_rules" {
+  description = "List of maps describing configuration of object lifecycle management for the log bucket"
   type        = any
   default     = []
 }
