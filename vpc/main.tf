@@ -25,7 +25,7 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_vpc_endpoint" "endpoints" {
-  for_each            = var.interface_endpoints
+  for_each            = var.interface_endpoints_enabled ? var.interface_endpoints : {}
   vpc_id              = aws_vpc.main.id
   service_name        = each.value.name
   policy              = each.value.policy
