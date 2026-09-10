@@ -85,6 +85,33 @@ resource "aws_s3_bucket_lifecycle_configuration" "delete_incomplete_multipart_up
       }
     }
   }
+
+  dynamic "rule" {
+    for_each = var.enable_log_bucket_lifecycle && var.apply_resource && endswith(var.bucket_name, "-logs") ? var.log_bucket_lifecycle_rules : []
+    iterator = rule
+    content {
+      id     = rule.value.id
+      status = rule.value.status
+
+      dynamic "expiration" {
+
+        for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [rule.value.expiration]
+        content {
+          date                         = lookup(expiration.value, "date", null)
+          days                         = lookup(expiration.value, "days", null)
+          expired_object_delete_marker = lookup(expiration.value, "expired_object_delete_marker", null)
+
+        }
+      }
+      dynamic "noncurrent_version_expiration" {
+        for_each = length(keys(lookup(rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [rule.value.noncurrent_version_expiration]
+        content {
+          noncurrent_days           = lookup(noncurrent_version_expiration.value, "noncurrent_days", null)
+          newer_noncurrent_versions = lookup(noncurrent_version_expiration.value, "newer_noncurrent_versions", null)
+        }
+      }
+    }
+  }
 }
 
 data "aws_iam_policy_document" "policy_document" {
