@@ -50,19 +50,23 @@ variable "bucket_versioning_status" {
     error_message = "The versioning status must be one of these: Enabled, Suspended, Disabled."
   }
 }
+
 variable "log_bucket_lifecycle_rules" {
   description = "List of maps describing configuration of object lifecycle management for the activity log buckets"
   type        = any
   default     = []
 }
+
 variable "enable_log_bucket_lifecycle" {
   description = "Whether to apply log bucket lifecycle rules to this bucket"
   type        = bool
   default     = false
 }
+
 variable "create_log_bucket" {
   default = true
 }
+
 variable "apply_resource" {
   description = "use to conditionally apply resource from the calling module"
   default     = true
