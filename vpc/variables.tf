@@ -39,8 +39,14 @@ variable "nat_instance_type" {
 }
 
 variable "use_nat_gateway" {
-  description = "Will create a nat gateway if set to true and a nat instance otherwise"
+  description = "Will create a nat gateway if set to true"
   default     = false
+}
+
+variable "use_nat_instance" {
+  description = "Will create a nat instance if set to true"
+  type        = bool
+  default     = true
 }
 
 variable "environment" {}
