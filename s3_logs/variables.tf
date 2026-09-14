@@ -28,3 +28,15 @@ variable "abort_incomplete_multipart_upload_days" {
   description = "The number of days to keep an incomplete multipart upload before it is deleted"
   default     = 7
 }
+
+variable "log_bucket_lifecycle_rules" {
+  description = "List of lifecycle rules to apply to the log bucket when enabled"
+  type        = any
+  default     = []
+}
+
+variable "enable_log_bucket_lifecycle" {
+  description = "Whether to apply lifecycle rules to the log bucket"
+  type        = bool
+  default     = false
+}
