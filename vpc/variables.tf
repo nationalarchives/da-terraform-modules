@@ -43,6 +43,12 @@ variable "use_nat_gateway" {
   default     = false
 }
 
+variable "use_nat_instance" {
+  description = "Will create a nat instance if set to true"
+  type        = bool
+  default     = true
+}
+
 variable "environment" {}
 
 variable "private_nacl_rules" {
@@ -105,10 +111,4 @@ variable "interface_endpoints" {
     security_group_ids = set(string)
     enable_private_dns = bool
   }))
-}
-
-variable "use_nat_instance" {
-  description = "For turning off the NAT gateways in intg and staging overnight"
-  type        = bool
-  default     = true
 }
