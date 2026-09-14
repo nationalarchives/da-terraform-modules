@@ -107,15 +107,8 @@ variable "interface_endpoints" {
   }))
 }
 
-# DR2-2503
-variable "nat_gateway_enabled" {
+variable "use_nat_instance" {
   description = "For turning off the NAT gateways in intg and staging overnight"
-  type        = bool
-  default     = true
-}
-
-variable "interface_endpoints_enabled" {
-  description = "For turning off NAT gateways in intg and staging overnight"
   type        = bool
   default     = true
 }

@@ -1,8 +1,8 @@
 locals {
   new_bits           = tonumber(split("/", var.subnet_cidr_prefix)[1]) - tonumber(split("/", var.cidr_block)[1])
   ip_count           = length(var.elastic_ip_allocation_ids) == 0 ? var.az_count : length(var.elastic_ip_allocation_ids)
-  count_nat_gateway  = var.use_nat_gateway && var.nat_gateway_enabled ? local.ip_count : 0
-  count_nat_instance = !var.use_nat_gateway && var.nat_gateway_enabled ? 0 : local.ip_count
+  count_nat_gateway  = var.use_nat_gateway && var.use_nat_instance ? local.ip_count : 0
+  count_nat_instance = !var.use_nat_gateway && var.use_nat_instance ? 0 : local.ip_count
   allocation_ids     = length(var.elastic_ip_allocation_ids) == 0 ? aws_eip.eip.*.allocation_id : var.elastic_ip_allocation_ids
   route_table_ids    = concat([aws_vpc.main.default_route_table_id], var.use_nat_gateway ? aws_route_table.private_nat_gateway.*.id : aws_route_table.private_nat_instance.*.id)
   private_cidr_blocks = [
@@ -25,7 +25,7 @@ data "aws_availability_zones" "available" {
 }
 
 resource "aws_vpc_endpoint" "endpoints" {
-  for_each            = var.interface_endpoints_enabled ? var.interface_endpoints : {}
+  for_each            = var.interface_endpoints
   vpc_id              = aws_vpc.main.id
   service_name        = each.value.name
   policy              = each.value.policy
