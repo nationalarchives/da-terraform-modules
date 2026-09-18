@@ -240,6 +240,13 @@ data "aws_iam_policy_document" "key_policy" {
         "kms:ReEncrypt*",
         "kms:GenerateDataKey*",
         "kms:Describe*"
+        ] : statement.value["service_name"] == "elasticfilesystem" ? [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:CreateGrant",
+        "kms:DescribeKey"
         ] : [
         "kms:Decrypt",
         "kms:GenerateDataKey*",
@@ -251,6 +258,14 @@ data "aws_iam_policy_document" "key_policy" {
         test     = "StringEquals"
         values   = [statement.value["service_source_account"] == null ? data.aws_caller_identity.current.account_id : statement.value["service_source_account"]]
         variable = "aws:SourceAccount"
+      }
+      dynamic "condition" {
+        for_each = statement.value["service_name"] == "elasticfilesystem" ? [true] : []
+        content {
+          test     = "Bool"
+          values   = ["true"]
+          variable = "kms:GrantIsForAWSResource"
+        }
       }
     }
   }
