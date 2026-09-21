@@ -1,7 +1,5 @@
 data "aws_caller_identity" "current" {}
 
-data "aws_region" "current" {}
-
 locals {
   user_roles_actions = [
     "kms:Encrypt",
@@ -233,12 +231,8 @@ data "aws_iam_policy_document" "key_policy" {
     content {
       sid = "AllowSameAccountServiceAccess${title(replace(statement.value["service_name"], ".", ""))}${index(var.default_policy_variables.service_details, statement.value)}"
       principals {
-        type = statement.value["service_name"] == "elasticfilesystem" ? "AWS" : "Service"
-        identifiers = statement.value["service_name"] == "elasticfilesystem" ? [
-          "*"
-          ] : [
-          "${statement.value["service_name"]}.amazonaws.com"
-        ]
+        type        = "Service"
+        identifiers = ["${statement.value["service_name"]}.amazonaws.com"]
       }
       actions = strcontains(statement.value["service_name"], "logs") ? [
         "kms:Encrypt*",
@@ -246,11 +240,6 @@ data "aws_iam_policy_document" "key_policy" {
         "kms:ReEncrypt*",
         "kms:GenerateDataKey*",
         "kms:Describe*"
-        ] : statement.value["service_name"] == "elasticfilesystem" ? [
-        "kms:Decrypt",
-        "kms:GenerateDataKeyWithoutPlaintext",
-        "kms:CreateGrant",
-        "kms:DescribeKey"
         ] : [
         "kms:Decrypt",
         "kms:GenerateDataKey*",
@@ -263,20 +252,31 @@ data "aws_iam_policy_document" "key_policy" {
         values   = [statement.value["service_source_account"] == null ? data.aws_caller_identity.current.account_id : statement.value["service_source_account"]]
         variable = "aws:SourceAccount"
       }
-      dynamic "condition" {
-        for_each = statement.value["service_name"] == "elasticfilesystem" ? [true] : []
+    }
+  }
+
+  dynamic "statement" {
+    for_each = var.default_policy_variables.additional_statements
+    content {
+      sid       = statement.value.sid
+      effect    = statement.value.effect
+      actions   = statement.value.actions
+      resources = statement.value.resources
+
+      dynamic "principals" {
+        for_each = statement.value.principals
         content {
-          test     = "StringEquals"
-          values   = ["elasticfilesystem.${data.aws_region.current.region}.amazonaws.com"]
-          variable = "kms:ViaService"
+          type        = principals.value.type
+          identifiers = principals.value.identifiers
         }
       }
+
       dynamic "condition" {
-        for_each = statement.value["service_name"] == "elasticfilesystem" ? [true] : []
+        for_each = statement.value.conditions
         content {
-          test     = "StringEquals"
-          values   = [statement.value["service_source_account"] == null ? data.aws_caller_identity.current.account_id : statement.value["service_source_account"]]
-          variable = "kms:CallerAccount"
+          test     = condition.value.test
+          variable = condition.value.variable
+          values   = condition.value.values
         }
       }
     }
