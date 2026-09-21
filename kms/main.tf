@@ -256,6 +256,33 @@ data "aws_iam_policy_document" "key_policy" {
   }
 
   dynamic "statement" {
+    for_each = var.default_policy_variables.additional_statements
+    content {
+      sid       = statement.value.sid
+      effect    = statement.value.effect
+      actions   = statement.value.actions
+      resources = statement.value.resources
+
+      dynamic "principals" {
+        for_each = statement.value.principals
+        content {
+          type        = principals.value.type
+          identifiers = principals.value.identifiers
+        }
+      }
+
+      dynamic "condition" {
+        for_each = statement.value.conditions
+        content {
+          test     = condition.value.test
+          variable = condition.value.variable
+          values   = condition.value.values
+        }
+      }
+    }
+  }
+
+  dynamic "statement" {
     for_each = length(var.default_policy_variables.cloudfront_distributions) == 0 ? [] : ["cloudfront_distributions"]
 
     content {

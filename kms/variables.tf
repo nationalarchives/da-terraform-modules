@@ -22,6 +22,7 @@ variable "default_policy_variables" {
   persistent_resource_roles - A list of roles which will allow those roles to grant access to AWS services. See   https://docs.aws.amazon.com/kms/latest/developerguide/key-policy-default.html#key-policy-service-integration for more information.
   persistent_resource_roles_decoupled - A list of roles which will allow those roles to grant access to AWS services. Unlike persistent_resource_roles these will be added as a condition instead of a principal to the statement, meaning that KMS will not resolve these ARNs to unique role IDs within AWS - they will be treated as strings. These principals MUST be within the same AWS Organization as the key.
   service_details - A list of service_detail objects, with a service name and a source account to add to the policy condition. This will allow decryption from AWS services.
+  additional_statements - Additional statements to add to the generated KMS key policy.
   wiz_roles - A list of wiz access roles to allow for full scanning of AWS resources for issues. DEPRECATED: Use user_roles_decoupled and persistent_resource_roles_decoupled instead
   EOT
   type = object({
@@ -35,6 +36,21 @@ variable "default_policy_variables" {
       service_name           = string
       service_source_account = optional(string, null)
     })), [])
+    additional_statements = optional(list(object({
+      sid       = optional(string)
+      effect    = optional(string, "Allow")
+      actions   = list(string)
+      resources = optional(list(string), ["*"])
+      principals = list(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    })), [])
     cloudfront_distributions = optional(list(string), [])
     wiz_roles                = optional(list(string), []) # DEPRECATED: Use user_roles_decoupled and persistent_resource_roles_decoupled instead
   })
@@ -46,6 +62,7 @@ variable "default_policy_variables" {
     persistent_resource_roles_decoupled = []
     ci_roles                            = []
     service_details                     = []
+    additional_statements               = []
     cloudfront_distributions            = []
     wiz_roles                           = []
   }
