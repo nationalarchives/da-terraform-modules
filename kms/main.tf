@@ -1,5 +1,7 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 locals {
   user_roles_actions = [
     "kms:Encrypt",
@@ -231,8 +233,12 @@ data "aws_iam_policy_document" "key_policy" {
     content {
       sid = "AllowSameAccountServiceAccess${title(replace(statement.value["service_name"], ".", ""))}${index(var.default_policy_variables.service_details, statement.value)}"
       principals {
-        type        = "Service"
-        identifiers = ["${statement.value["service_name"]}.amazonaws.com"]
+        type = statement.value["service_name"] == "elasticfilesystem" ? "AWS" : "Service"
+        identifiers = statement.value["service_name"] == "elasticfilesystem" ? [
+          "*"
+          ] : [
+          "${statement.value["service_name"]}.amazonaws.com"
+        ]
       }
       actions = strcontains(statement.value["service_name"], "logs") ? [
         "kms:Encrypt*",
@@ -241,10 +247,8 @@ data "aws_iam_policy_document" "key_policy" {
         "kms:GenerateDataKey*",
         "kms:Describe*"
         ] : statement.value["service_name"] == "elasticfilesystem" ? [
-        "kms:Encrypt",
         "kms:Decrypt",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
+        "kms:GenerateDataKeyWithoutPlaintext",
         "kms:CreateGrant",
         "kms:DescribeKey"
         ] : [
@@ -262,9 +266,17 @@ data "aws_iam_policy_document" "key_policy" {
       dynamic "condition" {
         for_each = statement.value["service_name"] == "elasticfilesystem" ? [true] : []
         content {
-          test     = "Bool"
-          values   = ["true"]
-          variable = "kms:GrantIsForAWSResource"
+          test     = "StringEquals"
+          values   = ["elasticfilesystem.${data.aws_region.current.region}.amazonaws.com"]
+          variable = "kms:ViaService"
+        }
+      }
+      dynamic "condition" {
+        for_each = statement.value["service_name"] == "elasticfilesystem" ? [true] : []
+        content {
+          test     = "StringEquals"
+          values   = [statement.value["service_source_account"] == null ? data.aws_caller_identity.current.account_id : statement.value["service_source_account"]]
+          variable = "kms:CallerAccount"
         }
       }
     }
