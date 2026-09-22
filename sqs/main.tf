@@ -156,8 +156,8 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
   metric_query {
     id = "m1"
     metric {
-      metric_name = "ApproximateNumberOfMessagesVisible"
-      stat        = "Sum"
+      metric_name = "ApproximateAgeOfOldestMessage"
+      stat        = "Maximum"
       period      = var.messages_visible_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
@@ -181,7 +181,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
 
   metric_query {
     id          = "e1"
-    expression  = "IF(m1 > 0 AND m2 == 0, 1)"
+    expression  = "IF(m1 > ${var.messages_visible_alarm_period} AND m2 == 0, 1, 0)"
     label       = "MessagesInQueueNoMessagesRecieved"
     return_data = true
   }
