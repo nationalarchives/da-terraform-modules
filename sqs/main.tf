@@ -146,7 +146,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
-  alarm_name          = "${local.sqs_queue.name}-unprocessed-messages-alert"
+  alarm_name          = "${local.sqs_queue.name}-no-consumers"
   alarm_description   = "Triggers when there are messages in the queue but no messages have been recieved for specified period"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
@@ -180,8 +180,21 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
   }
 
   metric_query {
+    id = "m3"
+    metric {
+      metric_name = "NumberOfEmptyReceives"
+      stat        = "Sum"
+      period      = var.messages_visible_alarm_period
+      namespace   = "AWS/SQS"
+      dimensions = {
+        QueueName = local.sqs_queue.name
+      }
+    }
+  }
+
+  metric_query {
     id          = "e1"
-    expression  = "IF(m1 > ${var.messages_visible_alarm_period} AND m2 == 0, 1, 0)"
+    expression  = "IF(m1 > 0 AND m2 == 0 AND m3 == 0, 1, 0)"
     label       = "MessagesInQueueNoMessagesRecieved"
     return_data = true
   }
