@@ -145,7 +145,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   }
 }
 
-resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
+resource "aws_cloudwatch_metric_alarm" "no_consumers_alert" {
   alarm_name          = "${local.sqs_queue.name}-no-consumers"
   alarm_description   = "Triggers when there are messages in the queue but no messages have been recieved for specified period"
   comparison_operator = "GreaterThanThreshold"
@@ -158,7 +158,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
     metric {
       metric_name = "ApproximateAgeOfOldestMessage"
       stat        = "Maximum"
-      period      = var.messages_visible_alarm_period
+      period      = var.no_consumers_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
         QueueName = local.sqs_queue.name
@@ -171,7 +171,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
     metric {
       metric_name = "NumberOfMessagesReceived"
       stat        = "Sum"
-      period      = var.messages_visible_alarm_period
+      period      = var.no_consumers_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
         QueueName = local.sqs_queue.name
@@ -184,7 +184,7 @@ resource "aws_cloudwatch_metric_alarm" "unprocessed_messages_alert" {
     metric {
       metric_name = "NumberOfEmptyReceives"
       stat        = "Sum"
-      period      = var.messages_visible_alarm_period
+      period      = var.no_consumers_alarm_period
       namespace   = "AWS/SQS"
       dimensions = {
         QueueName = local.sqs_queue.name

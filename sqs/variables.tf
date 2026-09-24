@@ -90,3 +90,9 @@ variable "messages_visible_alarm_period" {
   description = "The period for the metrics for the alarm visible messages"
   default     = 900
 }
+
+variable "no_consumers_alarm_period" {
+  type        = number
+  description = "The period for the metrics for the no consumers alarm"
+  default     = 900
+}

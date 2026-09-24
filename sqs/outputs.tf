@@ -23,7 +23,7 @@ output "event_alarms" {
 }
 
 output "unprocessed_message_alarm" {
-  value = aws_cloudwatch_metric_alarm.unprocessed_messages_alert.arn
+  value = aws_cloudwatch_metric_alarm.no_consumers_alert.arn
 }
 
 output "sqs_queue" {
