@@ -112,7 +112,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   datapoints_to_alarm = 1
 
   metric_query {
-    id         = "m1"
+    id = "m1"
     metric {
       metric_name = "ApproximateNumberOfMessagesVisible"
       stat        = "Maximum"
@@ -125,7 +125,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   }
 
   metric_query {
-    id         = "m2"
+    id = "m2"
     metric {
       metric_name = "ApproximateAgeOfOldestMessage"
       stat        = "Maximum"
