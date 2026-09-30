@@ -127,7 +127,7 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
   metric_query {
     id = "m2"
     metric {
-      metric_name = "ApproximateNumberOfMessagesNotVisible"
+      metric_name = "ApproximateAgeOfOldestMessage"
       stat        = "Maximum"
       period      = 60
       namespace   = "AWS/SQS"
@@ -139,8 +139,8 @@ resource "aws_cloudwatch_metric_alarm" "new_messages_added_to_dlq_alert" {
 
   metric_query {
     id          = "e1"
-    expression  = "DIFF(m1 + m2)"
-    label       = "NewMessagesInQueue"
+    expression  = "IF(DIFF(m1) > 0 AND m2 > 0, 1, 0)"
+    label       = "NewMessagesInDLQ"
     return_data = true
   }
 }
