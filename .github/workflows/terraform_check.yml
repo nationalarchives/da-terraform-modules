@@ -9,7 +9,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
-      - uses: nationalarchives/tdr-github-actions/.github/actions/run-git-secrets@f4d7086babd2c5156dd483d445e4500a603d8dc4
+      - uses: nationalarchives/tdr-github-actions/.github/actions/run-git-secrets@b469512bc31f0425270a12b87ebe68807c3a1daf
       - uses: nationalarchives/tdr-github-actions/.github/actions/slack-send@b469512bc31f0425270a12b87ebe68807c3a1daf
         if: failure()
         with:
