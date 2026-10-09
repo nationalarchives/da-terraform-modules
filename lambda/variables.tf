@@ -219,3 +219,8 @@ variable "architecture" {
     error_message = "The architecture variable should be one of 'x86_64' or 'arm64'."
   }
 }
+
+variable "code_sha256" {
+  default     = null
+  description = "If you pass in a filename and need terraform to detect when the local file has changed compared to the lambda code, pass in a sha256 checksum"
+}

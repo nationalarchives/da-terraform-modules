@@ -23,6 +23,7 @@ resource "aws_lambda_function" "lambda_function" {
   architectures = [var.architecture]
   layers        = var.layers
   publish       = var.publish_version
+  code_sha256   = var.code_sha256
 
   dynamic "snap_start" {
     for_each = var.snap_start == true ? ["snap_start"] : []
