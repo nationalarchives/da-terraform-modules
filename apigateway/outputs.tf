@@ -5,3 +5,7 @@ output "api_url" {
 output "api_execution_arn" {
   value = aws_api_gateway_rest_api.rest_api.execution_arn
 }
+
+output "rest_api" {
+  value = aws_api_gateway_rest_api.rest_api
+}
