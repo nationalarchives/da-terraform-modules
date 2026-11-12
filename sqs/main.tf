@@ -14,7 +14,6 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
   sqs_managed_sse_enabled   = true
   message_retention_seconds = var.message_retention_seconds
   max_message_size          = var.max_message_size
-  policy                    = var.sqs_policy
   receive_wait_time_seconds = var.receive_wait_time_seconds
   redrive_policy = var.create_dlq ? jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dlq_with_sse[count.index].arn
@@ -27,6 +26,18 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
     )
   )
   visibility_timeout_seconds = var.visibility_timeout
+}
+
+resource "aws_sqs_queue_policy" "sse_queue_policy" {
+  count = var.encryption_type == "sse" && var.sqs_policy != null ? 1 : 0
+  policy    = var.sqs_policy
+  queue_url = local.sqs_queue.url
+}
+
+resource "aws_sqs_queue_policy" "kms_queue_policy" {
+  count = var.encryption_type == "sse" && var.sqs_policy != null ? 0 : 1
+  policy    = var.sqs_policy
+  queue_url = local.sqs_queue.url
 }
 
 resource "aws_sqs_queue" "sqs_queue_with_kms" {
