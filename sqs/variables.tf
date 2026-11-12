@@ -7,6 +7,7 @@ variable "tags" {
 
 variable "sqs_policy" {
   description = "A string containing the SQS policy"
+  default = null
 }
 
 variable "redrive_maximum_receives" {
