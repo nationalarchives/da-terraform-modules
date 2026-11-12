@@ -4,6 +4,7 @@ locals {
   dlq_queue_name    = "${var.queue_name}-dlq${local.queue_name_suffix}"
   sqs_queue         = var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
   sqs_dlq           = var.create_dlq ? var.encryption_type == "sse" ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0] : null
+  queue_policy_not_empty = var.sqs_policy != null && var.sqs_policy != ""
 }
 
 resource "aws_sqs_queue" "sqs_queue_with_sse" {
@@ -29,13 +30,13 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
 }
 
 resource "aws_sqs_queue_policy" "sse_queue_policy" {
-  count = var.encryption_type == "sse" && var.sqs_policy != null ? 1 : 0
+  count = var.encryption_type == "sse" && local.queue_policy_not_empty ? 1 : 0
   policy    = var.sqs_policy
   queue_url = local.sqs_queue.url
 }
 
 resource "aws_sqs_queue_policy" "kms_queue_policy" {
-  count = var.encryption_type == "sse" || var.sqs_policy == null ? 0 : 1
+  count = var.encryption_type == "kms" && local.queue_policy_not_empty ? 1 : 0
   policy    = var.sqs_policy
   queue_url = local.sqs_queue.url
 }
