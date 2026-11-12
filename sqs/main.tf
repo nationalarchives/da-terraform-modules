@@ -35,7 +35,7 @@ resource "aws_sqs_queue_policy" "sse_queue_policy" {
 }
 
 resource "aws_sqs_queue_policy" "kms_queue_policy" {
-  count = var.encryption_type == "sse" && var.sqs_policy != null ? 0 : 1
+  count = var.encryption_type == "sse" || var.sqs_policy == null ? 0 : 1
   policy    = var.sqs_policy
   queue_url = local.sqs_queue.url
 }
