@@ -12,3 +12,8 @@ variable "integration_team_slug" {
 variable "secrets" {
   default = {}
 }
+
+variable "actions_variables" {
+  type    = map(string)
+  default = {}
+}

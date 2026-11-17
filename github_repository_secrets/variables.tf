@@ -14,3 +14,8 @@ variable "collaborators" {
   default     = []
   type        = set(string)
 }
+
+variable "actions_variables" {
+  type    = map(string)
+  default = {}
+}
