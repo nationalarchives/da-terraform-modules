@@ -1,9 +1,10 @@
 locals {
-  queue_name_suffix = var.fifo_queue ? ".fifo" : ""
-  queue_name        = "${var.queue_name}${local.queue_name_suffix}"
-  dlq_queue_name    = "${var.queue_name}-dlq${local.queue_name_suffix}"
-  sqs_queue         = var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
-  sqs_dlq           = var.create_dlq ? var.encryption_type == "sse" ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0] : null
+  queue_name_suffix      = var.fifo_queue ? ".fifo" : ""
+  queue_name             = "${var.queue_name}${local.queue_name_suffix}"
+  dlq_queue_name         = "${var.queue_name}-dlq${local.queue_name_suffix}"
+  sqs_queue              = var.encryption_type == "sse" ? aws_sqs_queue.sqs_queue_with_sse[0] : aws_sqs_queue.sqs_queue_with_kms[0]
+  sqs_dlq                = var.create_dlq ? var.encryption_type == "sse" ? aws_sqs_queue.dlq_with_sse[0] : aws_sqs_queue.dlq_with_kms[0] : null
+  queue_policy_not_empty = var.sqs_policy != null && var.sqs_policy != ""
 }
 
 resource "aws_sqs_queue" "sqs_queue_with_sse" {
@@ -14,7 +15,6 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
   sqs_managed_sse_enabled   = true
   message_retention_seconds = var.message_retention_seconds
   max_message_size          = var.max_message_size
-  policy                    = var.sqs_policy
   receive_wait_time_seconds = var.receive_wait_time_seconds
   redrive_policy = var.create_dlq ? jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dlq_with_sse[count.index].arn
@@ -29,6 +29,18 @@ resource "aws_sqs_queue" "sqs_queue_with_sse" {
   visibility_timeout_seconds = var.visibility_timeout
 }
 
+resource "aws_sqs_queue_policy" "sse_queue_policy" {
+  count     = var.encryption_type == "sse" && local.queue_policy_not_empty ? 1 : 0
+  policy    = var.sqs_policy
+  queue_url = local.sqs_queue.url
+}
+
+resource "aws_sqs_queue_policy" "kms_queue_policy" {
+  count     = var.encryption_type == "kms" && local.queue_policy_not_empty ? 1 : 0
+  policy    = var.sqs_policy
+  queue_url = local.sqs_queue.url
+}
+
 resource "aws_sqs_queue" "sqs_queue_with_kms" {
   count                     = var.encryption_type == "sse" ? 0 : 1
   name                      = local.queue_name
@@ -37,7 +49,6 @@ resource "aws_sqs_queue" "sqs_queue_with_kms" {
   kms_master_key_id         = var.kms_key_id
   message_retention_seconds = var.message_retention_seconds
   max_message_size          = var.max_message_size
-  policy                    = var.sqs_policy
   receive_wait_time_seconds = var.receive_wait_time_seconds
   redrive_policy = var.create_dlq ? jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dlq_with_kms[count.index].arn
